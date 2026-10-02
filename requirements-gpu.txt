@@ -1,0 +1,4 @@
+# Optional: GPU simulator / large sweeps (arbitration/gpu/, scripts/run_*.py).
+# The CPU reference and the tests do not need this file.
+# Install a torch build matching your CUDA version, see https://pytorch.org/get-started/locally/
+torch>=2.1

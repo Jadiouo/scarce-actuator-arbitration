@@ -1,3 +1,15 @@
 __pycache__/
 *.pyc
 .venv/
+.pytest_cache/
+results/results_quick.json
+scarce-actuator-arbitration.tar.gz
+*.aux
+*.log
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.out
+*.toc
+.DS_Store
