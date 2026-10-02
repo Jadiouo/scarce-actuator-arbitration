@@ -1,0 +1,181 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.9in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage[numbers]{natbib}
+\usepackage[colorlinks=true,allcolors=blue!50!black]{hyperref}
+\usepackage{xcolor}
+\usepackage{float}
+\setlength{\parskip}{0.4em}\setlength{\parindent}{0pt}
+
+% include a figure if the file exists, else a visible placeholder
+\newcommand{\safefig}[2]{\IfFileExists{#1}{\includegraphics[width=#2\linewidth]{#1}}{\fbox{\parbox{#2\linewidth}{\centering\small missing: \detokenize{#1}}}}}
+
+\title{When to audit a free claim: dispatching a scarce mobile actuator\\under strategic urgency reports}
+\author{Hao-Ting (Lex) Ho}
+\date{Working draft, not peer reviewed --- October 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+A single mobile actuator must restore the perception health of $N$ explorers on a ring. Explorers' health decays with hidden shocks, they report a noisy urgency for free, and travel and non-interruptible service make every dispatch costly. We use exact per-step dynamic programming ($N\le 4$) and a GPU simulator to ask when reports are worth anything and what happens when they are strategic. In the cell $N{=}3$, shock fraction $0.5$, spread $0.6$, service $5$, the exact value of free perfect state information is $\mathrm{VoI}_{\text{step}}=0.012/0.019/0.023/0.018$ team-health units at load $r=.002/.004/.008/.016$ (K-extrapolated, 32 seeds); it rises monotonically with the shock fraction. We do not claim that this is below the pre-specified (internal protocol) threshold of $0.02$. Naive trust in reports (\texttt{fused\_index}) loses (team-health units, truthful minus approximate best response) $0.247$ [0.223, 0.272] at $N{=}3$, $r{=}.004$, shock fraction $.5$ (57 actions) and $0.40$ [0.36, 0.44] at $N{=}8$, $r{=}.002$, shock fraction $.5$ (24 actions) against an approximate best-response profile; this is a quantitative instance of the cheap-talk collapse, not a new phenomenon. Auditing at arrival is bypassed by distance-dependent inflation (loss $0.024$ [0.010, 0.038] at $N{=}3$; $0.042$ [0.025, 0.059] at $N{=}8$). Auditing at arrival clearly fails: the loss CI excludes $0$ in 9 of the 10 cells run. Auditing at dispatch has a smaller loss within the tested strategy families and a limited best-response search ($0.0027$ [0.0001, 0.0052] and $0.0058$ [0.002, 0.010] in the same two cells, about 1/7--1/9 of the arrival audit), but the evidence is inconsistent: the CI contains $0$ in 5 of the 10 cells (no multiple-comparison correction) and best-response convergence is low ($0.25$ at $N{=}3$, $0.00$ at $N{=}8$). Because a search that has not converged may simply miss profitable deviations, the loss may be underestimated and the ratio should be read as an optimistic estimate for the dispatch audit; our pre-specified claim that the loss vanishes was refuted and is withdrawn. Pricing requests by distance, an exploratory result, mostly acts as a crude distance filter. All numbers refer to a reduced experimental grid (10 of 27 pre-specified cells), disclosed in Section~\ref{sec:prereg}.
+\end{abstract}
+
+\section{Introduction}
+Consider a multi-robot exploration team with one actuator (a ``super-robot'') that can restore a degraded explorer's perception. Explorer $B$ calls for help, the actuator sets off toward $B$, then explorer $A$ calls. Where should the actuator go? The folk answer is \emph{serve the most urgent}. We ask when that is right if urgency is private, noisy and free to claim, and if reaching a robot costs travel time.
+
+This paper is the corrected continuation (analysis plan written before the final confirmatory runs) of an earlier exploratory repository whose headline was that ``information has no value'' and that ``pricing the request'' recovers the loss. Both statements were weakened or reversed by later analysis (Section~\ref{sec:prereg}); we report what survived. Our contributions, in the order of the evidence strength:
+\begin{enumerate}
+\item \textbf{Exact value of information with travel coupling.} Exact per-step dynamic programming (DP) at $N=3$ gives the value of free perfect state information, $\mathrm{VoI}_{\text{step}}$, as a function of load and (at one load) of shock fraction and heterogeneity (Sections~\ref{sec:bench}--\ref{sec:voi}).
+\item \textbf{Audit timing.} In a reporting game, audit at arrival is bypassed by distance-dependent inflation; the arrival audit fails clearly (loss CI excludes $0$ in 9 of 10 cells), whereas the dispatch audit has a smaller loss within the tested strategy families and a limited best-response search (about 1/7--1/9 of the arrival audit in the same cell), but with inconsistent evidence (CI contains $0$ in 5 of 10 cells, uncorrected for multiple comparisons; convergence $0.25$ at $N{=}3$, $0.00$ at $N{=}8$). Since non-converged search may miss profitable deviations, the ratio is an optimistic estimate for the dispatch audit (Section~\ref{sec:game}).
+\item \textbf{Quantitative checks of known theory (not new phenomena).} Naive trust collapses as cheap-talk theory predicts (C4); a request price $\lambda d$ behaves like a Naor-type toll but is only a coarse distance filter (C7); myopic urgency-first dispatch is dominated by touring and distance-aware rules as in the dynamic traveling repairman problem (C1).
+\end{enumerate}
+Everything here rests on a stylised ring model, finite strategy families, and a reduced grid; Section~\ref{sec:limits} lists what we cannot claim.
+
+\section{Related work}
+\textbf{Dynamic traveling repairman and polling.} Serve-nearest and partition-plus-tour policies beat FCFS-type disciplines under load \citep{bertsimas1991,bertsimas1993}; see \citet{bullo2011} for robotics. In polling systems with switchover times the server is not work-conserving and only pseudo-conservation laws hold \citep{boxma1987,takagi1988}. Our round-robin baseline is a polling system with switchover equal to travel; our finding that urgency-first dispatch loses to touring reproduces this literature qualitatively and we treat it as a simulator sanity check.
+
+\textbf{Restless bandits and switching cost.} The problem is a restless-bandit-like allocation \citep{whittle1988,weber1990}; closed-form indices exist for reset-on-service maintenance and surveillance arms without travel \citep{glazebrook2006,villar2016}, and switching-cost index results cover non-restless arms \citep{asawa1996}, and for restless arms with general switching costs only heuristics are known \citep{leny2008}. A mobile repairman on a network is treated with index heuristics and rollout by \citet{tian2026}. We did not find a published index for decaying arms with position-dependent travel (a negative search, not proof of absence); we do not attempt a Whittle index, because the travel coupling breaks per-arm decomposition, and benchmark instead by exact DP at $N\le4$.
+
+\textbf{Cheap talk and artificial currencies.} In cheap-talk models free, unverifiable messages convey only coarse information when interests diverge, and a babbling outcome always exists \citep{crawford1982}; repeated allocation without money can be disciplined by artificial currencies \citep{gorokh2021,guo2009,elokda2024}, with field evidence from food banks \citep{prendergast2022}. Our ``always claim the ceiling'' outcome is the babbling case those mechanisms are designed to avoid.
+
+\textbf{Costly and ex post verification.} Verification is the classical remedy \citep{townsend1979,benporath2014,mylovanov2017}, with repeated-audit learning variants \citep{dai2025}. Those models are static or lack state dynamics and travel. Our audit mechanisms are simple heuristics in this spirit, not implementations of those optimal mechanisms.
+
+\textbf{Tolls.} \citet{naor1969} shows that individually optimal joining exceeds the social optimum and that a toll equal to the externality restores it \citep[see also][]{hassin2003}. A request price increasing in distance, $\theta+\lambda d$, is the analogous device here; we treat it as a numerical test, not a derivation.
+
+\section{Model}
+\textbf{Geometry and dynamics.} $N$ explorers sit at fixed posts on a ring of circumference $100$; one actuator moves at speed $1$. Explorer $i$ has health $h_i\in[0,1]$ and urgency $\tau_i=1-h_i$. Its base decay rate is $r_i=r\,e^{\varepsilon_i}$, $\varepsilon_i\sim\mathcal N(0,\text{spread}^2)$, where $r$ is the \emph{load} parameter. Under the \emph{legacy} model the decay is deterministic and linear, so $h_i$ is a function of the time since last service and private information is empty. Under the \emph{v2} (``shock'') model a fraction $(1-f)$ of the mean decay is deterministic and the rest arrives as hidden Poisson shocks (rate $0.01$ per step, exponential size; $f$ is the shock fraction). Health is clipped at $0$. Service takes $5$ steps (except where noted), is not interruptible, and restores $h_i=1$. The \emph{v2} configuration in the code additionally uses persistent report noise (below), keeps a commitment when the caller set empties, and records precision at dispatch.
+
+\textbf{Reports.} Explorer $i$ claims $\tau_i+\text{noise}+b_i$ with noise standard deviation $\sigma=0.15$ (i.i.d. under the legacy model; stationary AR(1) with $\varphi=0.9$ and marginal sd $0.15$ under v2, which is what every v2 result here uses), and $b_i\ge0$ is its strategic inflation. Requesting is free. The dispatcher observes true $h_i$ only on arrival, and learns each $r_i$ from such observations.
+
+\textbf{Dispatch rules.} \texttt{none}: blind spatial round-robin (ignores reports; the polling-style baseline). \texttt{greedy\_true}: argmax of true urgency, a myopic rule that ignores travel (not an optimal oracle). \texttt{learned\_index}: ignores claims, estimates urgency from age and learned rates and serves $\arg\max\, \min(1,\hat\tau_i+\hat r_i d_i)/(d_i+\text{service})$. \texttt{honest\_index}: the same index applied to claims. \texttt{fused\_index}: Bayesian fusion of the age prior with the claim, then the same index. \texttt{audit\_index}: \texttt{fused\_index} plus an ex post audit on arrival that estimates and removes each robot's claim bias and widens its measurement variance. \texttt{audit\_disp}: audit applied to the claim at the moment of dispatch (the claim of the robot just chosen is compared with what is later seen). \texttt{priced}: honest reporting, but a request is admitted only if $\tau_i>\theta+\lambda\,d_i$. \texttt{dp\_step\_full}, \texttt{dp\_age}: the exact benchmarks of Section~\ref{sec:bench}. Unless stated (the \texttt{pre} arms of C1 and C7) the simulated policies commit to a target until arrival; only \texttt{dp\_step\_full} re-plans every step. Service is not interruptible.
+
+\textbf{Metric.} Long-run mean team health after a 500-step burn-in (all experiments except C1, which uses 1500 steps without burn-in); secondary metrics are the fraction of robot-steps spent dead ($h=0$) and the 5th percentile of per-step minimum health. All comparisons are paired on identical seeds (posts, rates, shocks, noise); intervals are 95\% $t$ intervals over seeds unless said otherwise. The reference implementation is in numpy; a float64 GPU re-implementation reproduces the simulator seed by seed (maximum absolute difference $\le1.2\times10^{-15}$ in the stored checks; step DP versus semi-MDP on integer grids $\le4\times10^{-10}$; GPU versus CPU age-only DP up to $2.7\times10^{-5}$).
+
+\section{Exact benchmarks}\label{sec:bench}
+\textbf{Per-step MDP.} The state is (actuator position, health grid for each robot); the decision is taken \emph{every step} (including mid-route re-targeting), solved by relative value iteration on a $K{+}1$ health grid with mean-preserving interpolation and closed-form shock transitions. $J^*_{\text{step}}(\text{full})$ is the optimum with free perfect state observation. An earlier semi-MDP that decides only when a service completes yields only the best ``commit until arrival'' policy; re-planning each step is worth $0.006$--$0.011$ team-health units under shocks (32 seeds, $N{=}3$, $r{=}.002$--$.016$), so the per-step solution is the reference throughout.
+
+\textbf{Age-only information.} $J^*(\text{age})$ is the optimum for a dispatcher that knows rates and the age of each robot but not $h$; the belief is a function of ages so this is an ordinary MDP, exact up to an age cap. Under linear damage age determines $h$, hence $\mathrm{VoI}=0$ in the legacy model by construction; we do \emph{not} count this as a finding.
+
+\textbf{Definition.} $\mathrm{VoI}_{\text{step}}=J^*_{\text{step}}(\text{full})-J^*(\text{age})$.
+
+\textbf{K-extrapolation and estimator bias.} Grid error is one-sided and roughly $1/K$, so values at $K\in\{30,60\}$ are extrapolated linearly in $1/K$. The estimator is nevertheless biased: in the legacy model, where the theoretical VoI is $0$, it returns $-0.0014$ to $-0.0025$. This is comparable to the margins we discuss and is the main reason we do not claim H1 (Section~\ref{sec:prereg}).
+
+\section{Results: the value of information}\label{sec:voi}
+\textbf{C1: correcting the first version.} Cell: $N{=}8$, v2, shock fraction $0.5$, spread $0.6$, service $5$, $1500$ steps, 32 seeds (CPU reference), loads $r\in\{.0005,.001,.002,.004,.007,.012,.02,.04\}$; paired differences against round-robin (\texttt{none}) in team health, whose own mean falls from $0.956$ to $0.173$ over this range. \texttt{greedy\_true} is worse than round-robin at every load, with and without preemption (e.g.\ $-0.078$ [$-0.092$, $-0.063$] at $r{=}.002$ and $-0.140$ [$-0.159$, $-0.120$] at $r{=}.004$ without preemption). The distance-aware \texttt{index\_true} without preemption loses significantly at $r\in\{.0005,.004,.007\}$ ($-0.004$, $-0.015$, $-0.016$), is indistinguishable from round-robin at $.001,.002,.012$, and wins only at $r\ge0.02$ ($+0.015$ [0.003, 0.028] at $.02$; $+0.027$ [0.016, 0.038] at $.04$); \texttt{learned\_index} and \texttt{honest\_index} without preemption win significantly only at $r{=}.04$ ($+0.014$, $+0.027$). Exception: with preemption \texttt{index\_true} also beats round-robin at $r{=}.001,.002,.012$ ($+0.005$, $+0.010$, $+0.014$). The earlier statement that information is valueless was therefore mostly an artifact of ignoring distance. This matches the DTRP lesson above and is a check, not a discovery.
+
+\textbf{C2: exact $\mathrm{VoI}_{\text{step}}$.} In the cell $N{=}3$, $f{=}0.5$, spread $0.6$, service $5$, $K$-extrapolated from $(30,60)$, 32 seeds:
+\begin{center}\small
+\begin{tabular}{lcccc}\toprule
+load $r$ & .002 & .004 & .008 & .016\\\midrule
+$\mathrm{VoI}_{\text{step}}$ & 0.0120 [0.0104, 0.0135] & 0.0188 [0.0170, 0.0206] & 0.0232 [0.0213, 0.0251] & 0.0181 [0.0154, 0.0207]\\\bottomrule
+\end{tabular}
+\end{center}
+This is about twice the value for the non-re-targetable DP ($0.0059/0.0096/0.0120/0.0100$). The region map (Figure~\ref{fig:regions}; $N{=}3$, $r{=}.004$, $K{=}(20,30)$, 16 seeds) shows $\mathrm{VoI}_{\text{step}}$ increasing monotonically in the shock fraction (spread $0.6$, service 5: $-0.003$ at $f{=}0$ (estimator bias), 0.006 at $f{=}0.25$, 0.020 at $0.5$, 0.035 at $0.75$, 0.045 at $f{=}0.9$) and, for $f\ge0.25$, decreasing in spread (at $f{=}0.5$: $0.021$ at spread $0$ to $0.014$ at $1.5$).
+
+\begin{figure}[t]\centering
+\safefig{../../figures/fig10b_voi_step_regions.png}{0.7}
+\caption{$\mathrm{VoI}_{\text{step}}$ regions, $N{=}3$, $r{=}.004$, $K{=}(20,30)$, 16 seeds.}\label{fig:regions}
+\end{figure}
+
+\textbf{H1 is not claimed.} The pre-specified claim (VoI $<0.02$ at $r{=}.004$, $f{=}0.5$) is not supported: at the pre-specified cell the point estimate $0.019$ [0.017, 0.021] is indistinguishable from the threshold; at service $=1$ the region-map estimate ($0.024$ [0.020, 0.028], $K{=}(20,30)$, 16 seeds) is indistinguishable from the threshold, not a refutation: the same setting at shock fraction $0$, where the theoretical VoI is $0$, yields $+0.0021$ [0.001, 0.003] (\texttt{dp\_step.json}, region block), and after subtracting this bias the CI lower bound falls below $0.02$; and the estimator bias ($\approx0.002$) exceeds the margin. Nor can we claim the opposite.
+
+{\sloppy \textbf{C3: gap of round-robin.} The reference is the per-step optimum with free perfect information, so the gap includes VoI. The median gap of \texttt{none} is $0.021/0.038/0.057/0.082$ ($r{=}.002/.004/.008/.016$; means $0.024/0.042/0.058/0.088$; v2, $f{=}0.5$, spread $0.6$, $K{=}(30,60)$, 32 seeds, 20{,}000 evaluated steps) at $N{=}3$, and $0.039/0.058$ ($r{=}.004/.008$; means $0.044/0.068$; $K{=}(15,20,30)$, 16 seeds) at $N{=}4$ (Figure~\ref{fig:gap}; details in \texttt{results/dp\_step.json}, keys \texttt{gap\_table.v2} and \texttt{n4}). At $N{=}4$ the exact $\mathrm{VoI}_{\text{step}}$ is $0.0205$ [0.0181, 0.0229] and $0.0197$ [0.0168, 0.0225].\par}
+
+\begin{figure}[t]\centering
+\safefig{../../figures/fig9b_gap_distribution.png}{0.7}
+\caption{Per-seed distribution of each policy's gap to the per-step DP (distributions, not only means, are shown because gaps are skewed).}\label{fig:gap}
+\end{figure}
+
+\begin{figure}[t]\centering
+\safefig{../../figures/fig7_v2_load_sweep.png}{0.55}
+\caption{Policies versus load under v2 ($N{=}8$), supporting C1.}\label{fig:v2}
+\end{figure}
+
+\section{Strategic reporting and audits}\label{sec:game}
+\textbf{Game.} Explorer $i$'s utility is its own mean health; its action is a policy for $b_i$ drawn from a finite family, capped at $b\le0.8$: \emph{const} (constant $b$), \emph{timing} (inflate only while the actuator is undecided), \emph{dist10} and \emph{dist30} (inflate only while the actuator is farther than 10, respectively 30), \emph{taulow} (inflate only while own true urgency is below $0.3$), \emph{habit} (inflate only while the actuator is committed), and, for penalty variants only, \emph{adapt} (largest constant inflation that stays under the audit flag threshold), plus truthful reporting. The full design (57 actions, $N{=}3$, $r{=}.004$, $f{=}.5$) has truthful, 16 constants ($0.05$--$0.8$) and the five non-adaptive families at eight sizes ($0.1$--$0.8$); the reduced design (24 actions) has truthful, 8 constants and the five families at sizes $0.2,0.4,0.8$. We search for pure-strategy equilibria by best-response iteration with common random numbers, per instance, using a move threshold $\epsilon=0.002$ (sensitivity at $0.001,0.005$ was pre-specified and run only in the $N{=}3$ $r{=}.004$ $f{=}.5$ and $N{=}8$ cells). A profile is called an \emph{equilibrium} only when iteration converged; otherwise we say \emph{approximate} (Table~\ref{tab:loss} gives convergence rates). Final profiles are re-evaluated on fresh shock and noise streams. All game cells use holdout seeds 1000--1031 (32 seeds), 4000 steps at $N{=}3$ and 2000 at $N{=}8$, 500 burn-in; penalty parameters were tuned on seeds 0--15 in the first cell only.
+
+\textbf{Loss.} $\text{loss}=\text{health}(\text{truthful})-\text{health}(\text{approximate best-response profile})$ for the same mechanism, in team-health units, paired over seeds. (Exception: H2 compares the fused equilibrium to \texttt{learned\_index}; this inconsistency of baselines is disclosed in Section~\ref{sec:limits}.)
+
+\begin{table}[t]\centering\small
+\caption{Strategic loss (truthful minus approximate best response), 95\% CI over seeds. Convergence rate is the fraction of instances in which best response converged. ``Actions'' is the size of the strategy set in that cell (the nine $N{=}3$ cells: 57 at $r{=}.004,f{=}.5$; 24 at the other $f{=}.5$ cells; at $f{=}.25/.75$ the top three families per mechanism with 24-action sizes). All rows are the same cell and the same game (\texttt{full|truth|eps=0.002}, 32 seeds) for the three mechanisms, so the audit rows are directly comparable; every entry is read from \texttt{results/game.json}, key \texttt{game\_v2}. The $N{=}3$ nine-cell row has no ``not run'' entries; $N{=}4$ was not run.}\label{tab:loss}
+\begin{tabular}{llllll}\toprule
+mechanism & cell & loss [95\% CI] & conv. & actions\\\midrule
+\texttt{fused\_index} & $N{=}3$, $r{=}.004$, $f{=}.5$ & 0.247 [0.223, 0.272] & 0.875 & 57\\
+\texttt{fused\_index} & $N{=}3$, nine cells & 0.112--0.270 & 0.875--1.00 & 57 / 24\\
+\texttt{fused\_index} & $N{=}8$, $r{=}.002$, $f{=}.5$ & 0.40 [0.36, 0.44] & 0.875 & 24\\
+\texttt{audit\_index} & $N{=}3$, $r{=}.004$, $f{=}.5$ & 0.024 [0.010, 0.038] & 0.625 & 57\\
+\texttt{audit\_index} & $N{=}8$, $r{=}.002$, $f{=}.5$ & 0.042 [0.025, 0.059] & 0.312 & 24\\
+\texttt{audit\_disp} & $N{=}3$, $r{=}.004$, $f{=}.5$ & 0.0027 [0.0001, 0.0052] & 0.250 & 57\\
+\texttt{audit\_disp} & $N{=}8$, $r{=}.002$, $f{=}.5$ & 0.0058 [0.002, 0.010] & 0.000 & 24\\\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{C4: naive trust (H2 holds).} The loss of \texttt{fused\_index} is in Table~\ref{tab:loss}. Its equilibrium health is below that of \texttt{learned\_index}, which ignores claims, in every cell run, with CIs excluding $0$. The absolute losses ($0.19$--$0.25$ at $N{=}3$, $f{=}.5$, against exact $\mathrm{VoI}_{\text{step}}$ of $0.012$--$0.023$) are the primary evidence; as a side remark the ratio is $17$, $13$, $8$ at $r{=}.002,.004,.008$ ($f{=}.5$), and $34$ and $8$ at $f{=}.25$ and $.75$ ($r{=}.004$, using the region-map VoI), so it depends strongly on the cell. The loss is bounded by the inflation cap $b\le0.8$. In the exploratory scaling study (Section~\ref{sec:expl}; load calibrated per $N$: $r=.0098/.0032/.0022$, 25 actions, 4000 steps, 32 seeds) the loss is $0.165/0.405/0.413$ at $N=3/8/16$ (convergence $1.00/0.88/0.56$): it rises from 3 to 8 and then saturates. This is the cheap-talk collapse: free claims carry no credible information and informed rules should ignore them; the contribution is the size of the loss relative to the information being protected.
+
+\textbf{C5: audit at arrival fails (H3 holds).} Inflation that depends on distance (inflating when the distance exceeds $10$) bypasses the audit at arrival. Table~\ref{tab:loss} gives the loss; the dead-robot fraction rises from $0.029$ to $0.067$ at $N{=}3$. Convergence rates are $0.62$ ($N{=}3$) and $0.31$ ($N{=}8$), so the profiles are ``approximate''. The CI includes zero in one of the ten cells, $N{=}3$, $r{=}.008$, $f{=}.25$ ($0.011$ [$-0.003$, $0.025$]).
+
+\textbf{C6: audit at dispatch (H4 refuted and withdrawn).} The pre-specified claim was that \texttt{audit\_disp} is robust within the tested family (loss CI contains $0$ and $\max$ gain $\le2\epsilon$). Both criteria fail: the CI lower bound is $>0$ at both $N$ (Table~\ref{tab:loss}) and the maximum one-robot deviation gain exceeds $2\epsilon$. \textbf{We withdraw H4.} What we can claim is descriptive. \texttt{audit\_index} and \texttt{audit\_disp} are evaluated in the same cells and the same game (\texttt{full|truth|eps=0.002}), where the dispatch-time loss is $1/8.9$ ($N{=}3$) and $1/7.2$ ($N{=}8$) of the arrival-time loss; across all ten cells this ratio ranges from $4.6$ to $48$, because the denominators are near zero, so we do not state it as a general factor. This ratio should also be read as optimistic for the dispatch audit: convergence is low, and a search that has not converged may fail to find profitable deviations, so the dispatch-audit loss may be underestimated. By contrast, the arrival audit clearly fails (CI excludes $0$ in 9 of 10 cells). The evidence on the dispatch audit is inconsistent. In 5 of the 10 cells the loss CI contains zero (these CIs are not corrected for multiple comparisons); in the two cells of Table~\ref{tab:loss} the CI lower bound is $>0$. At $N{=}3$, $r{=}.004$, $f{=}.5$ it contains zero at $\epsilon=0.005$ ($0.0018$ [$-0.0010$, $0.0045$]); the calibrated variant has $0.0041$ [0.0016, 0.0065] there. Disclosures: (i) $\max$ gain is an in-sample quantity. Stored out-of-sample checks exist only for the $N{=}8$ cell (calibrated mechanisms): the naive in-sample gain is $0.075$ for \texttt{audit\_disp|cal} and $0.100$ for \texttt{audit\_index}, the out-of-sample maximum player gain only $0.0072$ and $0.0038$ (penalty variants up to $0.0178$), consistent with a winner's curse; (ii) the convergence rate is $0.25$ at $N{=}3$ and $0.00$ at $N{=}8$, so these profiles are loose approximations; (iii) the penalty variants flag truthful robots: the fraction of robots ever flagged under truthful play is $0.61$--$0.64$ at $N{=}3$ and $0.30$--$0.34$ at $N{=}8$ before calibration ($0.35$--$0.40$ and $0.07$--$0.11$ after).
+
+\begin{figure}[t]\centering
+\safefig{../../figures/fig11_strategic_loss_v2.png}{0.7}
+\caption{Truthful versus approximate best-response profile for each mechanism (v2 game cells).}\label{fig:strat}
+\end{figure}
+\begin{figure}[t]\centering
+\safefig{../../figures/fig13_strategy_families.png}{0.55}
+\caption{Loss from each strategy family; distance-dependent inflation is what defeats the arrival audit.}\label{fig:fam}
+\end{figure}
+
+\section{Exploratory: pricing and scale}\label{sec:expl}
+Everything in this section was run after the pre-specified protocol and is \emph{exploratory}.
+
+\textbf{C7: pricing.} At $N{=}8$ under v2, $\lambda^*$ was chosen separately for each load on seeds $0$--$15$ and evaluated on holdout seeds $1000$--$1031$ (6500 steps, spread $0.6$). \texttt{priced} (no preemption) improves on the no-thrash baseline (honest reporting, no preemption, commitment kept) by $+0.015/+0.045/+0.082/+0.092$ at $r=.002/.004/.008/.016$, but it remains $0.03$--$0.08$ below \texttt{honest\_index} ($0.029/0.068/0.077/0.052$) and $0.06$--$0.09$ below \texttt{learned\_index} (differences of means). Hence $\lambda d$ is a coarse distance filter. At $N{=}3$, $r{=}.004$, $\lambda^*=0$ without preemption (so \texttt{priced} is identical to \texttt{honest}) and $0.0022$ with preemption (priced minus honest $-0.002$ [$-0.007$, $0.003$]). A fitted conditional-logit index $\tau/(d+5)^{1.14}$ (exponent CI [1.07, 1.21]) predicts the exact per-step policy's choice with top-1 accuracy $0.77$ over 16{,}552 decisions ($N{=}3$, $r{=}.004$, $K{=}30$, 32 seeds; the argmax-urgency rule predicts $0.51$) (Figure~\ref{fig:price}, right). The hypothesis that $\lambda d$ is a decentralised implementation of the optimal policy is not supported. This is consistent with the Naor picture only qualitatively; we derive no closed form for $\lambda^*$. The earlier claim that most of the pricing gain was thrash suppression is supported: at $r{=}.004$ the no-thrash baseline alone explains $126\%$ (legacy) and $135\%$ (v2) of the gain of preemptive \texttt{priced} over preemptive \texttt{honest}; with tuned $\lambda^*$ the net gain over the no-thrash baseline is as above.
+
+\begin{figure}[t]\centering
+\safefig{../../figures/fig14a_priced_vs_nothrash.png}{0.46}\hfill
+\safefig{../../figures/fig14b_implied_exchange_rate.png}{0.46}
+\caption{Exploratory (C). Left: \texttt{priced} versus the no-thrash baseline ($N{=}8$, v2, holdout). Right: implied distance exchange rate of the exact per-step policy.}\label{fig:price}
+\end{figure}
+
+\textbf{C8: scale.} With the load calibrated separately per $N$, round-robin beats every tested information-based heuristic for $N\ge8$. A cheap value-of-information proxy (a heuristic's gain over \texttt{learned\_index}) recovers only $-5\%$ to $+41\%$ of the exact DP value at the six exact cells (it is a severe underestimate and per-seed correlations are $-0.08$ to $0.59$), so true VoI for $N>4$ is unknown. Round-robin beats all tested heuristics at $N=8$ and $16$ under both load calibrations (e.g.\ $0.763$ against $0.746$ for the best heuristic at $N{=}8$; $0.768$ against $0.722$ at $N{=}16$). A two-actuator variant is uninformative: with $A{=}1$ the fused minus learned difference is itself not significant (Figure~\ref{fig:scale}).
+
+\begin{figure}[t]\centering
+\safefig{../../figures/fig15a_scaling_with_N.png}{0.46}\hfill
+\safefig{../../figures/fig15b_voi_proxy_load_schemes.png}{0.46}
+\caption{Exploratory (D). Left: policies versus $N$. Right: VoI proxy under two load calibration schemes.}\label{fig:scale}
+\end{figure}
+
+\section{Pre-specified protocol and deviations}\label{sec:prereg}
+\textbf{Nature of the pre-specification.} The protocol was written in the middle of the project, after the stage-A and the first stage-B exploratory results. The choice of cells for H3 and H4 was influenced by those results. The document has no external timestamp; it is an internal protocol only. Readers should therefore treat it as an \emph{analysis plan written before the final confirmatory runs}, not as a pre-registration in the strict sense. It was written on 2026-10-02 before the final runs; earlier experiments and everything after are exploratory. Verdicts:
+\begin{itemize}
+\item \textbf{H1} (VoI $<0.02$ at $N{=}3$, $r{=}.004$, $f{=}0.5$; falsified if CI lower bound $\ge0.02$): \emph{not claimed}. The estimate $0.019$ [0.017, 0.021] cannot be separated from the threshold; indistinguishable from the threshold at service $=1$ ($0.024$ [0.020, 0.028]; the same setting at shock fraction $0$ gives $+0.0021$ [0.001, 0.003] where the theory says $0$, and after subtracting this bias the lower bound is below $0.02$); estimator bias $\approx0.002$.
+\item \textbf{H2} (fused equilibrium health below \texttt{learned\_index}; falsified if CI contains $0$): \emph{holds} in all cells run (CI excludes $0$).
+\item \textbf{H3} (arrival audit has positive equilibrium loss; falsified if both $N$ have CI containing $0$): \emph{holds} ($0.024$ at $N{=}3$, $0.042$ at $N{=}8$).
+\item \textbf{H4} (dispatch audit loss CI contains $0$ and $\max$ gain $\le2\epsilon$): \emph{refuted per the pre-specified criterion and withdrawn}.
+\end{itemize}
+Deviations, all listed here: (1) Of 27 pre-specified cells ($f\in\{.25,.5,.75\}$, $N\in\{3,4,8\}$, $r\in\{.002,.004,.008\}$) only 10 were run: nine at $N{=}3$ and one at $N{=}8$ ($r{=}.002$, $f{=}.5$); $N{=}4$ is entirely missing. (2) Reduced strategy sets and $\epsilon$ sets: the full design (57 actions, three $\epsilon$, coalitions) ran only at $N{=}3$, $r{=}.004$, $f{=}.5$; $N{=}8$ used 24 actions with three $\epsilon$ and coalitions; the other $f{=}.5$ cells used 24 actions and $\epsilon=0.002$ only; the $f{=}.25/.75$ cells ($N{=}3$ only) used the top three families per mechanism chosen from the $f{=}.5$ cells and $\epsilon=0.002$ only (source: \texttt{game\_v2.notes}). (3) Penalty tuning was done in a single cell. (4) The two DP-region maps use fewer seeds and coarser $K$ than the headline VoI cell. (5) The $\max$-gain criterion is in-sample (Section~\ref{sec:game}). (6) The loss baseline differs between hypotheses: H2 against \texttt{learned\_index}; H3, H4 against each mechanism's own truthful profile. (7) An earlier figure of the strategic results used superseded numbers and was redrawn. Language rules were followed: ``equilibrium'' only where converged, and ``robust'' only as ``within the tested family''.
+
+\section{Limitations}\label{sec:limits}
+\begin{itemize}
+\item DP is limited to $N\le4$; any statement about $N{=}8$ or $16$ rests on heuristics and a VoI proxy that tracks the DP only loosely.
+\item Strategy families are finite and inflation is capped at $0.8$; a larger family could raise any reported loss, including that of dispatch audits.
+\item 10 of 27 grid cells were run, $N{=}4$ none, $N{=}8$ one cell. Tuning was done in one cell. $\sigma{=}0.15$, shock rate, and $\varphi{=}0.9$ each take a single value.
+\item Health is clipped at $0$ and approximate equilibria show a high dead fraction, so losses may largely reflect robots dying.
+\item Service cannot be interrupted; the model is a ring with fixed posts, not a real robot system.
+\item Loss baselines are not uniform across hypotheses, and several equilibrium profiles are only approximate (convergence as low as $0.31$ for the arrival audit and $0.00$ for the $N{=}8$ dispatch audit).
+\item Exploratory results (C7, C8) must not be read as confirmatory.
+\end{itemize}
+
+\section{Conclusion}
+In a stylised ring with hidden shocks, the exact value of perfect state information for a travel-coupled dispatcher is of the order of $0.01$--$0.02$ team-health units at $N{=}3$ and rises with the shock fraction. It is dwarfed by the loss from trusting free claims, which a distance-dependent inflation strategy also exploits against audits at arrival. Auditing at dispatch has a smaller loss in the tested families (about 1/7--1/9 of the arrival audit in the same cell), but the evidence is inconsistent (CI contains $0$ in 5 of 10 cells, uncorrected; convergence $0.25$ and $0.00$), and the ratio is an optimistic estimate because a non-converged search may miss deviations. Two earlier claims were revised: ``information is worthless'' mostly reflected ignoring distance, and request pricing is mostly a coarse distance filter. The honest scope is $N\le4$ exact, a reduced grid, and finite strategy families.
+
+\textbf{Reproduction.} Code and results are in the repository root. The CPU reference (\texttt{arbitration/model.py}, \texttt{dp.py}, \texttt{game.py}) is verified seed by seed against the GPU code (\texttt{arbitration/gpu/}); all headline experiments were run on one GPU (float64 torch). Scripts: \texttt{scripts/run\_dp\_step.py} $\to$ \texttt{results/dp\_step.json} (C2, C3), \texttt{scripts/run\_game\_gpu.py} $\to$ \texttt{results/game.json}, key \texttt{game\_v2} (C4--C6; the older \texttt{game\_sweep} is exploratory), \texttt{scripts/run\_c\_pricing.py} $\to$ \texttt{results/c\_pricing.json}, \texttt{scripts/run\_d\_scaling.py} $\to$ \texttt{results/d\_scaling.json}; C1 comes from \texttt{results/results.json}. Figures are regenerated by the scripts' \texttt{figs} stages and \texttt{python -m arbitration.figures}. Interactive demo: \texttt{docs/demo/index.html}.
+
+\bibliographystyle{plainnat}
+\bibliography{refs}
+\end{document}

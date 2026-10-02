@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scarce Actuator Arbitration Demo</title>
+<meta name="description" content="Interactive demo: one actuator serves degrading explorers on a ring while some explorers inflate their urgency reports.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="hero">
+  <h1>One actuator, many callers</h1>
+  <p class="lead">Eight explorers sit on a ring and their perception health decays, partly through hidden shocks. A single actuator drives around the ring and restores one explorer at a time, so every dispatch costs travel time. Each explorer reports a noisy urgency and reporting is free, which lets a self-interested explorer inflate its claim. The dispatcher can ignore reports, trust them, or audit them against the truth it sees on arrival or at dispatch, and this demo lets you watch how those choices play out.</p>
+  <div class="presets" role="group" aria-label="Scenarios">
+    <button data-preset="distance" aria-pressed="false">1. Is information worth anything?</button>
+    <button data-preset="naive" aria-pressed="false">2. The cost of believing</button>
+    <button data-preset="audit" aria-pressed="false">3. When you audit</button>
+  </div>
+  <p id="presetText" class="presettext"></p>
+</header>
+
+<main>
+  <section class="card controls" aria-label="Controls">
+    <div class="grp">
+      <div class="row">
+        <label for="polA">Policy</label>
+        <select id="polA"></select>
+      </div>
+      <div class="row" id="polBwrap">
+        <label for="polB">Policy B</label>
+        <select id="polB"></select>
+      </div>
+      <button id="cmp" class="wide" aria-pressed="false">Side-by-side: off</button>
+      <p class="help" id="helpA"></p><p class="help" id="helpB"></p>
+    </div>
+    <div class="grp">
+      <div class="row"><label for="ninfl">Inflaters <output id="nV"></output></label>
+        <input id="ninfl" type="range" min="0" max="6" step="1" value="3"></div>
+      <div class="row"><label for="mode">Inflation mode</label><select id="mode"></select></div>
+      <div class="row"><label for="dthr">Distance threshold (distance mode)</label>
+        <select id="dthr"><option value="10">actuator farther than 10</option><option value="30">actuator farther than 30</option></select></div>
+      <div class="row"><label for="bsz">Inflation size b <output id="bV"></output></label>
+        <input id="bsz" type="range" min="0" max="1" step="0.05" value="0.5"></div>
+    </div>
+    <div class="grp">
+      <div class="row"><label for="rate">Load (decay rate) <output id="rateV"></output></label>
+        <input id="rate" type="range" min="0.002" max="0.02" step="0.001" value="0.006"></div>
+      <div class="row"><label for="shock">Shock share <output id="shockV"></output></label>
+        <input id="shock" type="range" min="0" max="1" step="0.05" value="0.5"></div>
+      <div class="row"><label for="seed">Seed</label>
+        <span class="seedrow"><input id="seed" type="number" value="7" min="0" step="1" inputmode="numeric"><button id="newseed" title="Random seed">Random</button></span></div>
+      <p class="help" id="seedLbl"></p>
+    </div>
+    <div class="grp run">
+      <div class="seg" role="group" aria-label="Speed">
+        <button data-speed="1" aria-pressed="true">1&times;</button>
+        <button data-speed="10" aria-pressed="false">10&times;</button>
+        <button data-speed="100" aria-pressed="false">100&times;</button>
+      </div>
+      <div class="btns">
+        <button id="pause" aria-pressed="false">Pause</button>
+        <button id="ff" title="Run 2000 steps instantly">+2000 steps</button>
+        <button id="reset">Reset</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="arenas" class="arenas"></div>
+
+  <section class="card chartcard">
+    <div class="charthead">
+      <h3>Cumulative team health over time</h3>
+      <div id="delta" class="delta" hidden>A &minus; B: <span id="deltaV"></span><br><small>Inflaters&rsquo; gain (inflater &minus; honest health): <b id="gainV"></b></small></div>
+    </div>
+    <canvas id="chart" aria-label="Team health over time"></canvas>
+    <p class="help" id="legendAB">Bold line: cumulative mean. Faint line: recent mean. Solid = A, dashed = B.</p>
+  </section>
+
+  <section class="card legend">
+    <h3>How to read the ring</h3>
+    <ul>
+      <li><span class="sw node"></span> Explorer: colour and size show its true health (small and red is low, large and blue is high); a dark outline means health is zero.</li>
+      <li><span class="sw bar grey"></span> Left bar: true urgency. <span class="sw bar claim"></span> Right bar: the claim the dispatcher receives.</li>
+      <li><span class="sw bar liar"></span> <span class="sw badge">!</span> Inflater: adds b to its claim, always, only while the actuator is choosing a target, or only while the actuator is far away.</li>
+      <li><span class="sw diamond"></span> Actuator, with a dashed line to its target and an arc showing service progress.</li>
+    </ul>
+    <p class="help">The simulation is a simplified JavaScript port of the repository&rsquo;s v2 model (ring of 100, speed 1, service of 5 steps, linear decay plus hidden Poisson shocks, autocorrelated report noise, no preemption). It illustrates the mechanisms; the quantitative results are in the paper and README.</p>
+  </section>
+</main>
+<script src="demo.js"></script>
+</body>
+</html>
