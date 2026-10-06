@@ -1,0 +1,6 @@
+{
+ "naive":  {"A":"NAIVE","B":"M3C","cfg":{"strat":"const","b":0.3,"rho":0.9,"tau":1,"T":800}},
+ "arrival":{"metric":"gA","A":"M2","B":"NAIVE","cfg":{"strat":"timing","b":0.3,"rho":0.9,"tau":1,"T":800}},
+ "dispatch":{"A":"M3C","B":"M2","cfg":{"strat":"timing","b":0.3,"rho":0.9,"tau":1,"T":800}},
+ "raid":{"A":"M4","B":"M3C","cfg":{"strat":"trickle","b":0.3,"rho":0.9,"tau":1,"T":800}}
+}

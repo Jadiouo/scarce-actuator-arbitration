@@ -13,3 +13,4 @@ scarce-actuator-arbitration.tar.gz
 *.out
 *.toc
 .DS_Store
+docs/idae/

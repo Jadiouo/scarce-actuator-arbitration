@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>When to Audit: Demo 2</title>
+<meta name="description" content="Interactive demo: a scarce server allocates to three agents, one of whom may misreport. Compare audit-timing mechanisms in the same world.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="hero">
+  <p class="crumb"><a href="../">Scarce Actuator Arbitration</a> &rsaquo; Demo 2: audit timing</p>
+  <h1>Who gets the scarce resource when someone may lie?</h1>
+  <p class="lead">A scarce server hands one item per round to one of three agents. Each agent reports how urgent its need is, and reporting is free, so one of them may exaggerate. The server can only check a claim later, by which time the truth has already drifted. Honest agents therefore never match their old claims exactly, and a checker must tell drift from lying. Pick a mechanism and a lying strategy, then watch who gets the item, what is claimed against what is true, when audits happen, and how much the liar gains over telling the truth.</p>
+  <p class="note">This is a simplified abstract model written for illustration. Single runs are noisy, so use the seed box to see how much results vary. The quantitative findings are in the paper draft, not in this page.</p>
+  <div class="presets" role="group" aria-label="Scenarios">
+    <button data-preset="naive" aria-pressed="false">1. The cost of believing</button>
+    <button data-preset="arrival" aria-pressed="false">2. Audit on arrival gets beaten</button>
+    <button data-preset="dispatch" aria-pressed="false">3. Audit at dispatch</button>
+    <button data-preset="raid" aria-pressed="false">4. Low-probability raids</button>
+  </div>
+  <p id="presetText" class="presettext"></p>
+</header>
+
+<main>
+  <section class="card controls" aria-label="Controls">
+    <div class="grp">
+      <div class="row"><label for="mechA">Mechanism A</label><select id="mechA"></select></div>
+      <div class="row" id="mechBwrap"><label for="mechB">Mechanism B (same world)</label><select id="mechB"></select></div>
+      <button id="cmp" class="wide" aria-pressed="true">Side-by-side: on</button>
+      <p class="help" id="helpA"></p><p class="help" id="helpB"></p>
+    </div>
+    <div class="grp">
+      <div class="row"><label for="strat">Agent 1&rsquo;s strategy</label><select id="strat"></select></div>
+      <p class="help" id="helpS"></p>
+      <div class="row" id="bwrap"><label for="bsz">Inflation size b <output id="bV"></output></label>
+        <input id="bsz" type="range" min="0.05" max="0.6" step="0.05" value="0.3"></div>
+    </div>
+    <div class="grp">
+      <div class="row"><label for="rho">Type persistence &rho; <output id="rhoV"></output></label>
+        <input id="rho" type="range" min="0.5" max="0.99" step="0.01" value="0.9"></div>
+      <div class="row"><label for="tau">Verification delay &tau; (rounds) <output id="tauV"></output></label>
+        <input id="tau" type="range" min="1" max="5" step="1" value="1"></div>
+      <p class="help">Control that matters: r = &rho;<sup>&tau;</sup> = <b id="rV"></b>. The closer r is to 1, the more a late check says about the claim.</p>
+      <div class="row"><label for="seed">Seed</label>
+        <span class="seedrow"><input id="seed" type="number" value="25" min="0" step="1" inputmode="numeric"><button id="newseed">Random</button></span></div>
+      <p class="help" id="seedLbl"></p>
+    </div>
+    <div class="grp run">
+      <div class="seg" role="group" aria-label="Speed">
+        <button data-speed="10" aria-pressed="false">Slow</button>
+        <button data-speed="40" aria-pressed="true">Medium</button>
+        <button data-speed="200" aria-pressed="false">Fast</button>
+      </div>
+      <div class="btns">
+        <button id="pause" aria-pressed="false">Pause</button>
+        <button id="step">Step</button>
+        <button id="restart">Restart</button>
+        <button id="end">Jump to end</button>
+      </div>
+      <div class="row"><label for="scrub">Round <output id="tV"></output></label><input id="scrub" type="range" min="0" max="800" step="1" value="0"></div>
+    </div>
+  </section>
+
+  <div id="arenas" class="arenas"></div>
+
+  <section class="card chartcard">
+    <div class="charthead">
+      <h3>Liar&rsquo;s gain: utility with its strategy minus utility if it had told the truth (same world)</h3>
+      <div id="delta" class="delta"></div>
+    </div>
+    <canvas id="chartG" aria-label="Cumulative liar gain over time"></canvas>
+    <p class="help">Running average over rounds. Above zero, lying pays; below zero, lying backfires (the best reply is then to stay honest). Solid = A, dashed = B.</p>
+  </section>
+  <section class="card chartcard">
+    <h3>Regret R/T: utility lost versus always serving the truly most urgent agent</h3>
+    <canvas id="chartR" aria-label="Regret over time"></canvas>
+    <p class="help">Running average of (best possible utility &minus; utility delivered). The panel metrics also show the honest-only R/T, which is the price of the mechanism when nobody lies.</p>
+  </section>
+
+  <section class="card legend">
+    <h3>How to read the panels</h3>
+    <ul>
+      <li><span class="sw bar grey"></span> True urgency now. <span class="sw bar claim"></span> Claim the server receives. <span class="sw bar liar"></span> Claim of agent 1, the possible liar. Under the quota mechanism the claim shown is the level the server actually sees after rewriting.</li>
+      <li><span class="sw box win"></span> Agent that received the item this round. In the timeline a filled square means &ldquo;got the item&rdquo;; a grey column means a round thrown away by a raid.</li>
+      <li><span class="sw hatch"></span> Suspended: the agent cannot win. <span class="sw ring"></span> An audit came back and passed. <span class="sw ring bad"></span> An audit or raid caught a mismatch. <span class="sw dia"></span> A raid looked at this agent.</li>
+      <li>Bottom strip of the timeline: agent 1&rsquo;s true urgency (grey) against its claim (colour).</li>
+    </ul>
+    <p class="help">Model: three agents, one item per round, only agent 1 may misreport. Types follow a Gaussian AR(1) in a latent space with three different marginals. Checks see the truth &tau; rounds after the decision. Mechanism parameters are scaled for these short runs and are not the paper&rsquo;s values. Strategies in this demo are a small hand-written set, so &ldquo;the liar loses here&rdquo; does not mean no strategy could win. Honest-only R/T of exactly zero for some mechanisms is a feature of this short run, not a claim.</p>
+  </section>
+</main>
+<script src="sim.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
