@@ -29,7 +29,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px 24px}
 .grp{display:flex;flex-direction:column;gap:12px;min-width:0}
 .row{display:flex;flex-direction:column;gap:4px}
-.row[hidden]{display:none}
+.row[hidden]{display:flex;visibility:hidden}
 label{font-size:.85rem;color:var(--muted)}
 output{color:var(--fg);font-weight:600;margin-left:6px}
 select,input[type=number]{width:100%}
@@ -38,7 +38,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .seedrow input{flex:1;min-width:0}
 .wide{width:100%}
 .help{margin:0;font-size:.82rem;color:var(--muted);line-height:1.45}
-.help:empty,.help[hidden]{display:none}
+.help:empty,.help[hidden]{display:block;visibility:hidden}
 .run{justify-content:flex-start}
 .seg{display:flex}
 .seg button{flex:1;border-radius:0;margin-left:-1px}
@@ -56,11 +56,12 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .tA{background:var(--a)}.tB{background:var(--b)}
 .metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin:12px 0 0}
 .metrics div{min-width:0}
-.metrics dt{font-size:.74rem;color:var(--muted);line-height:1.25}
+.metrics dt{font-size:.74rem;color:var(--muted);line-height:1.25;min-height:2.5em}
 .metrics dd{margin:0;font-size:1.15rem;font-weight:600;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .charthead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
 .charthead h3{margin:0}
-.delta{font-weight:600}
+.delta{font-weight:600;min-height:3.6em}
+.delta[hidden]{display:block;visibility:hidden}
 .delta span{font-size:1.4rem;font-variant-numeric:tabular-nums}
 .delta .pos{color:var(--pos)}.delta .neg{color:var(--neg)}
 .chartcard canvas{display:block;max-width:100%;margin:8px 0}

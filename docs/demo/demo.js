@@ -477,6 +477,20 @@
     $('pause').textContent = state.paused ? 'Resume' : 'Pause';
     $('pause').setAttribute('aria-pressed', state.paused);
   }
+  // reserve space for variable-length captions so the layout does not jump
+  function reserve(elm, texts, html) {
+    const probe = elm.cloneNode(false); probe.removeAttribute('id'); probe.removeAttribute('hidden');
+    probe.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;min-height:0;height:auto;display:block;width:' + elm.getBoundingClientRect().width + 'px';
+    elm.parentElement.appendChild(probe);
+    let hmax = 0;
+    for (const tx of texts) { if (html) probe.innerHTML = tx; else probe.textContent = tx; hmax = Math.max(hmax, probe.getBoundingClientRect().height); }
+    probe.remove(); elm.style.minHeight = Math.ceil(hmax) + 'px';
+  }
+  function reserveAll() {
+    const hs = Object.values(POLICY_HELP);
+    reserve($('helpA'), hs.map(x => 'A: ' + x)); reserve($('helpB'), hs.map(x => 'B: ' + x));
+    reserve($('presetText'), Object.values(PRESETS).map(P => '<strong>' + P.title + '.</strong> ' + P.text), true);
+  }
   function applyPreset(key) {
     const P = PRESETS[key], s = P.set;
     state.compare = s.compare; $('polA').value = s.a; $('polB').value = s.b; $('ninfl').value = s.nInfl;
@@ -504,11 +518,12 @@
     $('ff').onclick = () => fastForward(2000);
     document.querySelectorAll('[data-speed]').forEach(b => b.onclick = () => { state.speed = +b.dataset.speed; updateLabels(); });
     document.querySelectorAll('[data-preset]').forEach(b => b.onclick = () => applyPreset(b.dataset.preset));
-    window.addEventListener('resize', sizeCanvases);
+    window.addEventListener('resize', () => { sizeCanvases(); reserveAll(); });
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readColors);
     readColors();
     $('polA').value = 'audit_index'; $('polB').value = 'audit_disp_index';
-    applyPreset('audit');
+    applyPreset('audit'); reserveAll();
+    window.addEventListener('load', reserveAll);
     requestAnimationFrame(t => { last = t; frame(t); });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();

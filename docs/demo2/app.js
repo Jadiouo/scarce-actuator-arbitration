@@ -44,7 +44,27 @@
     $('mechBwrap').hidden = !st.cmp;
     const pr = st.preset && PRESETS[st.preset];
     $('seedLbl').textContent = pr && +$('seed').value === pr.seed ? `Seed ${pr.seed} is the seed closest to the median outcome among seeds 0 to 29 for this scenario (chosen by rule, not for effect size).` : 'Same seed, same world: reload with the same settings to reproduce.';
-    layout(); draw();
+    layout(); reserveAll(); draw();
+  }
+
+  // ---------- reserve space for variable-length text so the layout never jumps
+  function reserve(elm, texts, html) {
+    if (!elm || !elm.parentElement) return;
+    const probe = elm.cloneNode(false); probe.removeAttribute('id'); probe.removeAttribute('hidden');
+    probe.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;min-height:0;height:auto;display:block;width:' + elm.getBoundingClientRect().width + 'px';
+    elm.parentElement.appendChild(probe);
+    let hmax = 0;
+    for (const tx of texts) { if (html) probe.innerHTML = tx; else probe.textContent = tx; hmax = Math.max(hmax, probe.getBoundingClientRect().height); }
+    probe.remove(); elm.style.minHeight = Math.ceil(hmax) + 'px';
+  }
+  const WORST_STATUS = 'Round 800: item to agent 1 (claim 0.00, truth 0.00). Audit settled for agent 1: mismatch, suspended. Raid looked at agent 1: false claim, suspended. Agent 1 is suspended.';
+  function reserveAll() {
+    const mh = Object.values(S.MECHS).map(m => m.help), sh = Object.values(S.STRATS).map(m => m.help);
+    const wasHidden = $('mechBwrap').hidden;
+    reserve($('helpA'), mh.map(x => 'A: ' + x)); reserve($('helpB'), mh.map(x => 'B: ' + x)); reserve($('helpS'), sh);
+    reserve($('seedLbl'), ['Seed 25 is the seed closest to the median outcome among seeds 0 to 29 for this scenario (chosen by rule, not for effect size).', 'Same seed, same world: reload with the same settings to reproduce.']);
+    reserve($('presetText'), Object.values(PRESETS).map(p => `${p.text}<small>Representative seed ${p.seed}: the closest to the median outcome among seeds 0 to 29 under these settings.</small>`), true);
+    for (const k of ['A', 'B']) if (el[k]) reserve(el[k].status, [WORST_STATUS]);
   }
 
   function layout() {
@@ -242,7 +262,8 @@
   document.querySelectorAll('[data-speed]').forEach(b => b.addEventListener('click', () => {
     st.speed = +b.dataset.speed; document.querySelectorAll('[data-speed]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
   }));
-  let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(draw, 80); });
+  let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { reserveAll(); draw(); }, 80); });
+  window.addEventListener('load', () => { reserveAll(); draw(); });
   if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw);
   window.__demo = { st, applyPreset, draw };
   applyPreset('naive');

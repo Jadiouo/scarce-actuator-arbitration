@@ -34,16 +34,17 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px 24px}
 .grp{display:flex;flex-direction:column;gap:12px;min-width:0}
 .row{display:flex;flex-direction:column;gap:4px}
-.row[hidden]{display:none}
+.row[hidden]{display:flex;visibility:hidden}
 label{font-size:.85rem;color:var(--muted)}
-output{color:var(--fg);font-weight:600;margin-left:6px}
+output{color:var(--fg);font-weight:600;margin-left:6px;display:inline-block;min-width:4.5ch;font-variant-numeric:tabular-nums}
 select,input[type=number]{width:100%}
 input[type=range]{width:100%;accent-color:var(--accent)}
 .seedrow{display:flex;gap:8px}
 .seedrow input{flex:1;min-width:0}
 .wide{width:100%}
 .help{margin:0;font-size:.82rem;color:var(--muted);line-height:1.45}
-.help:empty,.help[hidden]{display:none}
+.help[hidden]{display:none}
+.help:empty{display:block}
 .seg{display:flex}
 .seg button{flex:1;border-radius:0;margin-left:-1px;padding:7px 6px}
 .seg button:first-child{border-radius:8px 0 0 8px;margin-left:0}
@@ -57,14 +58,14 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .panel canvas+canvas{margin-top:8px}
 .tag{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;font-size:.8rem;color:var(--bg);font-weight:700;flex:none}
 .tA{background:var(--a)}.tB{background:var(--b)}
-.status{margin:8px 0 0;font-size:.85rem;color:var(--muted);min-height:2.6em}
+.status{margin:8px 0 0;font-size:.85rem;color:var(--muted);min-height:2.6em;font-variant-numeric:tabular-nums}
 .metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin:10px 0 0}
 .metrics div{min-width:0}
-.metrics dt{font-size:.74rem;color:var(--muted);line-height:1.25}
-.metrics dd{margin:0;font-size:1.1rem;font-weight:600;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.metrics dt{font-size:.74rem;color:var(--muted);line-height:1.25;min-height:2.5em}
+.metrics dd{margin:0;min-height:1.55em;font-size:1.1rem;font-weight:600;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .charthead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
 .charthead h3{margin:0;flex:1 1 260px}
-.delta{font-weight:600;font-variant-numeric:tabular-nums}
+.delta{font-weight:600;font-variant-numeric:tabular-nums;min-height:1.55em;min-width:15ch;white-space:nowrap}
 .delta .pos{color:var(--pos)}.delta .neg{color:var(--neg)}
 .chartcard canvas{margin:8px 0}
 .legend ul{list-style:none;margin:0 0 12px;padding:0;display:grid;gap:8px;font-size:.92rem}
