@@ -6,7 +6,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 import numpy as np
 
-CACHE = "/tmp/claude-1000/-home-lex-Documents-scarce-actuator-arbitration/65de289c-60a0-47e9-b793-f6f4bf98ae51/scratchpad/cache2b"
+from pathlib import Path
+CACHE = os.environ.get("ARB_CACHE_DIR", str(Path(__file__).resolve().parents[1] / "results" / "cache" / "run_stage2b"))
 TUNE, EVAL = list(range(0, 16)), list(range(5000, 5032))
 RS = [0.5, 0.8, 0.9, 0.95, 0.99, 0.999]
 R_TAU5 = [0.8, 0.9, 0.99]

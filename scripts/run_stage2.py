@@ -19,7 +19,8 @@ RHOS = [0.5, 0.8, 0.9, 0.95, 0.99, 1.0]      # tau=1 => r = rho^tau (z-space); 1
 TS = [10000, 100000]
 BS = [round(0.05 * i, 2) for i in range(1, 11)]
 EPS_GAIN, FP_CAP = 0.002, 0.05                 # fixed before running (design doc)
-DEFAULT_CACHE = "/tmp/claude-1000/-home-lex-Documents-scarce-actuator-arbitration/65de289c-60a0-47e9-b793-f6f4bf98ae51/scratchpad/cache"
+from pathlib import Path
+DEFAULT_CACHE = os.environ.get("ARB_CACHE_DIR", str(Path(__file__).resolve().parents[1] / "results" / "cache" / "run_stage2"))
 INF = float("inf")
 
 
