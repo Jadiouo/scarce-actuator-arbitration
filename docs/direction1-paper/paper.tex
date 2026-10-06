@@ -1,0 +1,184 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.9in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage[numbers]{natbib}
+\usepackage[colorlinks=true,allcolors=blue!50!black]{hyperref}
+\usepackage{xcolor}
+\setlength{\parskip}{0.4em}\setlength{\parindent}{0pt}
+\newcommand{\FIGDIR}{../../figures}
+
+\title{Audits That Look Backward: A Fragility Map of Audit Mechanisms\\under Delayed, Noisy Verification}
+\author{Hao-Ting (Lex) Ho}
+\date{\textit{Working draft, not peer reviewed} --- October 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+A scarce server serves one of $K{=}3$ requesters per round. Requesters report an urgency for free and one of them may over-report; the server can only check a report after a delay, by which time the true state has drifted. We study this with simulation in an abstract repeated-allocation model, where the control variable is the $z$-space correlation $r=\rho^\tau$ between the reported and the verified state. We began with a theory programme (a noise-limited frontier between false punishment and the best lying gain). We wrote falsification conditions F1--F4 into the project notes before the stage-2b runs, without an external timestamp. A condition is \emph{triggered} if its falsification condition is met. F1 was triggered, F3 gave a mixed result, F2 was not triggered and F4 is undecidable; by the rule written beforehand, F1 alone suffices to stop the theory programme, so we report an empirical map instead. In a hand-written set of 45 deviation strategies, a low-probability surprise raid that also targets the winner is, among the mechanisms tested, the only one that is both unprofitable to lie against ($G\le0$) and low-regret: its maximum lying gain is $0.0000\pm0.0000$ at every $r$ we tested (a floor, because the maximum includes the honest strategy), at an honest regret of about $0.016$ per round, without needing $\rho$. (Round-robin M0 also has $G=0$, but at $R/T=0.224$.) Dispatch-time statistical audits and the marginal quota QM hold up against uninformed liars but not against liars who see opponents' bids; the transition and Escobar--Toikka-style quotas QT and QE do not hold even against uninformed liars (gains $0.022$--$0.104$). This is an empirical result inside a finite strategy set, not a theorem, and the raid cost we use (one wasted round) has not been connected back to a spatial simulation.
+\end{abstract}
+
+\section{Introduction}
+A repeated allocation problem with one scarce server, no money, and self-reported urgency has a familiar failure: if the server believes reports, whoever exaggerates wins. Auditing is the standard remedy. This paper asks what happens to audit-based mechanisms when verification arrives \emph{late}: the server sees the true state only $\tau$ rounds after the report, the state has meanwhile changed, and so even honest requesters mismatch their own reports.
+
+\textbf{Why would a machine misreport?} The natural objection is that a machine ``just reports honestly as designed''. We use ``lying'' in a narrower, behavioural sense: \emph{directional misreporting}, a systematic bias in the reported urgency that benefits the reporter. Such bias has at least four sources. (i) \emph{Different owners}: robots from several vendors sharing a charging station or elevator, or drones sharing a landing pad, each run software tuned for the owner's own performance, so a designer has an incentive to lower the threshold at which the machine asks for help. (ii) \emph{Learned reporting policies}: if a reporting policy is trained to maximise its own task completion, it can discover exaggeration by reward hacking or specification gaming \citep{amodei2016}; this is also why our next step is a learned adversary (Section~\ref{sec:concl}). (iii) \emph{Unintentional bias}: a systematically over-estimating estimator, or an engineer's conservative threshold, has the same effect on the dispatcher as strategic inflation. (iv) \emph{Faulty or compromised nodes}, a Byzantine fault in the sense of \citet{lamport1982}. Strategic over-reporting is the worst case of a \emph{directional} bias (one that always favours the reporter). Byzantine faults are arbitrary errors and lie outside our model; we call them related but different, and do not claim that withstanding a strategic liar implies withstanding faults. In the model below, a constant inflation $b$ roughly corresponds to a calibration bias, while timing, distance or edge inflation roughly correspond to \emph{purposeful} bias; the correspondence between the four sources and the inflation types is coarse. We do not claim that any real machine fleet behaves this way; the point is that the dispatcher cannot tell the sources apart from the reports alone.
+
+\textbf{What this paper is.} It is the result of a project that began as a theory programme and ended as an empirical map. We state plainly what was tried and what was refuted (Section~\ref{sec:timeline}). Contributions, in order of evidence strength:
+\begin{enumerate}
+\item A \emph{fragility map} of eight mechanisms at four values of $r$ ($T=10^5$, 32 evaluation seeds per cell), with the maximum lying gain reported separately for liars who use only their own type and history (``uninformed'') and for the maximum over all 45 strategies including ones that see opponents' bids (``oracle''), Section~\ref{sec:map}.
+\item A low-probability raid that includes the winner as a target is the most robust mechanism \emph{within the tested strategy set}; its cost in the abstract model is a wasted round (Section~\ref{sec:raid}).
+\item An honest account of a falsified theory programme: falsification conditions F1--F4 written into the project notes before the stage-2b runs (no external timestamp), of which F1 was triggered and F3 gave a mixed result (Section~\ref{sec:timeline}).
+\end{enumerate}
+Known results are \emph{checked}, not claimed: the single-audit false-flag rate of honest requesters matches $\Phi(-\kappa)$, and zero-tolerance matching with delay excludes honest requesters, which is obvious.
+
+\section{Relation to prior work}\label{sec:related}
+Our starting point is \citet{dai2025} (arXiv:2502.08412, v3): repeated no-money allocation with adaptive costly audits (AdaAudit), with i.i.d.\ types, an audit of the winner whose true utility is revealed in the same round, and permanent exclusion as punishment; they show $T$-independent regret $O(K^2)$ with $O(K^3\log T)$ audits. We put the same style of mechanism into an environment with persistent types and delayed verification and ask where it breaks. \citet{li2020} studies a static problem with costly verification, limited punishments and a two-threshold optimal structure; we borrow only the idea of a finite, forgivable punishment, but our verification is noisy. \citet{ravikumar2012} (circulated 2010) study dynamic auditing of a single taxpayer whose state is monotone and absorbing; there is no scarce resource and no strategic timing against the audit. A common gap in these three is non-monotone state evolution together with reports that are timed strategically; we state this as the gap we found, and our literature survey is not exhaustive.
+
+No-transfer \emph{linking} mechanisms are the baseline we must face: \citet{jackson2007} (i.i.d.\ types, no money, no verification, approximate incentive compatibility) and \citet{escobar2013} (Markov private information). Our quota mechanisms are simplified implementations: no $g^K$ correction, no anti-collusion adjustment, and the transition quota conditions only on the agent's own previous report. Probabilistic verification, where the chance of detection depends on the distance of the lie, appears in \citet{caragiannis2012} (with payments) and \citet{ball2025} (continuous verification technology). Much of our later ``noise frontier'' idea is of this known type, which is one reason it was withdrawn.
+
+\section{Model}\label{sec:model}
+\textbf{Environment.} $K{=}3$ requesters, one item per round. Only requester~1 may deviate; the others are honest. Types are Gaussian AR(1) in $z$-space, $z_{t+1}=\rho z_t+\sqrt{1-\rho^2}\,\varepsilon_t$, with marginals: requester 0 $\sim U[0.2,1]$, requester 1 $\sim U[0,1]$, requester 2 with cdf $x^2$. A report $v_t$ is made at round $t$ and dispatch occurs; the verifier observes $w=u_{t+\tau}$ after $\tau$ rounds ($\tau{=}1$ in the main map). The control variable is $r=\rho^\tau$, the correlation in $z$-space. For an honest report, the residual $(z_w-r\,z_v)/\sqrt{1-r^2}$ is exactly $N(0,1)$, so a single-threshold test with threshold $\kappa$ flags an honest requester with probability $\Phi(-\kappa)$ (checked: observed 0.1608 against 0.1587 at $\kappa{=}1.0$, $r{=}0.5$; \texttt{stage2.json}). The grid is $r\in\{0.5,0.8,0.9,0.99\}$.
+
+\textbf{Mechanisms.} \emph{M0}: round-robin, ignore reports. \emph{NAIVE}: believe reports (argmax). \emph{M1}: zero-tolerance comparison with permanent exclusion (fixed audit probability, or AdaAudit). \emph{M2}: audit on arrival (the server compares the report with the state it observes on arrival) with a suspension. \emph{M3} (C: CUSUM): audit at dispatch, residual test in $z$-space, forgivable suspension of length $L$. \emph{M4}: surprise raid: each round, with probability $\epsilon$ the round's item is wasted and the true state is observed immediately; the raid target is the winner with probability $rw$ (and otherwise another requester). \emph{M5} $=$ M3 $+$ M4. \emph{Quota family}: QM (marginal quota per block of $W$ rounds), QT (transition quota), QE (Escobar--Toikka-style), simplified as above, $W{=}1000$ here.
+
+\textbf{Strategies.} The deviator's strategy set has 45 members: honest; constant inflation $b$; $z$-shift $dz$ (including slow, small shifts); timing; burst; \emph{edge inflation} (inflate only when a small margin from winning, by just enough to win), in an oracle version that knows the opponents' current bids and an \emph{uninformed} version that uses only own type and history; and adaptive strategies that simulate the audit. The set is hand-written, not a best response.
+
+\textbf{Metrics.} Honest regret per round $R/T$; maximum lying gain $G$: the largest paired-seed (same seed as the honest run) mean utility difference of requester~1 per round; false-punishment rate $\alpha$ of honest requesters. $G$ is a maximum over strategies and therefore biased upward; a tuned-on-separate-seeds variant $G_{br}$ is stored in the JSON but not used here. In every $\pm$, the second value is the half-width of a 95\% interval (1.96 standard errors). Parameters are tuned on seeds 0--15 and cells are evaluated on other seeds (5000--5031 for the map; 1000--1031 for \texttt{stage2.json}, 64 or 32 seeds for the stage-1 experiments, see captions in text). Cell settings accompany every number.
+
+\section{What we tested and what was refuted}\label{sec:timeline}
+We list the experiments in time order, including the ones that failed.
+
+%LOC Sec: 4 (stage 1 zero tolerance)
+\textbf{(1) Zero tolerance is a strawman.} We expected only Markov types with delay to break AdaAudit-style mechanisms. In fact any delay breaks it, for i.i.d.\ and Markov types alike. At $\tau{=}5$, $T{=}10^5$, 64 seeds, fixed-$p$ audits with $p{=}0.1$, the honest-exclusion fraction is 1.00 and $R/T\approx0.812$ (i.i.d. types) and 0.812 (Markov, $\rho{=}0.9$); at $\tau{=}0$ the regret is 0.0. The cause is that a zero-tolerance comparison between utilities at different times must mismatch: nearly trivial, and not a contribution. The high $R/T$ also depends on a convention (when everyone is excluded, utility is recorded as $0$), so both fallbacks are reported from here on. As a fidelity check of the AdaAudit implementation, a late liar under $\tau{=}0$, i.i.d.\ types has $R=2.63$, below $K^2=9$.
+
+%LOC Sec: 4 (stage 1b AdaAudit more tolerant)
+\textbf{(2) ``AdaAudit is more tolerant'' is refuted.} With a tolerance $\delta$, the single-audit false-flag rate depends on $\rho^\tau$ only (an algebraic identity, not a finding), while dynamics only approximately collapse onto this variable (Figure~\ref{fig:collapse}). The hypothesis that AdaAudit's honest requesters might survive because they are audited only $\sim\log T$ times fails: at $(\rho,\tau){=}(0.9,1)$, $T{=}10^5$, $\delta{=}0.1$, 32 seeds, honest survival is 0.00 for the fixed-$p$ version and 0.00 for AdaAudit, and AdaAudit audits \emph{more} (16.7 against 9.4 audits). With a fixed $\delta$ and permanent exclusion the feasible region is very narrow: for a liar with $b{=}0.1$, $T{=}10^5$, AdaAudit, only one of the $13\times7$ $(\rho,\tau,\delta)$ cells is feasible, $(\rho,\tau){=}(0.99,1)$, $\delta{=}0.2$ (\texttt{feasibility}[6][4]${}=true$). A side observation: under $\tau{=}0$ with Markov types the audit count of AdaAudit rises from the ideal 3645.9 to 5626.1 ($T{=}10^5$, $\rho{=}0.9$), a constant-factor increase.
+
+\begin{figure}[t]
+\centering\includegraphics[width=0.92\linewidth]{\FIGDIR/fig17a_collapse_rhotau.png}
+\caption{Outcomes against $\rho^\tau$ for fixed-$p$ (orange) and AdaAudit (blue) with permanent exclusion, $T=10^4$, tolerance $\delta\in\{0.1,0.2,0.3,0.5\}$ (columns). Top: honest survival; middle and bottom: liar caught ($b{=}0.3$, $b{=}0.1$). Same $\rho^\tau$ approximately overlaps, but not exactly. Source: \texttt{results/adaaudit\_tol.json}.}\label{fig:collapse}
+\end{figure}
+
+%LOC Sec: 4 (stage 2 M3c, edge inflation)
+\textbf{(3) Dispatch-time CUSUM looked good, then oracle edge inflation beat it.} Under the strategy set of the time (constant-$b$ and $z$-shift families), M3c at $r{=}0.9$, $T{=}10^5$, seeds 1000--1031 had $G={}$$-$0.0118 $\pm$ 0.0028 and honest $R/T={}$0.0067 $\pm$ 0.0015, which we read as ``lying does not pay''. Arrival-time audit M2 was beaten by timing inflation, $G={}$0.2795 $\pm$ 0.0004 at $r{=}0.5$ and 0.2805 $\pm$ 0.0022 at $r{=}0.99$, regardless of $r$; this was never refuted. A red-team review then added oracle edge inflation. Under that strategy the same mechanism has $G={}$0.0211 $\pm$ 0.0033 at $r{=}0.9$ and 0.0870 $\pm$ 0.0053 at $r{=}0.5$ ($T{=}10^5$, seeds 5000--5031, M3C, best strategy \texttt{edge\_oracle}). The claim that M3c deters lying, and the phase diagram drawn from it, are \textbf{withdrawn}. The $r{=}0.8$ pass was only marginal to begin with ($G={}$0.0021 $\pm$ 0.0025, and at $T{=}10^4$ the pass flag is false at $r{=}0.8$ and false at $r{=}0.9$).
+
+%LOC Sec: 4 (M4 loophole)
+\textbf{(4) A loophole in the old raid.} Our stage-2 raid never audited the winner (a design loophole in the code, found by the red team). At $r{=}1$, $T{=}10^5$ the deviator still gained $G={}$0.1811 $\pm$ 0.0721 (raid rate $\epsilon{=}0.2$, $L{=}20$). A direct test: at $r{=}0.99$, $\epsilon{=}0.05$, $L{=}2500$, oracle edge inflation gained 0.0356 $\pm$ 0.0008 when the raid hit the winner with probability $rw{=}0.0$ and $-$0.1450 $\pm$ 0.0039 with $rw{=}1.0$. The $r{=}1$ gain was therefore a design gap, not a numerical bug. (Stage-2b cells in this paper use $T{=}20000$ per \texttt{stage2b.json} \texttt{meta}, with evaluation seeds 5000--5031.)
+
+%LOC Sec: 4 (F1-F4)
+\textbf{(5) Falsification conditions F1--F4: F1 triggered, F3 mixed; the theory programme was stopped.} All numbers in this item are from stage 2b ($T=2\times10^4$, seeds 5000--5031, \texttt{stage2b.json}), not from the $T=10^5$ map. After four reframings, we proposed a Neyman--Pearson-type frontier: the best lying gain $G^*(\alpha,\sigma_\tau)$ as a function of the false-punishment rate $\alpha$ and the verification noise $\sigma_\tau=\sqrt{1-r^2}$. Before the stage-2b runs, a reviewer role wrote four falsification conditions and a rule forbidding a fifth reframing into the project notes; there is no external timestamp, so we do not call this pre-registration. We use ``triggered'' to mean that the falsification condition holds:
+\begin{center}\small\begin{tabular}{@{}p{0.07\linewidth}p{0.55\linewidth}p{0.3\linewidth}@{}}
+\toprule
+ & Falsification condition (paraphrased) & Status \\ \midrule
+F1 & At fixed $\alpha$ the log--log slope of $G^*$ against $\sigma_\tau$ differs from $1$ beyond the CI, or $(\rho,\tau)$ swept separately do not overlay & \textbf{triggered} \\
+F2 & As $\alpha\to$ small, $G^*$ does not approach 0 or is not monotone in $\alpha$ & not triggered (monotone, drops to 0 at finite $\alpha$) \\
+F3 & Uninformed edge inflation gains $\lesssim2$ standard errors & mixed: triggered at $r\le0.8$, not at $r\in\{0.9,0.99\}$, marginal at $0.95$ (see below) \\
+F4 & No test attains a constant multiple of the lower bound & cannot be decided (no lower bound derived) \\ \bottomrule
+\end{tabular}\end{center}
+\emph{F1.} Writing $G=c\sigma^s$, the exponent is $s=1.26$ [1.13, 1.39] at false-punishment target $\alpha{=}0.005$ and $2.18$ [1.77, 2.63] at $\alpha{=}0.05$ (best-family frontier, stage 2b). The exponent differs from 1 and changes with $\alpha$. With $(\rho,\tau)$ swept separately at $r{=}0.9$, $\alpha$ target $0.05$, the frontier gain is 0.0227 $\pm$ 0.0060 at $\tau{=}1$ and 0.0221 $\pm$ 0.0069 at $\tau{=}5$: the frontier is set by $r$. \emph{F3.} For M3C at $\alpha$ target $0.01$, uninformed edge inflation gains (gain $\pm$ half-width; $z$ is gain divided by its standard error): 0.0287 $\pm$ 0.0058 at $r{=}0.5$ ($z{=}9.7$), about a quarter of the oracle version (0.1235 $\pm$ 0.0077); 0.0158 $\pm$ 0.0044 at $r{=}0.8$ ($z{=}6.95$); 0.0011 $\pm$ 0.0015 at $r{=}0.9$ ($z{=}1.49$); 0.0047 $\pm$ 0.0036 at $r{=}0.95$ ($z{=}2.57$, marginal; at $\alpha$ target $0.02$ the same strategy gives $-$0.0013 $\pm$ 0.0031, $z{=}-0.79$); and $-$0.0108 $\pm$ 0.0064 at $r{=}0.99$ ($z{=}-3.29$). The condition (gain $\lesssim2$ standard errors) is thus met at $r\in\{0.9,0.99\}$, marginally missed at $0.95$ and clearly missed at $r\le0.8$: the result is mixed. The first-order gain is mostly an oracle artefact at high $r$, while at low $r$ the uninformed gain is clearly positive (source: \texttt{stage2b.json}, \texttt{eval\_rows.M3C[tag=a0.01]}, \texttt{groups.edge\_un}). \emph{F2} was not triggered, and \emph{F4} cannot be decided. By the rule written beforehand, F1 alone suffices to stop the theory framework, whatever the F3 outcome; we stopped the theory direction and the project reduced to an empirical map. We make no statement about a lower bound or achievability, and do not claim a scaling law.
+
+\textbf{(6) A positive surprise.} The corrected raid (winner included) at $\epsilon{=}0.01$, $rw{=}1$, $r{=}0.5$ ($T{=}20000$) has $G={}$$-$0.0443 $\pm$ 0.0094 and false-punishment $\alpha={}$0.0000 $\pm$ 0.0000, contradicting our first intuition that unpredictable raids are infeasible. The marginal quota QM blocks uninformed small inflation (contrary to our prior) but not oracle strategies; QT and QE do not block even uninformed liars (Section~\ref{sec:map}).
+
+\section{Main result: the fragility map}\label{sec:map}
+Table~\ref{tab:map} reports 8 mechanisms $\times$ 4 values of $r$ at $T=10^5$, $\tau=1$, $K=3$, evaluation seeds 5000--5031 (32 each). Parameters were tuned on seeds 0--15 and never selected on the evaluation seeds. \textbf{Uninformed $G$} is the best gain among strategies that use only own type and history; \textbf{oracle $G$} is the maximum over all 45 strategies (upward biased). The M2 rows come from \texttt{stage2.json} (seeds 1000--1031, a smaller strategy set whose best strategy is the uninformed timing shift, so the two $G$ columns coincide). Quota mechanisms are tuned against the oracle best response (variant ``o'', $W=1000$). $\alpha$ is the honest false-punishment rate for M3C; M4 and the quota mechanisms do not punish honest requesters ($\alpha=0$) and the quota rows instead list the fraction of honest reports that were rewritten (rw). M4 here has $\epsilon=0.02$ and winner-raid probability $1/3$; note this differs from stage 2b, where the raid winner probability is $1$ and $\epsilon=0.01$ (Section~\ref{sec:raid}).
+
+\begin{table}[t]
+\centering\footnotesize\setlength{\tabcolsep}{3.5pt}
+\caption{Fragility map ($T{=}10^5$, $\tau{=}1$, $K{=}3$, 32 seeds per cell; mean $\pm$ 95\% half-width). $R/T$: honest regret per round. Mechanism parameters (CUSUM $h$, suspension $L$; raid $\epsilon$, winner-raid probability; quota bins $n_b$, classes $n_c$) are in the last column; M3C uses $p{=}0.1$, quotas use $W{=}1000$.}\label{tab:map}
+\begin{tabular}{@{}llccccl@{}}
+\toprule
+Mechanism & $r$ & honest $R/T$ & $G$ uninformed & $G$ oracle & $\alpha$ / rewrite & parameters \\ \midrule
+NAIVE & 0.5 & 0.0000 $\pm$ 0.0000 & 0.2793 $\pm$ 0.0004 & 0.2793 $\pm$ 0.0004 & 0 & --- \\
+NAIVE & 0.8 & 0.0000 $\pm$ 0.0000 & 0.2793 $\pm$ 0.0006 & 0.2793 $\pm$ 0.0006 & 0 & --- \\
+NAIVE & 0.9 & 0.0000 $\pm$ 0.0000 & 0.2792 $\pm$ 0.0009 & 0.2792 $\pm$ 0.0009 & 0 & --- \\
+NAIVE & 0.99 & 0.0000 $\pm$ 0.0000 & 0.2806 $\pm$ 0.0028 & 0.2806 $\pm$ 0.0028 & 0 & --- \\
+\midrule
+M0 & 0.5 & 0.2236 $\pm$ 0.0002 & 0.0000 $\pm$ 0.0000 & 0.0000 $\pm$ 0.0000 & 0 & --- \\
+M0 & 0.8 & 0.2237 $\pm$ 0.0003 & 0.0000 $\pm$ 0.0000 & 0.0000 $\pm$ 0.0000 & 0 & --- \\
+M0 & 0.9 & 0.2239 $\pm$ 0.0004 & 0.0000 $\pm$ 0.0000 & 0.0000 $\pm$ 0.0000 & 0 & --- \\
+M0 & 0.99 & 0.2240 $\pm$ 0.0014 & 0.0000 $\pm$ 0.0000 & 0.0000 $\pm$ 0.0000 & 0 & --- \\
+\midrule
+M2 & 0.5 & 0.0000 $\pm$ 0.0000 & 0.2795 $\pm$ 0.0004 & 0.2795 $\pm$ 0.0004 & 0 & $p{=}0.1,L{=}20$ \\
+M2 & 0.8 & 0.0000 $\pm$ 0.0000 & 0.2794 $\pm$ 0.0005 & 0.2794 $\pm$ 0.0005 & 0 & $p{=}0.1,L{=}20$ \\
+M2 & 0.9 & 0.0000 $\pm$ 0.0000 & 0.2792 $\pm$ 0.0009 & 0.2792 $\pm$ 0.0009 & 0 & $p{=}0.1,L{=}20$ \\
+M2 & 0.99 & 0.0000 $\pm$ 0.0000 & 0.2805 $\pm$ 0.0022 & 0.2805 $\pm$ 0.0022 & 0 & $p{=}0.1,L{=}20$ \\
+\midrule
+M3C & 0.5 & 0.0071 $\pm$ 0.0018 & 0.0213 $\pm$ 0.0039 & 0.0870 $\pm$ 0.0053 & 0.0285 $\pm$ 0.0061 & $h{=}6,L{=}2500$ \\
+M3C & 0.8 & 0.0081 $\pm$ 0.0012 & 0.0037 $\pm$ 0.0019 & 0.0335 $\pm$ 0.0044 & 0.0339 $\pm$ 0.0042 & $h{=}6,L{=}2500$ \\
+M3C & 0.9 & 0.0070 $\pm$ 0.0016 & 0.0020 $\pm$ 0.0011 & 0.0211 $\pm$ 0.0033 & 0.0303 $\pm$ 0.0060 & $h{=}6,L{=}2500$ \\
+M3C & 0.99 & 0.0000 $\pm$ 0.0000 & 0.0059 $\pm$ 0.0004 & 0.0460 $\pm$ 0.0015 & 0.0001 $\pm$ 0.0001 & $h{=}8,L{=}100$ \\
+\midrule
+M4 & 0.5 & 0.0162 $\pm$ 0.0001 & 0.0000 $\pm$ 0.0000 & 0.0000 $\pm$ 0.0000 & 0 & $\epsilon{=}.02,rw{=}\tfrac13$ \\
+M4 & 0.8 & 0.0162 $\pm$ 0.0001 & 0.0000 $\pm$ 0.0000 & 0.0000 $\pm$ 0.0000 & 0 & $\epsilon{=}.02,rw{=}\tfrac13$ \\
+M4 & 0.9 & 0.0162 $\pm$ 0.0001 & 0.0000 $\pm$ 0.0000 & 0.0000 $\pm$ 0.0000 & 0 & $\epsilon{=}.02,rw{=}\tfrac13$ \\
+M4 & 0.99 & 0.0162 $\pm$ 0.0002 & 0.0000 $\pm$ 0.0000 & 0.0000 $\pm$ 0.0000 & 0 & $\epsilon{=}.02,rw{=}\tfrac13$ \\
+\midrule
+QM & 0.5 & 0.0114 $\pm$ 0.0001 & 0.0006 $\pm$ 0.0001 & 0.0897 $\pm$ 0.0003 & 0 (rw 4.3\%) & $n_b{=}5$ \\
+QM & 0.8 & 0.0159 $\pm$ 0.0002 & 0.0008 $\pm$ 0.0002 & 0.0896 $\pm$ 0.0005 & 0 (rw 6.4\%) & $n_b{=}5$ \\
+QM & 0.9 & 0.0212 $\pm$ 0.0003 & 0.0011 $\pm$ 0.0003 & 0.0903 $\pm$ 0.0006 & 0 (rw 9.0\%) & $n_b{=}5$ \\
+QM & 0.99 & 0.0585 $\pm$ 0.0011 & 0.0048 $\pm$ 0.0014 & 0.1001 $\pm$ 0.0015 & 0 (rw 27.0\%) & $n_b{=}5$ \\
+\midrule
+QT & 0.5 & 0.0043 $\pm$ 0.0000 & 0.0224 $\pm$ 0.0004 & 0.1220 $\pm$ 0.0003 & 0 (rw 10.9\%) & $n_b{=}10,n_c{=}2$ \\
+QT & 0.8 & 0.0058 $\pm$ 0.0000 & 0.0629 $\pm$ 0.0005 & 0.0745 $\pm$ 0.0005 & 0 (rw 15.4\%) & $n_b{=}10,n_c{=}5$ \\
+QT & 0.9 & 0.0067 $\pm$ 0.0001 & 0.0765 $\pm$ 0.0006 & 0.0801 $\pm$ 0.0006 & 0 (rw 16.2\%) & $n_b{=}10,n_c{=}5$ \\
+QT & 0.99 & 0.0067 $\pm$ 0.0001 & 0.0987 $\pm$ 0.0021 & 0.1091 $\pm$ 0.0020 & 0 (rw 34.4\%) & $n_b{=}20,n_c{=}2$ \\
+\midrule
+QE & 0.5 & 0.0049 $\pm$ 0.0001 & 0.0330 $\pm$ 0.0006 & 0.0330 $\pm$ 0.0006 & 0 (rw 0.2\%) & $n_b{=}5,n_c{=}5$ \\
+QE & 0.8 & 0.0043 $\pm$ 0.0000 & 0.0657 $\pm$ 0.0008 & 0.0657 $\pm$ 0.0008 & 0 (rw 0.0\%) & $n_b{=}5,n_c{=}5$ \\
+QE & 0.9 & 0.0043 $\pm$ 0.0000 & 0.0654 $\pm$ 0.0005 & 0.0654 $\pm$ 0.0005 & 0 (rw 0.0\%) & $n_b{=}5,n_c{=}5$ \\
+QE & 0.99 & 0.0094 $\pm$ 0.0005 & 0.1040 $\pm$ 0.0028 & 0.1040 $\pm$ 0.0028 & 0 (rw 2.2\%) & $n_b{=}5,n_c{=}5$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%LOC Sec: 5 (findings)
+\textbf{Reading the table.} \emph{Believing reports and arrival-time audits lose heavily.} NAIVE has $G={}$0.2793 $\pm$ 0.0004 at $r{=}0.5$; M2 has 0.2795 $\pm$ 0.0004, unchanged by $r$. The honest requester's own mean utility under NAIVE at $r{=}0.5$ is only 0.1875 $\pm$ 0.0007. \emph{Dispatch-time audit is cheap but stable only against uninformed liars.} M3C at $r{=}0.9$ has honest $R/T={}$0.0070 $\pm$ 0.0016 and $\alpha={}$0.0303 $\pm$ 0.0060; its uninformed $G$ is at most 0.0213 $\pm$ 0.0039 (at $r{=}0.5$). The oracle edge inflation gains 0.0211 $\pm$ 0.0033 ($r{=}0.9$) to 0.0870 $\pm$ 0.0053 ($r{=}0.5$), and still 0.0460 $\pm$ 0.0015 at $r{=}0.99$ (Figure~\ref{fig:edge} shows the edge-inflation gains by variant) (there the tuning chose $h{=}8$, which almost never punishes: $\alpha={}$0.0001 $\pm$ 0.0001). It is sensitive to a mis-specified $\rho$ (stage 2b, M3C at $\alpha$ target $0.02$): over-estimating $r$ by $0.05$ at true $r{=}0.9$ punishes honest requesters at rate 0.3073 $\pm$ 0.0212, and at true $r{=}0.95$ (assumed $r{=}1$) at 0.9531 $\pm$ 0.0032; under-estimating by $0.05$ at $r{=}0.99$ raises the best lying gain (a $dz$ strategy) from 0.0044 $\pm$ 0.0059 (oracle $\rho$) to 0.0556 $\pm$ 0.0019. These misspecification numbers are from stage 2b ($T=2\times10^4$, seeds 5000--5031). The M3C oracle gain at $r{=}0.99$ is 0.0044 $\pm$ 0.0059 there but 0.0460 $\pm$ 0.0015 in Table~\ref{tab:map}; this is not a contradiction: they come from different cells ($T=2\times10^4$ with $\alpha$ target $0.02$ against $T=10^5$ with the oracle-tuned $h{=}8,L{=}100$), and the tuned parameters differ. \emph{The marginal quota QM blocks uninformed liars but not oracle liars, and quotas cost efficiency when types persist; QT and QE do not block even uninformed liars.} QM has uninformed $G$ at most 0.0048 $\pm$ 0.0014 ($r{=}0.99$), but with oracle strategies about 0.0897 $\pm$ 0.0003 at $r{=}0.5$ (best strategy: saving the high-quantile budget). QT and QE have uninformed gains of 0.0224 $\pm$ 0.0004 to 0.0987 $\pm$ 0.0021 (QT) and 0.0330 $\pm$ 0.0006 to 0.1040 $\pm$ 0.0028 (QE) across $r$ (Table~\ref{tab:map}; \texttt{results/quota.json}). The price is rewriting honest reports: 4.3\% at $r{=}0.5$ rising to 27.0\% at $r{=}0.99$, with honest $R/T$ from 0.0114 $\pm$ 0.0001 to 0.0585 $\pm$ 0.0011 (Figure~\ref{fig:quota}).
+
+\begin{figure}[t]
+\centering\includegraphics[width=0.97\linewidth]{\FIGDIR/fig20a_quota_vs_audit.png}
+\caption{Quota (QM, QT, QE; block $W$ in the label) against audits (M3C, M4) and the M0/NAIVE references; $T=10^5$, seeds 5000--5031. Top: honest $R/T$ (dark) and $R/T$ at the best-response liar (light); middle: maximum lying gain, circles for all strategies and open squares for non-oracle strategies; bottom: honest-agent utility loss against the oracle allocation. Source: \texttt{results/quota.json}.}\label{fig:quota}
+\end{figure}
+
+\begin{figure}[t]
+\centering\includegraphics[width=0.85\linewidth]{\FIGDIR/fig19c_edge_uninformed_density.png}
+\caption{Left: edge-inflation gain at false-punishment rates $\le0.05$ against $r$ (new seeds); solid lines are the uninformed version and dashed lines are the oracle version, for four dispatch-audit variants (M3C, M3G, M3T, M3W). Right: scale of the edge gain from the margin density. Source: \texttt{results/stage2b.json}.}\label{fig:edge}
+\end{figure}
+
+\section{The main finding: low-probability raids that include the winner}\label{sec:raid}
+%LOC Sec: 6 (raids)
+Within the 45 strategies, M4 with the winner as a target is, among the tested mechanisms, the only one that is both unprofitable to lie against ($G\le0$) and low-regret: its maximum lying gain is 0.0000 $\pm$ 0.0000 in both columns at every $r$ (Table~\ref{tab:map}). M0 also has $G=0$, but its honest $R/T$ is 0.224. The value 0.0000 is a floor, because the maximum over strategies includes the honest strategy; the best \emph{deviation} in stage 2b is negative, $-$0.0443 $\pm$ 0.0094 at $r{=}0.5$ and $-$0.0544 $\pm$ 0.0112 at $r{=}0.99$ ($\epsilon{=}0.01$, $rw{=}1$, $T=2\times10^4$; \texttt{stage2b.json}, \texttt{eval\_rows.M4[tag=a0.01]}.\texttt{G\_max}). Its honest regret is 0.0162 $\pm$ 0.0001 at $r{=}0.5$ and 0.0162 $\pm$ 0.0002 at $r{=}0.99$, with no false punishment, and it does not need to know $\rho$. It is more expensive than M3C for honest requesters (M3C at $r{=}0.9$: 0.0070 $\pm$ 0.0016), the price of robustness. At $\epsilon{=}0.01$ with winner-raid probability $1$ in stage 2b, honest $R/T={}$0.0082 $\pm$ 0.0002 ($r{=}0.5$, $T{=}20000$). Figure~\ref{fig:raid} shows the \emph{pre-fix} stage-2 raid, whose lying gain stays positive for short suspension $L$; it illustrates the loophole and is not evidence for the corrected raid.
+
+\textbf{Is M4 non-trivial, given that it verifies immediately?} M4 buys the true value in the same round by paying one round: it trades cost for delay, which is the obvious way around delayed verification. In the abstract model one round of cost corresponds to one trip in a spatial model. Its value is that it needs no knowledge of $\rho$ (M3C is sensitive to mis-specified $\rho$: with $r+0.05$ at true $r{=}0.9$ the honest false-punishment rate is 0.3073 $\pm$ 0.0212; stage 2b, $T=2\times10^4$) and is unaffected by uninformed or oracle strategies within the set. The price is regret: honest $R/T$ of 0.0162 is about 2.3 times that of M3C (0.0070 at $r{=}0.9$) and 1.7 to 3.8 times that of QT (0.0043--0.0067) and QE (0.0043--0.0094) (\texttt{quota.json}). We also admit three weaknesses of the evidence: $L{=}2500$ lies at the edge of the tuning grid and interacts with $T$; the map's M4 uses $rw{=}1/3$ and $\epsilon{=}0.02$ (\texttt{quota.json}) while stage 2b uses $rw{=}1$; and the cost correspondence to travel is untested.
+
+\textbf{Cost assumption.} In the abstract model a raid has one cost: the raided round's item is not allocated, so the waste fraction equals $\epsilon$ (measured 0.0200 $\pm$ 0.0002 for $\epsilon{=}0.02$). In a spatial model the corresponding cost is \emph{travel}: to observe the truth immediately the server must physically go there, and the approach can itself be observed by requesters. We have \textbf{not} connected the raid to the ring-spatial simulation of earlier work, so this correspondence is an untested analogy, and the robustness claim should not be transferred to a real dispatcher before that is done. The two M4 parameterisations also differ: the map uses $rw{=}1/3$, stage 2b uses $rw{=}1$, and they must be read separately.
+
+\begin{figure}[t]
+\centering\includegraphics[width=\linewidth]{\FIGDIR/fig18b_raid_cost.png}
+\caption{Maximum lying gain per round against raid cost (wasted-round fraction $\epsilon$) for raid mechanisms (M4, several suspension lengths $L$) and M5, with a horizontal line for the selected single-threshold dispatch audit (M3a), at $T=10^5$, by $r$. Source: stage-2 results (\texttt{fig18b}). This figure was drawn before the winner-raid fix (the raid never audited the winner) and is shown to illustrate that loophole, not the numbers in Table~\ref{tab:map}.}\label{fig:raid}
+\end{figure}
+
+\section{Limitations}\label{sec:limits}
+\begin{itemize}\setlength\itemsep{0pt}
+\item \textbf{Finite, hand-written strategy set.} Oracle strategies dominate the maximum, no strategy is shown to be a best response, and $G$ (oracle) is a maximum over 45 strategies and therefore biased upward. Every ``pass'' means ``passes in this set''.
+\item \textbf{Adaptive strategies are weak.} The adaptive strategy (own simulation of the audit) is often worse than a simple $dz$; for M3C at $\alpha$ target $0.01$, $r{=}0.9$ it gains $-$0.0297 $\pm$ 0.0078. This looks like weak implementation, not unprofitability.
+\item \textbf{Oracle $\rho$.} M3C and QT use the true $\rho$; mis-specification is shown above and a poisoned estimator was not tested.
+\item \textbf{Small system.} $K{=}3$; number of requesters and scarcity were not swept.
+\item \textbf{Not tied to the spatial simulation.} The raid-to-travel correspondence is verbal only.
+\item \textbf{Grid-edge parameters.} The M3C selections $L{=}2500$, $h{=}6$ ($h{=}8$ at $r{=}0.99$) lie at the upper edge of the tuning grid (L up to 2500, $h$ up to 8), as does M4's $L$; true optima may lie outside. The $r{=}0.8$ pass of M3c (0.0021 $\pm$ 0.0025) is marginal.
+\item \textbf{Winner's curse.} The audited agent is the winner, whose report is selected to be high. M3 absorbs this by conditioning in $z$-space and matches $\Phi(-\kappa)$; M1's one-sided comparison has no such correction. The maximum $G$ is taken on the evaluation seeds.
+\item \textbf{Simplified quota mechanisms,} no $g^K$ correction, no anti-collusion, a QT/QE that conditions only on the own previous report.
+\item \textbf{Related work} is a targeted, not exhaustive, survey; only three core papers were read in full.
+\item \textbf{Unresolved.} F4 (achievability) is undecided and no lower bound was derived; we make no claim of a scaling law. We also do not report some intermediate numbers from earlier drafts and notes because they have no recorded source in our result files.
+\end{itemize}
+
+\section{Conclusion and next step}\label{sec:concl}
+Delayed verification turns auditing into a noisy test, and in our model the choice of mechanism matters far more than the choice of tolerance. Arrival-time audits and believing reports are beaten; dispatch-time statistical audits and the marginal quota QM hold against uninformed liars but not informed ones, while QT and QE do not hold even against uninformed liars (gains 0.022--0.104); a low-probability raid including the winner holds in all 45 strategies, at an honest regret of 0.0162 per round, about 2.3 times M3C's 0.0070 and 1.7 to 3.8 times that of QT and QE. We also report that a theory programme was dropped on grounds written into the project notes beforehand (no external timestamp), not repackaged. The decisive weakness is the hand-written strategy set. The next step (direction two) is to \emph{train} an adversary by reinforcement learning against each deployed mechanism and replace the hand-written set by a learned best response. It tests three things: whether the raid's $G\le0$ survives (our strongest claim), how quotas fare against stronger adaptive opponents, and whether M3C holds under mis-specified $\rho$ or a poisoned estimator, possibly with a partially informed adversary to fill the gap between the two $G$ columns. Until then, the raid claim should read ``in this strategy set''. A second step is to connect the raid cost to travel in the spatial simulation, and a third is to combine quota with audit, which we did not test.
+
+\bibliographystyle{plainnat}
+\bibliography{refs}
+\end{document}
