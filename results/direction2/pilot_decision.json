@@ -1,0 +1,148 @@
+{
+ "schema": "direction2-pilot-decision/1",
+ "chosen_start": "cold",
+ "rule": "REQ-S1-20 / REQ-OPT-07 / P-7: cold validation G >= 0.8*G*_ref -> freeze cold; warm run not needed",
+ "pilot_cell": "pilot_naive_cold",
+ "warm_run": null,
+ "warm_note": "pilot_naive_warm not run: the cold pilot passed (REQ-S1-20 runs warm only if cold fails)",
+ "G_star_ref": {
+  "mean": 0.27909212421035584,
+  "lo": 0.2785559060739357,
+  "hi": 0.27962834234677597,
+  "half": 0.0005362181364201152,
+  "sd": 0.0014872703335310335
+ },
+ "threshold": 0.22327369936828467,
+ "cold_val_G": {
+  "mean": 0.3121000505375625,
+  "lo": 0.3116032685454395,
+  "hi": 0.3125968325296855,
+  "half": 0.0004967819921229954
+ },
+ "cold_passes": true,
+ "val_seeds": [
+  2000,
+  2031
+ ],
+ "T_val": 100000,
+ "T_score": 97500,
+ "best_checkpoint_gen": 50,
+ "convergence_gen": 50,
+ "final_sigma": 1.6460338284021113e-55,
+ "G_val_by_gen": [
+  {
+   "gen": 50,
+   "G_val": 0.3121000505375625
+  },
+  {
+   "gen": 100,
+   "G_val": 0.3121000505375625
+  },
+  {
+   "gen": 150,
+   "G_val": 0.3121000505375625
+  },
+  {
+   "gen": 200,
+   "G_val": 0.3121000505375625
+  },
+  {
+   "gen": 250,
+   "G_val": 0.3121000505375625
+  },
+  {
+   "gen": 300,
+   "G_val": 0.3121000505375625
+  },
+  {
+   "gen": 350,
+   "G_val": 0.3121000505375625
+  },
+  {
+   "gen": 400,
+   "G_val": 0.3121000505375625
+  }
+ ],
+ "always_report_1": {
+  "REQ": "REQ-S1-25",
+  "T100000": {
+   "mean": 0.3121000505375625,
+   "lo": 0.3116032685454395,
+   "hi": 0.3125968325296855,
+   "half": 0.0004967819921229954
+  },
+  "T20000": {
+   "mean": 0.31228594580888913,
+   "lo": 0.3113494315203475,
+   "hi": 0.31322246009743077,
+   "half": 0.0009365142885416091
+  },
+  "rl_T20000": {
+   "mean": 0.31228594580888913,
+   "lo": 0.3113494315203475,
+   "hi": 0.31322246009743077,
+   "half": 0.0009365142885416091
+  },
+  "diff_rl_minus_always1_T100000": {
+   "mean": 0.0,
+   "lo": 0.0,
+   "hi": 0.0,
+   "half": 0.0
+  },
+  "note": "RL policy identical to always-report-1 on all 32 val seeds"
+ },
+ "best_handwritten_val": {
+  "T100000": {
+   "name": "b=1.0",
+   "G": 0.3121000505375625
+  },
+  "T20000": {
+   "name": "b=1.0",
+   "G": 0.31228594580888913
+  },
+  "second": "dz=4.0 0.31182 (T=1e5)",
+  "reference_dz2": 0.27909212421035584
+ },
+ "job_wall_s": [
+  847.0,
+  1047.3,
+  950.9,
+  823.1,
+  873.9,
+  913.4,
+  843.0,
+  869.4,
+  911.0,
+  767.5,
+  792.9,
+  793.6,
+  168.9
+ ],
+ "overrun": false,
+ "gpujobs": {
+  "train": [
+   130,
+   131,
+   132,
+   133,
+   134,
+   135,
+   136,
+   137,
+   138,
+   139,
+   140,
+   141,
+   142
+  ],
+  "eval": [
+   151,
+   152,
+   153,
+   154,
+   155,
+   156
+  ]
+ },
+ "seeds_used": "train 0-999 for training, val 2000-2031 only for validation/eval; no test seeds"
+}
