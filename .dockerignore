@@ -1,0 +1,3 @@
+# The build context only needs requirements.txt (the repository is mounted at /work, never baked into the image).
+*
+!requirements.txt

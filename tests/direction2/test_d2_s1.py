@@ -602,16 +602,18 @@ def test_S123_designer_source_and_status():
     assert "隔離成立" in iso
     calls2 = [json.loads(x) for x in open(os.path.join(d2, "tool_calls.jsonl"), encoding="utf-8") if x.strip()]
     assert calls2 and {c["tool"] for c in calls2} <= {"Read", "Write", "SubagentHandback"}, "designer_2 may not use Bash/Grep/Glob"
-    reads = sorted(os.path.relpath(c["args"]["file_path"], ROOT) for c in calls2 if c["tool"] == "Read")
+    def _rel(fp):        # the recorded paths are absolute on the machine that made the log (/home/lex/...); keep the part inside the repository
+        return fp.split("scarce-actuator-arbitration/", 1)[1] if "scarce-actuator-arbitration/" in fp else os.path.relpath(fp, ROOT)
+    reads = sorted(_rel(c["args"]["file_path"]) for c in calls2 if c["tool"] == "Read")
     allowed = ["arbitration/gpu/frontier.py", "docs/direction2-vuln-format.md"]
     assert reads == allowed, f"designer_2 Read set {reads}"
-    writes = [os.path.relpath(c["args"]["file_path"], ROOT) for c in calls2 if c["tool"] == "Write"]
+    writes = [_rel(c["args"]["file_path"]) for c in calls2 if c["tool"] == "Write"]
     assert writes == ["docs/direction2-blind-vulns-2.md"]
     assert s1.check_designer_prompt(open(os.path.join(d2, "prompt.txt"), encoding="utf-8").read()) == []
     man2 = [dict(path=p, sha256="0" * 64) for p in reads]
     assert s1.check_designer_manifest(man2, allowed, []) == []
     calls1 = [json.loads(x) for x in open(os.path.join(d1, "tool_calls.jsonl"), encoding="utf-8") if x.strip()]      # designer_1 log uses name/input keys
-    reads1 = {os.path.relpath(c["input"]["file_path"], ROOT) for c in calls1 if c["name"] == "Read" and "file_path" in c.get("input", {})}
+    reads1 = {_rel(c["input"]["file_path"]) for c in calls1 if c["name"] == "Read" and "file_path" in c.get("input", {})}
     assert "docs/direction2-spec.md" in reads1, "designer_1's contaminating spec read must stay on record"
     assert s1.check_designer_manifest([dict(path=p, sha256="0" * 64) for p in sorted(reads1)], allowed, []) != []
 

@@ -53,12 +53,30 @@ def test_T76_plan_holds_the_final_5_5_values():
     assert pl["start_registration"]["warm"]["warm_T"] == 4096
 
 
+def _assert_json_close(a, b, path="plan"):
+    if isinstance(a, dict):
+        assert isinstance(b, dict) and a.keys() == b.keys(), path
+        for k in a:
+            _assert_json_close(a[k], b[k], f"{path}.{k}")
+    elif isinstance(a, list):
+        assert isinstance(b, list) and len(a) == len(b), path
+        for i, (x, y) in enumerate(zip(a, b)):
+            _assert_json_close(x, y, f"{path}[{i}]")
+    elif isinstance(a, float) or isinstance(b, float):
+        assert abs(a - b) <= 1e-12 * max(1.0, abs(a), abs(b)), f"{path}: {a} vs {b}"
+    else:
+        assert a == b and type(a) is type(b), path
+
+
 def test_T77_plan_is_reproducible_from_the_script(tmp_path):
     """T-77: re-running scripts/make_d2_run_plan.py reproduces results/direction2/run_plan.json byte for byte."""
     out = tmp_path / "plan.json"
     subprocess.run([sys.executable, os.path.join(ROOT, "scripts", "make_d2_run_plan.py"), "--out", str(out)], check=True, cwd=ROOT,
                    capture_output=True, text=True)
-    assert out.read_bytes() == open(PLAN, "rb").read()
+    # Byte for byte on the machine that froze the plan; on another machine (other numpy/BLAS) sums can differ in the last bit of a float
+    # (e.g. 94.75629909218686 vs 94.7562990921869), so compare the parsed documents with a 1e-12 relative tolerance on floats.
+    if out.read_bytes() != open(PLAN, "rb").read():
+        _assert_json_close(json.loads(out.read_text()), json.load(open(PLAN)))
 
 
 def test_T78_plan_sha_matches_freeze_and_tampering_is_refused(tmp_path):

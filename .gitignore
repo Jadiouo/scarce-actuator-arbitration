@@ -15,3 +15,9 @@ scarce-actuator-arbitration.tar.gz
 .DS_Store
 docs/idae/
 results/cache/
+
+# Direction 2 deployment / discarded local S1 (never committed, never shipped)
+deploy/out/
+results/direction2/discarded_local_s1/
+results/direction2/target_check.json
+results/direction2/target_check_work/
