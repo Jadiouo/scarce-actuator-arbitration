@@ -27,11 +27,21 @@ run_plan.json 由 `scripts/make_d2_run_plan.py` 產生（可重現，測試 T-77
 | 0.5 | **0.0058** | `results/quota.json: main[12].Gmax_uninformed[1]`＝0.0039011376（半寬）；0.0039011376/1.96×2.8922＝0.005757 |
 | 0.9 | **0.0016** | `results/quota.json: main[14].Gmax_uninformed[1]`＝0.0010604507（半寬）；0.0010604507/1.96×2.8922＝0.001565 |
 
-`MDE_D,plan`（REQ-MEAS-03 / M-3，以代理策略對在驗證 seeds 量測）**尚未量測**（`results/direction2/` 內沒有 M-3 檔）：**待 M-3 量測後依規則填入**，不得以上表的估計代替。r=0.9 在 n_S≤256 下功效不足（需 n_S≈2734），只作描述性報告（REQ-OPT-11）。
+`MDE_D,plan`（REQ-MEAS-03 / M-3；驗證 seeds 2000–2031、T=1e5、三個手寫對 {dz=0.03,dz=0.05}、{dz=0.1,dz=0.3}、{edge_uninf thr band=0.05, band=0.1} 為代理；σ̂ 取 ddof=1，三對取中位數；MDE=κσ̂/√32，κ=2.8922；gpujob #143；出處 `results/direction2/measure_m3.json`，sha256 見 FREEZE.md 的 `M3_SHA256`）：
+
+| r | σ̂_val(G) | σ̂_val(D) | MDE_G | **MDE_D,plan** | MDE_est（規劃） | rel_diff |
+|---|---|---|---|---|---|---|
+| 0.5 | 0.003578（`rows[0].sigma_val_G`） | 0.003479（`rows[0].sigma_val_D`） | 0.001829 | **0.001779**（`rows[0].MDE_D_plan`） | 0.0058 | −68.5%（`rows[0].rel_diff`） |
+| 0.9 | 0.006272 | 0.005542 | 0.003207 | 0.002833（`rows[1].MDE_D_plan`） | 0.0016 | +100.4% |
+
+- 依 REQ-MEAS-03：r=0.5 的實測 MDE_est 與 0.0058 相差超過 ±30%（−68.5%），記錄之；規則不變（n_S 與 G_gens 已凍結，不因此改動）。r=0.9 同樣超過 ±30%，只作描述。
+- 限制（照實揭露）：代理為兩個高度相關的手寫策略之差，σ̂(D) 偏小。同檔 `rows[0].sensitivity_uncorrelated` 給出「RL 與手寫得利不相關」的敏感度：MDE_D,plan 中位數 0.002467、最大 0.006964；最大對（`MDE_D_plan_max_pair`）0.005984。**所有變體都 < 0.01**，G_s 的結論不變。每個 run 實際偵測仍用它自己驗證集算出的 `MDE_D`（REQ-MET-06）。
 
 ## 4. 閘門大小集合 G_s
 
-定義（REQ-S1-22）：`G_s = { s ∈ {0.01, 0.02} : s ≥ MDE_D,plan }`；`0.02 ∉ G_s`（`MDE_D,plan > 0.02`）⇒ 觸發 REQ-STOP-02，S1 不進行。**G_s 待 M-3 量測 MDE_D,plan 後依此規則填入。** 規劃用估計 MDE_est(r=0.5)=0.0058 ⇒ G_s={0.01, 0.02}，run 數 N=3·|G_s|+6＝12；因此 run_plan.json 登記 12 個 S1 run，其中 s=0.01 的 3 個標為 `conditional`（只在 0.01∈G_s 時跑）。族內與盲區固定只跑 s=0.02。
+定義（REQ-S1-22）：`G_s = { s ∈ {0.01, 0.02} : s ≥ MDE_D,plan }`；`0.02 ∉ G_s` ⇒ 觸發 REQ-STOP-02。
+
+**判定（M-3 後）**：`MDE_D,plan(r=0.5)=0.001779`（`results/direction2/measure_m3.json: rows[0].MDE_D_plan`）⇒ `0.01 ≥ 0.001779` 且 `0.02 ≥ 0.001779` ⇒ **G_s={0.01, 0.02}**，STOP-02 未觸發；**s=0.01 的 3 個 conditional cell（s1_D1_s0.01、s1_D2_s0.01、s1_O1_s0.01）要執行**。run 數 N=3·2+6=12，其中 NAIVE 錨點重用 pilot_naive_cold 的結果，實際新訓練 11 個 S1 run。程式 `plan.check_conditional` 在啟動時依已登記的 M-3 記錄再次判定。族內與盲區固定只跑 s=0.02。
 
 ## 5. 暖啟動與冷啟動（REQ-OPT-07，兩條路都登記）
 
@@ -51,3 +61,11 @@ run_plan.json 由 `scripts/make_d2_run_plan.py` 產生（可重現，測試 T-77
 - **n_S 涵蓋範圍的揭露**（REQ-OPT-13）：n_S=256 依「σ 三種的中位數最壞值」滿足 REQ-OPT-09，但**單一隨機策略對的最壞情況**（`sd_CRN`=0.034465）需要 n_S≈565（`measure_v2_summary.json: nS_need["0.5"].nS_formula_continuous_pair`＝564.95），**目前無法涵蓋（not covered）**；r=0.9 需 n_S 數千，只作描述。此揭露不改變任何判定規則。
 - **CRN 降幅有限**（VRF 約 1–1.7）：見規格 §5.5 的 VRF 列（REQ-MEAS-02）。
 - 凍結記錄、特徵表、k=8、P_MAX=64、σ0：見 `results/direction2/FREEZE.md`。
+
+## 8. S1 開跑前強化補登與時數重估
+
+- 新增登記（程式合併 sha、測試合併 sha、M-3 sha、鎖定入口、NAIVE 錨點重用）見 `results/direction2/FREEZE.md` 末節「S1 開跑前強化補登」。
+- **暖啟動**：`best_handwritten_on_train` 與 `warm_start_theta` 一律在該 cell 自己的環境擬合（漏洞 cell 用 `vulns.simulate_vuln(operator, knob)` 與其公開觀測；NAIVE 錨點 p=0；M4 錨點用自己的 cfg 與 r=0.99）。
+- **漏洞環境單步耗時**（gpujob #144，`results/direction2/measure_vuln_timing.json`；λ=256、n_S=256、T=2e4；1 個不計時的暖機世代後各取 3 個世代；7 個 wired=false 的 diag run 不計入）：D4 mean 1.3587 ms、p95 1.3593 ms；D2 mean 1.2316 ms、p95 1.2350 ms（每步＝世代秒數／T）；每次驗證 D4 131.7 s、D2 120.3 s；峰值記憶體約 154 MB。p95 只來自 3 個世代，變異低估；與純 M3C 的 v2 值（mean 1.359、p95 1.948 ms）相比，漏洞環境沒有明顯更慢。
+- **時數重估**（`results/direction2/hours_estimate.json`；規格 5.5 公式；D4／D2 用各自實測，其餘漏洞算子取兩者較大值〔假設，未逐一量測〕；diag 7 個不計；NAIVE 錨點重用 0 小時）：S1 新訓練 11 個 run，mean 37.1 小時／p95 38.5 小時；主實驗 6 個 run，mean 22.6／p95 31.6 小時；S1＋主實驗 17 個 run，mean 59.7／p95 70.1 小時；加 pilot 冷啟動（3.4／4.8 小時）共 mean 63.2／p95 74.9 小時（暖啟動 pilot 只在冷未達標時才跑，未計）。舊估 94.8／132.3 小時含 7 個 diag run 與 NAIVE 錨點。
+- **揭露**：訓練 T_train=2e4，漏洞大小（knob）在 T=1e5 校準，時間尺度不同；驗證與測試在 T=1e5。

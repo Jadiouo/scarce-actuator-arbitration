@@ -28,3 +28,15 @@
 - **為何不能依賴執行時讀到的檔案**：`arbitration/rl/budget.py` 的 `decide_params` 依輸入即時算出 n_S；以 v1 輸入會得到 n_S=64，以 v2 最壞情況才得到 256（交叉檢查見 run_plan.json 的 `budget_crosscheck`：v2 輸入 → λ=256、T_train=20000、n_S=256、G_gens=416／499，與定稿值一致；v1 輸入 → n_S=64）。因此訓練參數寫死在 run_plan.json，訓練入口只讀計畫檔，並在啟動時驗證計畫檔 sha256 與本檔 `RUN_PLAN_SHA256` 一致。
 - **補登的檔案**：results/direction2/run_plan.json、scripts/make_d2_run_plan.py、arbitration/rl/plan.py、arbitration/rl/train.py（`--plan`／`--cell` 入口，另讓漏洞環境與 M4 錨點可由計畫檔訓練）、docs/direction2-freeze.md（規格 S1-14 要求的登記檔）、tests/direction2/test_d2_plan.py（T-76～T-80）、tdd-map 的登記、tests/direction2/test_d2_misc.py 的可攜寫法。**規格 v1.3、漏洞套件、判定規則與 budget.py 均未改動**（sha256 與上方凍結記錄相同）。
 - 登記檔：docs/direction2-freeze.md（MDE、G_s 規則、暖冷啟動、通過標準、判定表版本、run_plan.json 與 vuln_suite.json 的 sha256）。
+
+## S1 開跑前強化補登（pre-S1 hardening；早於任何 S1／主實驗訓練，本節為新增、前面各節保留）
+
+- **補登 commit**：見本分支標題為「Direction 2: pre-S1 hardening … — before S1」的 commit（分支 direction2-freeze，本機，未 push）。凍結 commit 仍為 `a72d3d731a450fe4724f0fa118943e25c39b7577`；run_plan.json、vuln_suite.json、規格、判定規則**未改動**（RUN_PLAN_SHA256 不變）。
+- **程式與測試的新合併 sha**（舊的一筆保留於上）：程式（`arbitration/rl/*.py` 與 `scripts/run_d2_*.py`，檔名排序後串接）sha256 `8ca14ac31cb61699535ab896a4bd2078a626bda3616fe206e95fa55314396b76`；測試（`tests/direction2/*.py`）sha256 `849b3224a26a62de2551aaa5bb6b9c53347e0bc9865249ac4cf73410979b252d`；CPU 測試（-m "not gpu"）112 passed（含 S123 於主 repo 路徑）。
+- **入口鎖定**：`train` 沒有 `--plan` 即拒絕（舊分支移除，預算旗標不存在）；`--plan`／`--freeze`／`--root` 只接受 repo 預設路徑；啟動時 `git diff --quiet HEAD -- run_plan.json FREEZE.md` 必須通過，HEAD 必須是凍結 commit 的後代；`pilot_decision.json` 必須已 commit、只 commit 一次、sha256 等於本檔 `PILOT_DECISION_SHA256`（登記前只允許 pilot cell；登記後 chosen_start 不得更動）；`--test-mode` 只能搭配 repo 外的 root。
+- **M-3 記錄登記**（REQ-MEAS-03；`results/direction2/measure_m3.json`，gpujob #143）：
+  M3_SHA256: a82d91921ba7fc411e167384f64af4687e051757406930c5fd81355f729156e5
+  s=0.01 的 conditional cell 只在此記錄（已 commit、sha 相符）顯示 `0.01 ≥ MDE_D,plan` 時才可執行（REQ-S1-22）。
+- **單步耗時量測**：`results/direction2/measure_vuln_timing.json`（gpujob #144）sha256 `88a0dcce8ca485b242b04f173e45a532350563579a2aabc0f1999b0b008749b2`；時數估算 `results/direction2/hours_estimate.json`（`scripts/estimate_d2_hours.py`）sha256 `fceba3761bf59b37f52231a5b666929892f1a0c87715240c129d8066c2967fb3`。
+- **NAIVE 錨點重用紀錄**：`s1_NAIVE_anchor` 與 `pilot_naive_cold` 的設定逐項相同（mechanism、variant、r、λ=256、T_train=20000、n_S=256、G_gens=416、val_every、σ0、obs_version、F、hidden、run_ids=[0]、algo_seeds=[9000]、train_seeds 區塊規則、val_seeds），**不再重跑**，直接引用 pilot_naive_cold 的結果（測試 seeds 評估仍依 S1 流程對該 pilot 的驗證選出檢查點做一次）。程式 `plan.REUSED_CELLS`／`check_reuse` 在啟動 `s1_NAIVE_anchor` 時逐項比對，並拒絕重跑；僅在採用冷啟動時重用 pilot_naive_cold（若決定為暖，改引用 pilot_naive_warm，同樣逐項檢查）。省下約 3.4 小時（mean）。
+- **揭露（訓練時間尺度）**：訓練用 T_train=2e4，而漏洞大小（knob）是在 T=1e5 下校準的，兩者時間尺度不同；訓練時漏洞的相對得利可能與校準值不同，驗證（T_val=1e5）與測試則在 T=1e5 進行。此項只揭露，不改變任何規則或參數。

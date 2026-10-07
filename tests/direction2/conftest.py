@@ -181,3 +181,42 @@ def make_freeze(**over):
              calibration=dict(calib_seeds="val+val2", n_seeds=64, ci="t63", records=[]), categories=dict(FIXED_CATEGORIES))
     d.update(over)
     return d
+
+
+def make_git_root(tmp_path, *, decision=None, register_decision=True, m3_mde=None, register_m3=True, commit=True, name="repo"):
+    """A throw-away git repository (outside the real repo) holding results/direction2/{run_plan.json, FREEZE.md} copied from the real repo, optionally a
+    pilot_decision.json ({'chosen_start': decision}) and an M-3 record with MDE_D_plan=m3_mde (r=0.5) plus their FREEZE.md registrations, all in ONE
+    commit.  Returns the root path.  Used with `--test-mode --root <root>`."""
+    import hashlib
+    import shutil
+    import subprocess
+    root = tmp_path / name
+    d = root / "results" / "direction2"
+    d.mkdir(parents=True)
+    shutil.copy(os.path.join(ROOT, "results", "direction2", "run_plan.json"), d / "run_plan.json")
+    freeze = open(os.path.join(ROOT, "results", "direction2", "FREEZE.md"), encoding="utf-8").read()
+    import re
+    freeze = re.sub(r"^[ \t]*(M3_SHA256|PILOT_DECISION_SHA256):.*$", "", freeze, flags=re.M)      # the throw-away repo registers its own records
+    if decision is not None:
+        (d / "pilot_decision.json").write_text(json.dumps(dict(chosen_start=decision)))
+        if register_decision:
+            freeze += "\nPILOT_DECISION_SHA256: " + hashlib.sha256((d / "pilot_decision.json").read_bytes()).hexdigest() + "\n"
+    if m3_mde is not None:
+        row = lambda r, v: dict(r=r, sigma_val_G=0.01, sigma_val_D=0.01, MDE_G=0.0058, MDE_D_plan=v, MDE_est=0.0058, rel_diff=0.0)
+        (d / "measure_m3.json").write_text(json.dumps(dict(rows=[row(0.5, m3_mde), row(0.9, 0.001)])))
+        if register_m3:
+            freeze += "\nM3_SHA256: " + hashlib.sha256((d / "measure_m3.json").read_bytes()).hexdigest() + "\n"
+    (d / "FREEZE.md").write_text(freeze, encoding="utf-8")
+    g = lambda *a: subprocess.run(["git", "-C", str(root), *a], check=True, capture_output=True, text=True)
+    g("init", "-q")
+    g("config", "user.email", "t@t")
+    g("config", "user.name", "t")
+    if commit:
+        g("add", "-A")
+        g("commit", "-q", "-m", "test root")
+    return str(root)
+
+
+def git(root, *args):
+    import subprocess
+    return subprocess.run(["git", "-C", str(root), *args], check=True, capture_output=True, text=True).stdout.strip()

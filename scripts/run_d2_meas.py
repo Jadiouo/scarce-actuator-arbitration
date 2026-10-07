@@ -4,6 +4,8 @@ Always run through gpujob (one GPU).  Parts (each < 25 min):
   python scripts/run_d2_meas.py m1                 -> results/direction2/measure_m1.json
   python scripts/run_d2_meas.py m2 --r 0.5         -> results/direction2/measure_m2_r0.5.json   (same for 0.9)
   python scripts/run_d2_meas.py merge              -> results/direction2_meas.json  (CPU only; also applies s5.5 rules)
+  python scripts/run_d2_meas.py m3                 -> results/direction2/measure_m3.json         (REQ-MEAS-03, r=0.5 and 0.9)
+  python scripts/run_d2_meas.py vtime              -> results/direction2/measure_vuln_timing.json (D4 / D2 step time, lam=256 n_S=256 T=2e4)
 """
 import argparse
 import json
@@ -387,9 +389,94 @@ def part_merge_v2(args):
     print(json.dumps(out, indent=1))
 
 
+# =====================================================================================================  M-3 (REQ-MEAS-03)
+M3_T = 100000                                  # validation horizon (REQ-OPT-06)
+M3_VAL_SEEDS = list(range(2000, 2032))          # the 32 validation seeds (REQ-MET-06: the MDE only uses these)
+
+
+def m3_row(r, f, seeds):
+    """REQ-MEAS-03 / REQ-MET-06: f[7, 32] = per-seed fitness U/T_score of [honest, a1, b1, a2, b2, a3, b3] (the three M-2 (b) hand pairs) on the 32
+    validation seeds.  G_i = f_i - f_honest (paired); D_k = G_a - G_b (proxy for D = G_RL - G_HW).  sigma_hat = sample SD (ddof=1) per quantity; the
+    plan value is the MEDIAN over the 6 policies (G) / 3 pairs (D), the maximum is reported too.  MDE = kappa*sigma/sqrt(32) via metrics.mde
+    (validation seeds only).  MDE_est = the REQ-OPT-09 planning value; rel_diff = MDE_G/MDE_est - 1."""
+    from arbitration.rl import metrics
+    f = np.asarray(f, dtype=float)
+    G = [f[i] - f[0] for i in range(1, 7)]
+    D = [G[0] - G[1], G[2] - G[3], G[4] - G[5]]
+    sG = [float(np.std(g, ddof=1)) for g in G]
+    sD = [float(np.std(d, ddof=1)) for d in D]
+    mdeG = [metrics.mde(g, seeds) for g in G]
+    mdeD = [metrics.mde(d, seeds) for d in D]
+    est = MDE_EST[r]
+    ind = [math.sqrt(sG[2 * k] ** 2 + sG[2 * k + 1] ** 2) for k in range(3)]       # sensitivity: RL and HW per-seed gains uncorrelated
+    kap = metrics.kappa()
+    return dict(r=r, sigma_val_G=float(np.median(sG)), sigma_val_D=float(np.median(sD)), MDE_G=float(np.median(mdeG)),
+                MDE_D_plan=float(np.median(mdeD)), MDE_est=est, rel_diff=float(np.median(mdeG) / est - 1.0),
+                replaces_MDE_est=bool(abs(np.median(mdeG) / est - 1.0) > 0.3),
+                sigma_G_by_policy=sG, sigma_D_by_pair=sD, MDE_G_by_policy=mdeG, MDE_D_by_pair=mdeD, MDE_D_plan_max_pair=float(max(mdeD)),
+                sensitivity_uncorrelated=dict(sigma_D=ind, MDE_D_plan_median=float(kap * np.median(ind) / math.sqrt(32)),
+                                              MDE_D_plan_max=float(kap * max(ind) / math.sqrt(32))),
+                kappa=kap, n_seeds=len(seeds), aggregation="median over the 6 policies (G) / 3 pairs (D)")
+
+
+def part_m3(args):
+    """M-3: the 3 hand pairs of M-2 (b) on the 32 validation seeds at T=1e5, r in {0.5, 0.9}; one job (<25 min)."""
+    from arbitration.rl import seeds as _sd
+    assert M3_VAL_SEEDS == list(_sd.splits()["val"])
+    pols = [policy.AdapterPolicy({})]
+    for a, b in HAND_PAIRS:
+        pols += [policy.AdapterPolicy(a), policy.AdapterPolicy(b)]
+    rows = []
+    for r in V2_R:
+        t0 = time.time()
+        out = env.simulate("M3C", M3_T, CFG, pols, M3_VAL_SEEDS, r=r, dev="cuda")
+        f = (out["snap"]["util_b"][:, :, 1] / out["T_score"]).cpu().numpy().astype(np.float64)
+        rows.append(m3_row(r, f, M3_VAL_SEEDS))
+        print("r", r, "done", round(time.time() - t0), "s", {k: rows[-1][k] for k in ("sigma_val_G", "sigma_val_D", "MDE_G", "MDE_D_plan", "rel_diff")}, flush=True)
+    doc = dict(spec="direction2-spec v1.3 REQ-MEAS-03 (M-3)", git_sha=git_sha(), T=M3_T, val_seeds="2000-2031", T_score=out["T_score"],
+               pairs=[[a, b] for a, b in HAND_PAIRS], rows=rows, device=torch.cuda.get_device_name(), torch=torch.__version__,
+               note="D proxy = G_a - G_b of a hand pair (same as M-2 (b)); MDE_D_plan is the median over the 3 pairs; see sensitivity_uncorrelated for the "
+                    "RL-vs-HW case where the two gains are not highly correlated")
+    os.makedirs(OUT, exist_ok=True)
+    json.dump(doc, open(os.path.join(OUT, "measure_m3.json"), "w"), indent=1)
+
+
+# =====================================================================================================  vulnerability-environment step time
+def part_vtime(args):
+    T_SCORE = env.score_window(20000, int(CFG["L"]))
+    """GPU time per training generation in the vulnerable environments D4 and D2 (lam=256, n_S=256, T=2e4): 1 untimed warm-up generation (compilation,
+    allocator), then 3 timed generations each; per-step ms = generation seconds / T.  Also one validation (T=1e5, 32 seeds) per operator."""
+    from arbitration.rl import cmaes, plan, train
+    pl = json.load(open(os.path.join(ROOT, "results", "direction2", "run_plan.json")))
+    doc = dict(git_sha=git_sha(), device=torch.cuda.get_device_name(), torch=torch.__version__, lam=256, n_S=256, T=20000, cells={})
+    for name in ("s1_D4_s0.02", "s1_D2_s0.02"):
+        c = plan.get_cell(pl, name)
+        S = plan.cell_to_settings(c)
+        sim = train.make_sim_fn(S["mech"], S["T_train"], S["cfg"], S["r"], "cuda", None, S["F"], S["hidden"], S["obs_version"], S["operator"], S["knob"])
+        val = train.make_val_fn(S["mech"], S["T_val"], S["cfg"], S["r"], "cuda", S["F"], S["hidden"], S["obs_version"], S["operator"], S["knob"])
+        opt = cmaes.make_optimizer(55, lam=S["lam"], sigma0=S["sigma0"], seed=9000)
+        times = []
+        for g in range(4):
+            sb = list(train.seed_block(0, g, S["n_S"]))
+            torch.cuda.synchronize(); t0 = time.perf_counter()
+            X = opt.ask()
+            res = train.evaluate_generation(sim, X, sb, T_SCORE)
+            opt.tell(X, res["f"])
+            torch.cuda.synchronize(); times.append(time.perf_counter() - t0)
+            print(name, "gen", g, round(times[-1], 2), "s", "mem MB", round(torch.cuda.max_memory_allocated() / 2 ** 20), flush=True)
+        timed = times[1:]
+        ts = [1000.0 * x / S["T_train"] for x in timed]
+        tv0 = time.perf_counter(); gv = val(np.array(opt.mean)); torch.cuda.synchronize(); tv = time.perf_counter() - tv0
+        doc["cells"][name] = dict(operator=S["operator"], knob=S["knob"], gen_s_warmup=times[0], gen_s_timed=timed, t_step_ms_timed=ts,
+                                  t_step_ms_mean=float(np.mean(ts)), t_step_ms_p95=float(np.percentile(ts, 95)), t_step_ms_max=float(np.max(ts)),
+                                  t_val_s=tv, mem_peak_MB=torch.cuda.max_memory_allocated() / 2 ** 20, uptime=_uptime())
+        json.dump(doc, open(os.path.join(OUT, "measure_vuln_timing.json"), "w"), indent=1)
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("part", choices=["m1", "m2", "merge", "m2v2", "m1v2", "merge_v2"])
+    ap.add_argument("part", choices=["m1", "m2", "merge", "m2v2", "m1v2", "merge_v2", "m3", "vtime"])
     ap.add_argument("--r", type=float, default=0.5)
     a = ap.parse_args()
-    {"m1": part_m1, "m2": part_m2, "merge": part_merge, "m2v2": part_m2v2, "m1v2": part_m1v2, "merge_v2": part_merge_v2}[a.part](a)
+    {"m1": part_m1, "m2": part_m2, "merge": part_merge, "m2v2": part_m2v2, "m1v2": part_m1v2, "merge_v2": part_merge_v2,
+     "m3": part_m3, "vtime": part_vtime}[a.part](a)

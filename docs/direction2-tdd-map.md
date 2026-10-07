@@ -278,3 +278,18 @@ GPU 隊列被實作 agent 的量測 job（m1、m2）佔用，本次加強後的 
 
 - 另：`test_d2_misc.py::test_T52_gpu_job_manifest` 的 python 路徑改為 `sys.executable`（可攜，斷言不變）。
 - 限制：診斷 cell（REQ-S1-19，7 個）在計畫中登記為 `wired=false`，入口拒絕執行（T-55 仍為 NotImplementedError 的既有狀態）。`pilot_decision.json` 在 pilot 完成後才會產生；之前入口只允許 pilot 兩個 cell。
+
+## S1 開跑前的強化（2026-10-07，早於任何 S1 訓練）：鎖定入口、conditional、暖啟動環境、錨點重用、M-3、時數
+
+依據：notes「紅方（訓練接線與計畫）與 commander 決定」。測試檔 `tests/direction2/test_d2_hardening.py`（CPU）；`test_d2_plan.py::T-80` 改為測試模式（`--test-mode --root <repo 外的暫存 git repo>`）。
+
+| T | 測試 | 對應 REQ | 驗證內容 |
+|---|---|---|---|
+| T-81 | `test_T81_entry_without_plan_or_with_other_paths_is_refused` | S1-14、OPT-07 | 沒有 `--plan` 拒絕（舊分支移除）；舊的預算旗標（`--lam/--nS/--T/--mech…`）不存在；`--plan`／`--freeze`／`--root` 不是 repo 預設路徑即拒絕（假 plan、假 FREEZE、假 root）；`--test-mode` 的 root 必須在 repo 之外（含 symlink），不得寫入 results/direction2 |
+| T-82 | `test_T82_uncommitted_plan_or_freeze_and_non_descendant_head_are_refused` | S1-14 | `git diff --quiet HEAD -- plan FREEZE.md`：未暫存、已暫存未 commit、未追蹤都拒絕；HEAD 必須是凍結 commit a72d3d7 的後代 |
+| T-83 | `test_T83_pilot_decision_must_be_committed_and_registered` | OPT-07、S1-14、S1-20 | pilot_decision.json 未 commit／未在 FREEZE.md 登記 `PILOT_DECISION_SHA256` ⇒ 只允許 pilot cell；sha 不符、事後修改、第二次 commit、登記被改、重複衝突登記、chosen_start 非法皆拒絕；已登記後 `--start` 與決定矛盾拒絕 |
+| T-84 | `test_T84_conditional_cells_are_read_and_enforced_by_gate_sizes` | S1-22、MEAS-03、STOP-02 | 計畫中 s=0.01 的 3 個 conditional cell 被程式讀取：依已登記（`M3_SHA256`）且已 commit 的 M-3 記錄，`0.01 ≥ MDE_D,plan` 才可執行（邊界相等可），否則拒絕並說明；`MDE_D,plan > 0.02` ⇒ STOP-02；無或未登記的 M-3 記錄拒絕 |
+| T-85 | `test_T85_warm_start_is_fitted_in_the_cells_own_environment`、`test_T85b_main_passes_operator_and_knob_to_the_warm_start` | OPT-07、S1-05 | `best_handwritten_on_train`／`warm_start_theta` 在該 cell 自己的環境擬合：漏洞 cell 用 `simulate_vuln(operator, knob)`，只在漏洞環境中最佳的手寫策略被挑出；NAIVE／M4 錨點用各自設定；`warm_obs` 只是觀察者（不改變模擬，operator=None 時與 `env.simulate(diagnostic=True)` 的 obs 逐位元相同）；`main()` 把 operator／knob 傳給暖啟動 |
+| T-86 | `test_T86_naive_anchor_reuses_the_cold_pilot_only_if_every_setting_is_identical` | S1-08、S1-20 | `s1_NAIVE_anchor` 與 `pilot_naive_cold` 逐項相同（含 algo seed、run_ids、train_seeds 區塊規則、val seeds）才允許重用，入口拒絕重跑；任何一項不同即不可重用；路線須為已登記的路線 |
+| T-87 | `test_T87_m3_record_schema_and_computation` | MEAS-03、MET-06、S1-22 | M-3 的 σ̂（ddof=1）、MDE=κσ/√32、三對取中位數、輸出欄位符合 `validate_m3`；只接受驗證 seeds |
+| T-88 | `test_T88_hours_estimate_uses_measured_vulnerability_step_time` | OPT-10、GPU-05 | 時數估算：規格 5.5 公式搭配實測的 D4／D2 單步耗時；不計 7 個 diag；NAIVE 錨點重用不計；s=0.01 只在 G_s 內計入 |

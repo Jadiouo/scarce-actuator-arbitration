@@ -371,6 +371,7 @@ class _HS:
         self.win, self.clean, self.rsw = z(), z(), z()
         self.ext = None            # designer mutations: _Ext object
         self.rules = []            # in-loop rule policies: [(mask[B], loop-rule object)]
+        self.wrec = None           # optional (warm-start recorder): list of (obs[B,F], u1[B], v1[B]) per round
         self.plog = None           # optional public log of agent 1: list of [B,4] (u1, v1, won1, susp1 at the start of the round)
         self.cur_susp1 = None
 
@@ -552,6 +553,8 @@ def _vstep(st, bank, op: Optional[VulnOperator], knob: float, hs: _HS, log: Opti
         rl.update(dict(t=t, u1=u1, elig1=elig[:, 1], won1=won1))
     if hs.plog is not None:
         hs.plog.append(torch.stack([u1, v[:, 1], won1.to(F64), hs.cur_susp1], 1))
+    if hs.wrec is not None:
+        hs.wrec.append((obs, u1.clone(), v[:, 1].clone()))
     # ---- agent-1 streak bookkeeping and HOOK cusum_reset (every round, after the settlement)
     hs.win = torch.where(won1, hs.win + 1, torch.zeros_like(hs.win))
     hs.rsw = torch.where(won1, torch.zeros_like(hs.rsw), hs.rsw + 1)
@@ -562,17 +565,19 @@ def _vstep(st, bank, op: Optional[VulnOperator], knob: float, hs: _HS, log: Opti
 
 def simulate_vuln(operator: Any, knob: Any, mech: str, T: int, cfg: Dict[str, float], policies: Sequence[Any],
                   seeds: Sequence[int], *, r: float, dev: str = "cuda", hook_log: bool = False,
-                  T_score: Optional[int] = None, public_log: bool = False) -> Dict[str, Any]:
+                  T_score: Optional[int] = None, public_log: bool = False, warm_obs: bool = False) -> Dict[str, Any]:
     """REQ-S1-05: simulate in the vulnerable environment; operator=None must equal env.simulate bitwise.
 
     operator: None | 'O1'..'O6' | 'D1'..'D4' | registered id | VulnOperator; knob: its size parameter (kappa; C for O3; g for O5; s/Q/s/eta for D1..D4);
     a sequence of length len(policies) gives every policy its own knob (used to evaluate several knob values in one batch).
     policies may contain RulePolicy objects (history rules run in the loop; see the rule section at the end of this module).
+    warm_obs=True (warm start, REQ-OPT-07) additionally returns out['warm_obs'] = dict(obs[P,S,T,F], u1[P,S,T], v1[P,S,T]): the public observation the
+    policy sees INSIDE this vulnerable environment and the report it makes (obs tracking does not change the simulation).
     Returns the env.simulate fields ('final', 'snap', 'T_score') and, when hook_log=True, out['hook_log'][hook] =
     dict(mask=bool[P,S,T], out=[P,S,T], <inputs>=[P,S,T]) for the 5 hooks (inputs are those the hook received in this run)."""
     op = get_operator(operator)
     has_rule = any(isinstance(p, RulePolicy) for p in policies)
-    if op is None and not hook_log and not has_rule and not public_log:
+    if op is None and not hook_log and not has_rule and not public_log and not warm_obs:
         return _env.simulate(mech, T, cfg, policies, seeds, r=r, T_score=T_score, dev=dev, obs_version="public")
     if mech != "M3C":
         raise ValueError("vulnerability operators and hook logs are defined for the M3C audit block only")
@@ -586,13 +591,15 @@ def simulate_vuln(operator: Any, knob: Any, mech: str, T: int, cfg: Dict[str, fl
     e = np.arange(N)
     pid, sd = e // S, e % S
     uniq, inv = np.unique(seeds_a[sd], return_inverse=True)
-    need_obs = any(isinstance(p, MLPPolicy) for p in policies)
+    need_obs = warm_obs or any(isinstance(p, MLPPolicy) for p in policies)
     st = _env.SimState("M3C", cfg, r, uniq.tolist(), inv, dev, "public", track_obs=need_obs)
     bank_pols = [AdapterPolicy({}) if isinstance(p, RulePolicy) else p for p in policies]
     bank = _env._Bank(bank_pols, torch.as_tensor(pid, device=dev), dev, 25, obs_version="public")
     hs = _HS(N, dev)
     if public_log:
         hs.plog = []
+    if warm_obs:
+        hs.wrec = []
     if isinstance(knob, (list, tuple, np.ndarray)):
         if len(knob) != P:
             raise ValueError("a knob sequence needs one entry per policy")
@@ -614,6 +621,9 @@ def simulate_vuln(operator: Any, knob: Any, mech: str, T: int, cfg: Dict[str, fl
             snap = {f: getattr(st, f).clone() for f in _env._FIELDS}
     rs = lambda x: x.reshape(P, S, *x.shape[1:])
     out = dict(final={f: rs(getattr(st, f)) for f in _env._FIELDS}, snap={f: rs(v) for f, v in snap.items()}, T_score=Ts)
+    if warm_obs:
+        out["warm_obs"] = dict(obs=rs(torch.stack([x[0] for x in hs.wrec], 1)), u1=rs(torch.stack([x[1] for x in hs.wrec], 1)),
+                               v1=rs(torch.stack([x[2] for x in hs.wrec], 1)))
     if public_log:
         out["public_log"] = rs(torch.stack(hs.plog, 1))
     if hook_log:

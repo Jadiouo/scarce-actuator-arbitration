@@ -1,0 +1,217 @@
+{
+ "G_s": [
+  0.01,
+  0.02
+ ],
+ "rows": [
+  {
+   "cell": "pilot_naive_cold",
+   "group": "pilot",
+   "runs": 1,
+   "t_step_ms_mean": 1.359011063186148,
+   "t_step_ms_p95": 1.9480773326298124,
+   "t_val_s": 132.72400184050002,
+   "t_source": "v2 plain",
+   "mean_h": 3.4357677945646534,
+   "p95_h": 4.797165395056678
+  },
+  {
+   "cell": "pilot_naive_warm",
+   "group": "pilot",
+   "runs": 1,
+   "t_step_ms_mean": 1.359011063186148,
+   "t_step_ms_p95": 1.9480773326298124,
+   "t_val_s": 132.72400184050002,
+   "t_source": "v2 plain",
+   "mean_h": 3.4357677945646534,
+   "p95_h": 4.797165395056678
+  },
+  {
+   "cell": "s1_D1_s0.02",
+   "group": "s1",
+   "runs": 1,
+   "t_step_ms_mean": 1.3587142343666834,
+   "t_step_ms_p95": 1.3593245461247716,
+   "t_val_s": 131.74114512099914,
+   "t_source": "assumed=max(D4,D2)",
+   "mean_h": 3.4328976641385553,
+   "p95_h": 3.4343081624239145
+  },
+  {
+   "cell": "s1_D2_s0.02",
+   "group": "s1",
+   "runs": 1,
+   "t_step_ms_mean": 1.2315890409332495,
+   "t_step_ms_p95": 1.2350474469499386,
+   "t_val_s": 120.29717164100293,
+   "t_source": "measured",
+   "mean_h": 3.1136661649146276,
+   "p95_h": 3.121658925486532
+  },
+  {
+   "cell": "s1_O1_s0.02",
+   "group": "s1",
+   "runs": 1,
+   "t_step_ms_mean": 1.3587142343666834,
+   "t_step_ms_p95": 1.3593245461247716,
+   "t_val_s": 131.74114512099914,
+   "t_source": "assumed=max(D4,D2)",
+   "mean_h": 3.4328976641385553,
+   "p95_h": 3.4343081624239145
+  },
+  {
+   "cell": "s1_O2_s0.02",
+   "group": "s1",
+   "runs": 1,
+   "t_step_ms_mean": 1.3587142343666834,
+   "t_step_ms_p95": 1.3593245461247716,
+   "t_val_s": 131.74114512099914,
+   "t_source": "assumed=max(D4,D2)",
+   "mean_h": 3.4328976641385553,
+   "p95_h": 3.4343081624239145
+  },
+  {
+   "cell": "s1_O3_s0.02",
+   "group": "s1",
+   "runs": 1,
+   "t_step_ms_mean": 1.3587142343666834,
+   "t_step_ms_p95": 1.3593245461247716,
+   "t_val_s": 131.74114512099914,
+   "t_source": "assumed=max(D4,D2)",
+   "mean_h": 3.4328976641385553,
+   "p95_h": 3.4343081624239145
+  },
+  {
+   "cell": "s1_D4_s0.02",
+   "group": "s1",
+   "runs": 1,
+   "t_step_ms_mean": 1.3587142343666834,
+   "t_step_ms_p95": 1.3593245461247716,
+   "t_val_s": 131.74114512099914,
+   "t_source": "measured",
+   "mean_h": 3.4328976641385553,
+   "p95_h": 3.4343081624239145
+  },
+  {
+   "cell": "s1_O5_s0.02",
+   "group": "s1",
+   "runs": 1,
+   "t_step_ms_mean": 1.3587142343666834,
+   "t_step_ms_p95": 1.3593245461247716,
+   "t_val_s": 131.74114512099914,
+   "t_source": "assumed=max(D4,D2)",
+   "mean_h": 3.4328976641385553,
+   "p95_h": 3.4343081624239145
+  },
+  {
+   "cell": "s1_NAIVE_anchor",
+   "group": "s1",
+   "runs": 0,
+   "mean_h": 0.0,
+   "p95_h": 0.0,
+   "note": "result reused from the pilot (no retraining)"
+  },
+  {
+   "cell": "s1_M4rw0_anchor",
+   "group": "s1",
+   "runs": 1,
+   "t_step_ms_mean": 1.359011063186148,
+   "t_step_ms_p95": 1.9480773326298124,
+   "t_val_s": 132.72400184050002,
+   "t_source": "v2 plain",
+   "mean_h": 3.4357677945646534,
+   "p95_h": 4.797165395056678
+  },
+  {
+   "cell": "s1_D1_s0.01",
+   "group": "s1",
+   "runs": 1,
+   "t_step_ms_mean": 1.3587142343666834,
+   "t_step_ms_p95": 1.3593245461247716,
+   "t_val_s": 131.74114512099914,
+   "t_source": "assumed=max(D4,D2)",
+   "mean_h": 3.4328976641385553,
+   "p95_h": 3.4343081624239145
+  },
+  {
+   "cell": "s1_D2_s0.01",
+   "group": "s1",
+   "runs": 1,
+   "t_step_ms_mean": 1.2315890409332495,
+   "t_step_ms_p95": 1.2350474469499386,
+   "t_val_s": 120.29717164100293,
+   "t_source": "measured",
+   "mean_h": 3.1136661649146276,
+   "p95_h": 3.121658925486532
+  },
+  {
+   "cell": "s1_O1_s0.01",
+   "group": "s1",
+   "runs": 1,
+   "t_step_ms_mean": 1.3587142343666834,
+   "t_step_ms_p95": 1.3593245461247716,
+   "t_val_s": 131.74114512099914,
+   "t_source": "assumed=max(D4,D2)",
+   "mean_h": 3.4328976641385553,
+   "p95_h": 3.4343081624239145
+  },
+  {
+   "cell": "main_M3C_r0.5",
+   "group": "main",
+   "runs": 3,
+   "t_step_ms_mean": 1.359011063186148,
+   "t_step_ms_p95": 1.9480773326298124,
+   "t_val_s": 132.72400184050002,
+   "t_source": "v2 plain",
+   "mean_h": 10.30730338369396,
+   "p95_h": 14.391496185170032
+  },
+  {
+   "cell": "main_M3C_r0.9",
+   "group": "main",
+   "runs": 3,
+   "t_step_ms_mean": 1.359011063186148,
+   "t_step_ms_p95": 1.9480773326298124,
+   "t_val_s": 132.72400184050002,
+   "t_source": "v2 plain",
+   "mean_h": 12.297872022635218,
+   "p95_h": 17.196939830175026
+  }
+ ],
+ "totals": {
+  "pilot": {
+   "runs": 2,
+   "mean_h": 6.871535589129307,
+   "p95_h": 9.594330790113355
+  },
+  "s1": {
+   "runs": 11,
+   "mean_h": 37.12628143750235,
+   "p95_h": 38.514948545421056
+  },
+  "main": {
+   "runs": 6,
+   "mean_h": 22.605175406329177,
+   "p95_h": 31.58843601534506
+  },
+  "pilot_cold_only": {
+   "mean_h": 3.4357677945646534,
+   "p95_h": 4.797165395056678
+  },
+  "s1_plus_main": {
+   "runs": 17,
+   "mean_h": 59.73145684383152,
+   "p95_h": 70.10338456076612
+  },
+  "all_incl_pilot_cold_excl_warm_pilot": {
+   "mean_h": 63.16722463839618,
+   "p95_h": 74.9005499558228
+  }
+ },
+ "inputs": {
+  "plan": "results/direction2/run_plan.json",
+  "timing": "results/direction2/measure_vuln_timing.json",
+  "v2": "results/direction2/measure_v2_summary.json",
+  "rules": "diag cells (wired=false) excluded; s1_NAIVE_anchor reused from pilot_naive_cold (0 h); s=0.01 cells only if in G_s; operators other than D4/D2 use max(D4, D2) (not measured)"
+ }
+}

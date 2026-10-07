@@ -264,7 +264,7 @@ def registry_sha256(path: str) -> str:
 
 def is_exempt_cell(cell: str) -> bool:
     """REQ-S1-14: NAIVE pilot ('naive_pilot*') and smoke-test ('smoke*') cells are exempt from the ordering check."""
-    return cell.startswith("naive_pilot") or cell.startswith("smoke")
+    return cell.startswith("naive_pilot") or cell.startswith("pilot_naive") or cell.startswith("smoke")
 
 
 def _git(repo: str, *args: str) -> subprocess.CompletedProcess:

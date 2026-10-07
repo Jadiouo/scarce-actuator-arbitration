@@ -7,7 +7,7 @@ import sys
 
 import pytest
 
-from conftest import ROOT, load_json
+from conftest import ROOT, git, load_json, make_git_root
 from arbitration.rl import budget, plan as P, train
 
 PLAN = os.path.join(ROOT, "results", "direction2", "run_plan.json")
@@ -100,16 +100,6 @@ def test_T79_budget_py_with_v2_inputs_agrees_with_the_frozen_values():
     assert cc["v2_matches_frozen"] is True and cc["v1_would_give_n_S"] == 64
 
 
-def _copy_root(tmp_path, with_decision=None):
-    root = tmp_path / "repo"
-    (root / "results" / "direction2").mkdir(parents=True)
-    shutil.copy(PLAN, root / "results" / "direction2" / "run_plan.json")
-    shutil.copy(FREEZE, root / "results" / "direction2" / "FREEZE.md")
-    if with_decision:
-        (root / "results" / "direction2" / "pilot_decision.json").write_text(json.dumps(dict(chosen_start=with_decision)))
-    return str(root)
-
-
 @pytest.fixture
 def captured(monkeypatch):
     """Replace the simulator and the segment trainer so that main() runs on CPU and records what it was given."""
@@ -121,17 +111,23 @@ def captured(monkeypatch):
     return got
 
 
+def _base(root):
+    return ["--test-mode", "--root", root, "--plan", "results/direction2/run_plan.json", "--dev", "cpu"]
+
+
 def test_T80_plan_entry_takes_the_cell_parameters_from_the_plan(tmp_path, captured):
     """T-80: `--plan --cell` runs with lam/n_S/T/val_every/obs_version/knob from the plan; CLI overrides of those, a tampered plan, an unwired or
-    unknown cell, a run or generation outside the plan, an undecided or contradicted start route are all refused."""
-    root = _copy_root(tmp_path, with_decision="cold")
-    base = ["--root", root, "--plan", "results/direction2/run_plan.json", "--dev", "cpu"]
+    unknown cell, a run or generation outside the plan, an undecided or contradicted start route are all refused.  (Test mode: a throw-away git
+    repository outside the real repo; the git/registration guards are the production ones, see test_d2_hardening.py.)"""
+    root = make_git_root(tmp_path, decision="cold")
+    base = _base(root)
     train.main(base + ["--cell", "s1_D2_s0.02", "--g1", "50"])
     cell = captured["cell"]
     assert (cell["lam"], cell["n_S"], cell["T_train"], cell["val_every"], cell["patience"], cell["sigma0"]) == (256, 256, 20000, 50, None, 0.3)
     a, k = captured["sim"]
     assert a[0] == "M3C" and a[1] == 20000 and tuple(a[-3:]) == ("public", "D2", 1100)
     assert captured["val"][0][1] == 100000 and captured["g1"] == 50
+    assert captured["k"]["root"] == os.path.realpath(root)
     # M4 anchor: mechanism and cfg from the plan
     train.main(base + ["--cell", "s1_M4rw0_anchor", "--g1", "10"])
     assert captured["sim"][0][0] == "M4" and captured["sim"][0][2]["L"] == 20
@@ -141,29 +137,32 @@ def test_T80_plan_entry_takes_the_cell_parameters_from_the_plan(tmp_path, captur
         train.main(base + ["--cell", "main_M3C_r0.9", "--g1", "500"])
     with pytest.raises(ValueError):
         train.main(base + ["--cell", "s1_D2_s0.02", "--run", "1", "--g1", "10"])
-    # locked flags
-    for flag in (["--lam", "64"], ["--nS", "64"], ["--T", "40000"], ["--val-every", "25"], ["--r", "0.9"], ["--mech", "NAIVE"]):
+    # the budget flags no longer exist (the old command-line branch is removed): argparse refuses them
+    for flag in (["--lam", "64"], ["--nS", "64"], ["--T", "40000"], ["--val-every", "25"], ["--r", "0.9"], ["--mech", "NAIVE"], ["--patience", "3"],
+                 ["--T-val", "5"], ["--warm-T", "9"], ["--warm-seeds", "2"]):
         with pytest.raises(SystemExit):
             train.main(base + ["--cell", "s1_D2_s0.02", "--g1", "10"] + flag)
-    # start route: contradicts the pilot decision / not decided / fixed by the pilot cell
+    # start route: contradicts the registered pilot decision
     with pytest.raises(ValueError, match="contradicts"):
         train.main(base + ["--cell", "s1_D2_s0.02", "--g1", "10", "--start", "warm"])
-    undecided = _copy_root(tmp_path / "u")
+    # no registered decision: non-pilot cells are refused, the pilot cell runs (fixed route cold), warm on the cold pilot is refused
+    undecided = make_git_root(tmp_path, name="undecided")
     with pytest.raises(ValueError, match="pilot"):
-        train.main(["--root", undecided, "--plan", "results/direction2/run_plan.json", "--dev", "cpu", "--cell", "s1_D2_s0.02", "--g1", "10"])
-    train.main(["--root", undecided, "--plan", "results/direction2/run_plan.json", "--dev", "cpu", "--cell", "pilot_naive_cold", "--g1", "10"])
+        train.main(_base(undecided) + ["--cell", "s1_D2_s0.02", "--g1", "10"])
+    train.main(_base(undecided) + ["--cell", "pilot_naive_cold", "--g1", "10"])
     assert captured["sim"][0][2]["p"] == 0.0                           # NAIVE = M3C with p=0
     with pytest.raises(ValueError):
-        train.main(["--root", undecided, "--plan", "results/direction2/run_plan.json", "--dev", "cpu", "--cell", "pilot_naive_cold", "--g1", "10",
-                    "--start", "warm"])
+        train.main(_base(undecided) + ["--cell", "pilot_naive_cold", "--g1", "10", "--start", "warm"])
     # unwired diagnostic cell and unknown cell
     with pytest.raises(NotImplementedError):
         train.main(base + ["--cell", "diag_history64", "--g1", "10"])
     with pytest.raises(ValueError):
         train.main(base + ["--cell", "no_such_cell", "--g1", "10"])
-    # tampered plan: sha256 differs from FREEZE.md
-    d = json.load(open(os.path.join(root, "results", "direction2", "run_plan.json")))
+    # tampered plan, committed (so the git guard is satisfied): the sha256 registered in FREEZE.md no longer matches
+    pth = os.path.join(root, "results", "direction2", "run_plan.json")
+    d = json.load(open(pth))
     d["cells"][2]["n_S"] = 64
-    json.dump(d, open(os.path.join(root, "results", "direction2", "run_plan.json"), "w"), indent=2)
+    json.dump(d, open(pth, "w"), indent=2)
+    git(root, "commit", "-qam", "tamper")
     with pytest.raises(ValueError, match="sha256"):
         train.main(base + ["--cell", "s1_D2_s0.02", "--g1", "10"])

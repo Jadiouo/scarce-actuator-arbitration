@@ -1,5 +1,6 @@
 """T-20..T-25, T-64: optimizer, objective, decision rules (spec s14.3); spec v1.2: REQ-OPT-06/09/10/12/13, REQ-SEED-07."""
 import ast
+import json
 import inspect
 import os
 import random
@@ -329,11 +330,13 @@ def test_T25b_validation_every_50_generations_OPT06(tmp_path):
     assert budget.segment_estimate_s(0, 49, ts, 100, 8, 32, t_val_s=10.0) == pytest.approx(budget.segment_estimate_s(0, 49, ts, 100, 8, 32))
     assert budget.segment_estimate_s(0, 50, ts, 100, 8, 32, t_val_s=10.0) == pytest.approx(budget.segment_estimate_s(0, 50, ts, 100, 8, 32) + 10.0)
     assert budget.segment_estimate_s(50, 100, ts, 100, 8, 32, t_val_s=10.0) == pytest.approx(budget.segment_estimate_s(50, 100, ts, 100, 8, 32) + 10.0)
-    # command-line default
+    # command line: the budget flags are gone (pre-S1 hardening); the 50-generation validation interval comes from the frozen plan
     tree = ast.parse(open(os.path.join(ROOT, "arbitration", "rl", "train.py"), encoding="utf-8").read())
-    defaults = [kw.value.value for c in ast.walk(tree) if isinstance(c, ast.Call) and getattr(c.func, "attr", "") == "add_argument"
-                and c.args and isinstance(c.args[0], ast.Constant) and c.args[0].value == "--val-every" for kw in c.keywords if kw.arg == "default"]
-    assert defaults == [50], f"--val-every default must be 50 (v1.2), got {defaults}"
+    flags = [c.args[0].value for c in ast.walk(tree) if isinstance(c, ast.Call) and getattr(c.func, "attr", "") == "add_argument"
+             and c.args and isinstance(c.args[0], ast.Constant)]
+    assert "--val-every" not in flags
+    plan = json.load(open(os.path.join(ROOT, "results", "direction2", "run_plan.json"), encoding="utf-8"))
+    assert {c["val_every"] for c in plan["cells"]} == {50}
 
 
 # ---- REQ-OPT-12: obs_version must be passed explicitly --------------------------------------------------------------------------------
