@@ -46,3 +46,11 @@
 - 決策檔 `results/direction2/pilot_decision.json`（只 commit 一次）：冷啟動通過（cold_val_G=0.3121 ≥ 0.8·G*_ref=0.2233），chosen_start=cold，不跑暖啟動。
   PILOT_DECISION_SHA256: b8b57239affed1e9063149ff99a7090ec9beb7817d85ff05ffe0b688c4ec8172
 - 訓練輸出：pilot_naive_cold 的 `results/direction2/parts/`（13 個 part，260K）與 `ckpt/`（136K）合計遠小於 50MB，全部 commit 作紀錄；評估腳本 `scripts/eval_d2_pilot.py`。
+
+## M-3 登記更正（早於任何 S1／主實驗 part；REQ-MEAS-03、S1-22、MET-06、S1-14）
+
+- `MDE_D,plan` 改登記為 **0.00598**（`measure_m3.json: rows[0].MDE_D_plan_max_pair`，pair2 的最壞對）。原登記 ~~0.001779~~（`rows[0].MDE_D_plan`，三對中位數）保留作紀錄；原因：`scripts/run_d2_meas.py:425-440` 取中位數，規格未指定中位數，結果挑到變異最小的代理對；依 REQ-OPT-09「取最壞」更正。`measure_m3.json` 未改動，`M3_SHA256` 不變；`arbitration/rl/plan.py` 的 `mde_d_plan` 改讀 `MDE_D_plan_max_pair`（並核對等於 `max(MDE_D_by_pair)`）。
+- 紅方 GPU 重算（gpujob #157，scratchpad `redM3/m3proxy.py`）：MLP 代理對、細網格手寫最佳，MDE_D 為 0.0063–0.0086；手寫兩兩配對最大 0.0095。
+- G_s 維持 {0.01, 0.02}；s=0.01 依 S1-22 仍執行（0.01 ≥ 0.00598，且 ≥ 0.0095）。揭露：最壞情況下 s=0.01 與 MDE 接近，可能被判為未偵測，這是檢測力的特性。
+- 次要更正：`rel_diff`（−68.5%）是 MDE_G 與 0.0058 的比較，不是 MDE_D。
+- 程式檔（plan.py）與測試（conftest.py）因此變動，上方「合併 sha」為更正前；以 git 為準。本更正 commit 與 PILOT_DECISION_SHA256 登記互不影響（pilot_decision.json 只在先前 commit 出現一次）。

@@ -202,7 +202,7 @@ def make_git_root(tmp_path, *, decision=None, register_decision=True, m3_mde=Non
         if register_decision:
             freeze += "\nPILOT_DECISION_SHA256: " + hashlib.sha256((d / "pilot_decision.json").read_bytes()).hexdigest() + "\n"
     if m3_mde is not None:
-        row = lambda r, v: dict(r=r, sigma_val_G=0.01, sigma_val_D=0.01, MDE_G=0.0058, MDE_D_plan=v, MDE_est=0.0058, rel_diff=0.0)
+        row = lambda r, v: dict(r=r, sigma_val_G=0.01, sigma_val_D=0.01, MDE_G=0.0058, MDE_D_plan=v, MDE_est=0.0058, rel_diff=0.0, MDE_D_plan_max_pair=v, MDE_D_by_pair=[v, v / 2, v / 3])
         (d / "measure_m3.json").write_text(json.dumps(dict(rows=[row(0.5, m3_mde), row(0.9, 0.001)])))
         if register_m3:
             freeze += "\nM3_SHA256: " + hashlib.sha256((d / "measure_m3.json").read_bytes()).hexdigest() + "\n"

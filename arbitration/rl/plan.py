@@ -129,7 +129,12 @@ def mde_d_plan(root: str, r: float = 0.5) -> float:
         raise ValueError(f"M-3 record has no unique row for r={r}")
     from . import meas
     meas.validate_m3(rows[0])
-    return float(rows[0]["MDE_D_plan"])
+    # REQ-OPT-09 (worst case): MDE_D,plan is the WORST of the 3 proxy pairs (MDE_D_plan_max_pair), not the median stored in rows[0].MDE_D_plan
+    # (the median picked the least variable proxy pair; the spec does not prescribe a median).
+    worst = float(rows[0]["MDE_D_plan_max_pair"])
+    if worst != max(float(x) for x in rows[0]["MDE_D_by_pair"]):
+        raise ValueError("M-3 record: MDE_D_plan_max_pair != max(MDE_D_by_pair)")
+    return worst
 
 
 def check_conditional(cell: Dict[str, Any], root: str) -> None:

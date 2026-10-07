@@ -27,13 +27,16 @@ run_plan.json 由 `scripts/make_d2_run_plan.py` 產生（可重現，測試 T-77
 | 0.5 | **0.0058** | `results/quota.json: main[12].Gmax_uninformed[1]`＝0.0039011376（半寬）；0.0039011376/1.96×2.8922＝0.005757 |
 | 0.9 | **0.0016** | `results/quota.json: main[14].Gmax_uninformed[1]`＝0.0010604507（半寬）；0.0010604507/1.96×2.8922＝0.001565 |
 
-`MDE_D,plan`（REQ-MEAS-03 / M-3；驗證 seeds 2000–2031、T=1e5、三個手寫對 {dz=0.03,dz=0.05}、{dz=0.1,dz=0.3}、{edge_uninf thr band=0.05, band=0.1} 為代理；σ̂ 取 ddof=1，三對取中位數；MDE=κσ̂/√32，κ=2.8922；gpujob #143；出處 `results/direction2/measure_m3.json`，sha256 見 FREEZE.md 的 `M3_SHA256`）：
+`MDE_D,plan`（REQ-MEAS-03 / M-3；驗證 seeds 2000–2031、T=1e5、三個手寫對 {dz=0.03,dz=0.05}、{dz=0.1,dz=0.3}、{edge_uninf thr band=0.05, band=0.1} 為代理；σ̂ 取 ddof=1，**MDE_D,plan 取三對中最壞（最大）者，見下方更正**；MDE=κσ̂/√32，κ=2.8922；gpujob #143；出處 `results/direction2/measure_m3.json`，sha256 見 FREEZE.md 的 `M3_SHA256`）：
 
-| r | σ̂_val(G) | σ̂_val(D) | MDE_G | **MDE_D,plan** | MDE_est（規劃） | rel_diff |
+| r | σ̂_val(G) | σ̂_val(D) | MDE_G | **MDE_D,plan** | MDE_est（規劃） | rel_diff（MDE_G 對 0.0058） |
 |---|---|---|---|---|---|---|
-| 0.5 | 0.003578（`rows[0].sigma_val_G`） | 0.003479（`rows[0].sigma_val_D`） | 0.001829 | **0.001779**（`rows[0].MDE_D_plan`） | 0.0058 | −68.5%（`rows[0].rel_diff`） |
+| 0.5 | 0.003578（`rows[0].sigma_val_G`） | 0.003479（`rows[0].sigma_val_D`） | 0.001829 | **0.00598**（`rows[0].MDE_D_plan_max_pair`，pair2 最壞對）；~~0.001779~~（原登記，`rows[0].MDE_D_plan` 中位數） | 0.0058 | −68.5%（`rows[0].rel_diff`；是 MDE_G 對 0.0058 的比較，不是 MDE_D） |
 | 0.9 | 0.006272 | 0.005542 | 0.003207 | 0.002833（`rows[1].MDE_D_plan`） | 0.0016 | +100.4% |
 
+- **更正（M-3 登記，早於任何 S1 part）**：`MDE_D,plan` 改登記為 **0.00598**（`rows[0].MDE_D_plan_max_pair` ＝ pair2 `{dz=0.1,dz=0.3}` 的 0.005984，三對中最壞）。原登記 ~~0.001779~~ 保留作紀錄；原因：`scripts/run_d2_meas.py:425-440` 取三對的中位數，規格 REQ-MEAS-03 未指定中位數，結果挑到變異最小的代理對；依 REQ-OPT-09「取最壞」改用最壞值。`measure_m3.json` 本身未改動（sha 不變），`plan.mde_d_plan` 改讀 `MDE_D_plan_max_pair`。
+- 紅方獨立 GPU 重算（gpujob #157，`redM3/m3proxy.py`）：以 MLP 代理對、細網格手寫最佳，MDE_D 為 0.0063–0.0086；手寫兩兩配對最大 0.0095。皆 < 0.01。
+- 揭露：最壞情況下 s=0.01 與 MDE 接近（0.0095 對 0.01），s=0.01 的效應可能被判為「未偵測」，這是檢測力的特性，不是錯誤。
 - 依 REQ-MEAS-03：r=0.5 的實測 MDE_est 與 0.0058 相差超過 ±30%（−68.5%），記錄之；規則不變（n_S 與 G_gens 已凍結，不因此改動）。r=0.9 同樣超過 ±30%，只作描述。
 - 限制（照實揭露）：代理為兩個高度相關的手寫策略之差，σ̂(D) 偏小。同檔 `rows[0].sensitivity_uncorrelated` 給出「RL 與手寫得利不相關」的敏感度：MDE_D,plan 中位數 0.002467、最大 0.006964；最大對（`MDE_D_plan_max_pair`）0.005984。**所有變體都 < 0.01**，G_s 的結論不變。每個 run 實際偵測仍用它自己驗證集算出的 `MDE_D`（REQ-MET-06）。
 
@@ -41,7 +44,7 @@ run_plan.json 由 `scripts/make_d2_run_plan.py` 產生（可重現，測試 T-77
 
 定義（REQ-S1-22）：`G_s = { s ∈ {0.01, 0.02} : s ≥ MDE_D,plan }`；`0.02 ∉ G_s` ⇒ 觸發 REQ-STOP-02。
 
-**判定（M-3 後）**：`MDE_D,plan(r=0.5)=0.001779`（`results/direction2/measure_m3.json: rows[0].MDE_D_plan`）⇒ `0.01 ≥ 0.001779` 且 `0.02 ≥ 0.001779` ⇒ **G_s={0.01, 0.02}**，STOP-02 未觸發；**s=0.01 的 3 個 conditional cell（s1_D1_s0.01、s1_D2_s0.01、s1_O1_s0.01）要執行**。run 數 N=3·2+6=12，其中 NAIVE 錨點重用 pilot_naive_cold 的結果，實際新訓練 11 個 S1 run。程式 `plan.check_conditional` 在啟動時依已登記的 M-3 記錄再次判定。族內與盲區固定只跑 s=0.02。
+**判定（M-3 後，更正後）**：`MDE_D,plan(r=0.5)=0.00598`（`results/direction2/measure_m3.json: rows[0].MDE_D_plan_max_pair`；原登記 ~~0.001779~~）⇒ `0.01 ≥ 0.00598` 且 `0.02 ≥ 0.00598` ⇒ **G_s={0.01, 0.02}**，STOP-02 未觸發；**s=0.01 的 3 個 conditional cell（s1_D1_s0.01、s1_D2_s0.01、s1_O1_s0.01）要執行**。run 數 N=3·2+6=12，其中 NAIVE 錨點重用 pilot_naive_cold 的結果，實際新訓練 11 個 S1 run。程式 `plan.check_conditional` 在啟動時依已登記的 M-3 記錄再次判定。族內與盲區固定只跑 s=0.02。
 
 ## 5. 暖啟動與冷啟動（REQ-OPT-07，兩條路都登記）
 
