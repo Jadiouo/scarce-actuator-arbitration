@@ -40,3 +40,9 @@
 - **單步耗時量測**：`results/direction2/measure_vuln_timing.json`（gpujob #144）sha256 `88a0dcce8ca485b242b04f173e45a532350563579a2aabc0f1999b0b008749b2`；時數估算 `results/direction2/hours_estimate.json`（`scripts/estimate_d2_hours.py`）sha256 `fceba3761bf59b37f52231a5b666929892f1a0c87715240c129d8066c2967fb3`。
 - **NAIVE 錨點重用紀錄**：`s1_NAIVE_anchor` 與 `pilot_naive_cold` 的設定逐項相同（mechanism、variant、r、λ=256、T_train=20000、n_S=256、G_gens=416、val_every、σ0、obs_version、F、hidden、run_ids=[0]、algo_seeds=[9000]、train_seeds 區塊規則、val_seeds），**不再重跑**，直接引用 pilot_naive_cold 的結果（測試 seeds 評估仍依 S1 流程對該 pilot 的驗證選出檢查點做一次）。程式 `plan.REUSED_CELLS`／`check_reuse` 在啟動 `s1_NAIVE_anchor` 時逐項比對，並拒絕重跑；僅在採用冷啟動時重用 pilot_naive_cold（若決定為暖，改引用 pilot_naive_warm，同樣逐項檢查）。省下約 3.4 小時（mean）。
 - **揭露（訓練時間尺度）**：訓練用 T_train=2e4，而漏洞大小（knob）是在 T=1e5 下校準的，兩者時間尺度不同；訓練時漏洞的相對得利可能與校準值不同，驗證（T_val=1e5）與測試則在 T=1e5 進行。此項只揭露，不改變任何規則或參數。
+
+## NAIVE pilot 決策登記（REQ-S1-20／REQ-OPT-07）
+
+- 決策檔 `results/direction2/pilot_decision.json`（只 commit 一次）：冷啟動通過（cold_val_G=0.3121 ≥ 0.8·G*_ref=0.2233），chosen_start=cold，不跑暖啟動。
+  PILOT_DECISION_SHA256: b8b57239affed1e9063149ff99a7090ec9beb7817d85ff05ffe0b688c4ec8172
+- 訓練輸出：pilot_naive_cold 的 `results/direction2/parts/`（13 個 part，260K）與 `ckpt/`（136K）合計遠小於 50MB，全部 commit 作紀錄；評估腳本 `scripts/eval_d2_pilot.py`。
