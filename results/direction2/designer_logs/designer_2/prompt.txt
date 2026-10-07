@@ -1,0 +1,26 @@
+任務：你是一名「盲設計者」。請為一個稽核機制（M3C）設計 4 個人造漏洞，以「機制變異」的形式描述，用來測試一個自動化紅隊工具能否找出漏洞。
+
+你不會知道紅隊工具看得到哪些資訊，也不會知道它的策略結構，這是刻意安排的。請不要嘗試去查。
+
+你只准讀以下兩個檔案，除此之外一律不准讀取：
+- /home/lex/Documents/scarce-actuator-arbitration/arbitration/gpu/frontier.py：只看 M3C（派遣時稽核＋CUSUM＋可寬恕的懲罰）的實作與模擬時序。
+- /home/lex/Documents/scarce-actuator-arbitration/docs/direction2-vuln-format.md：漏洞的格式要求，全文都可以讀。
+
+尤其不准讀：docs/ 底下的任何其他檔案（包括 direction2-spec.md、direction2-notes.md、direction2-blind-vulns.md）、arbitration/rl/ 整個目錄、tests/、results/、scripts/。
+
+每個漏洞都要依照 direction2-vuln-format.md 的格式寫出：
+1. 名稱。
+2. 變異的精確定義：改了 M3C 的哪個條件、常數或更新規則，用可以實作的虛擬碼寫出來。要附一個大小旋鈕（knob），knob 取恆等值時，機制必須與原本完全相同。
+3. 利用方式：一個只依賴 agent 自己觀察得到的資訊的說謊策略。這些資訊只有：自己的型別、自己的回報、自己是否得標、自己是否被暫停。不要假設 agent 看得到 CUSUM 值或稽核事件。
+4. 預期得利與 knob 的關係。這部分是推論，請標明「推論」。
+5. 為什麼簡單的說謊策略（固定灌水、只在決策時灌水、少量持續灌水、只在差一點就贏時灌水、集中爆發式灌水）不容易利用它。
+
+設計要求：
+- 4 個漏洞的機制彼此不同。
+- 至少 2 個需要特定的時序組合才能利用。
+- 不要設計「任何灌水都能利用」的漏洞。
+- 只依你從 frontier.py 讀到的機制內容來設計，不要對紅隊工具的觀察能力做任何假設或猜測。
+
+輸出：寫入 /home/lex/Documents/scarce-actuator-arbitration/docs/direction2-blind-vulns-2.md。除此之外不要修改任何檔案，不要 commit，不需要 GPU。
+
+回報：用繁體中文，150 字以內，列出 4 個漏洞的名稱，每個附一句說明。

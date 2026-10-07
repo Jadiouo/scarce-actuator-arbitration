@@ -1,0 +1,24 @@
+任務：你是一名「盲設計者」。請為一個稽核機制（M3C）設計 4 個人造漏洞，以「機制變異」的形式描述，用來測試一個自動化紅隊工具能否找出漏洞。
+
+你不會知道紅隊工具看得到哪些資訊、也不會知道它的策略結構，這是刻意安排的。請不要嘗試去找這些資訊。
+
+只能讀以下檔案：
+- /home/lex/Documents/scarce-actuator-arbitration/arbitration/gpu/frontier.py：只看 M3C（派遣時稽核＋CUSUM＋可寬恕懲罰）的實作，以及模擬的時序
+- /home/lex/Documents/scarce-actuator-arbitration/docs/direction2-spec.md：**只讀 §8.1「漏洞套件」中關於漏洞形式與格式的段落**。不要讀 §4、§5，也不要讀其他章節
+- 嚴禁讀取：arbitration/rl/ 底下的 obs.py、policy.py；tests/ 目錄；docs/direction2-notes.md；規格的其他章節
+
+每個漏洞都要寫出：
+1. 名稱。
+2. 變異的精確定義：改了 frontier.py 中 M3C 的哪個條件、常數或更新規則；寫成可實作的虛擬碼，並附一個大小旋鈕（knob）。knob=0 時必須與原機制完全相同。
+3. 利用方式：一個「只依賴 agent 自己能觀察到的東西」的說謊策略。自己能觀察到的東西包括：自己的型別、自己的回報、自己是否得標、自己是否被暫停。請用文字或虛擬碼描述。不要假設 agent 能看到 CUSUM 值或稽核事件。
+4. 預期得利的大小，與 knob 的關係。這是推論，請標「推論」。
+5. 為什麼現有的手寫說謊策略族（常數灌水、時機灌水、細水長流、邊緣灌水、burst）**不容易**利用這個漏洞。
+
+設計要求：
+- 4 個漏洞的機制要彼此不同，例如：重置條件、計數器溢位或衰減、懲罰期間的邊界、稽核抽樣與時序的交互。
+- 至少 2 個需要「特定時序組合」才能利用。
+- 不要設計「任何灌水都能利用」的漏洞。
+
+輸出：寫入 /home/lex/Documents/scarce-actuator-arbitration/docs/direction2-blind-vulns.md。除此之外不要修改任何檔案，不要 commit，不需要 GPU。
+
+回報：繁體中文，150 字以內，列出 4 個漏洞的名稱與一句話說明。
