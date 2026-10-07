@@ -1,0 +1,857 @@
+{
+ "schema": "REQ-S1-03: entries[] = (vulnerability, size) with id, kind, operator, knob, size, blind, ref_policy, G_star_val, G_HW_best_val, delta_val, delta_train64; anchors have G_star_ref instead; uncalibratable[] lists planned (vuln, size) pairs that could not be calibrated",
+ "git_sha": "eae1f3a",
+ "generated": "2026-10-07",
+ "sizes_run": [
+  0.01,
+  0.02
+ ],
+ "size_definition": "Delta = G*_V - G_HW_best_V (paired, validation seeds 2000-2031)",
+ "entries": [
+  {
+   "id": "D1",
+   "kind": "designer",
+   "operator": "D1",
+   "knob": 0.9,
+   "size": 0.01,
+   "blind": false,
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "rule",
+    "name": "d2_rested",
+    "params": {
+     "dz": 2.0,
+     "G": 5.0,
+     "dz0": 0.2
+    }
+   },
+   "G_star_val": {
+    "mean": 0.037875940262756286,
+    "lo": 0.033751652384227185,
+    "hi": 0.04200022814128539,
+    "half": 0.004124287878529102
+   },
+   "G_HW_best_val": {
+    "name": "dz=0.3",
+    "mean": 0.02622544631243456
+   },
+   "delta_val": {
+    "mean": 0.011650493950321719,
+    "lo": 0.006589718502181488,
+    "hi": 0.01671126939846195,
+    "half": 0.005060775448140231
+   },
+   "delta_train64": 0.0074917896875,
+   "delta_train64_ci": {
+    "mean": 0.0074917896875,
+    "lo": 0.004575735132465964,
+    "hi": 0.010407844242534037,
+    "half": 0.0029160545550340365
+   },
+   "calibration_part": "plan_v1",
+   "n_candidate_knobs_checked": 6,
+   "source": "designer_2",
+   "designer_name": "V1_RestedAuditDiscount",
+   "exact_from_recompute": true
+  },
+  {
+   "id": "D1",
+   "kind": "designer",
+   "operator": "D1",
+   "knob": 0.98,
+   "size": 0.02,
+   "blind": false,
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "rule",
+    "name": "d2_rested",
+    "params": {
+     "dz": 2.0,
+     "G": 5.0,
+     "dz0": 0.2
+    }
+   },
+   "G_star_val": {
+    "mean": 0.045081687752960925,
+    "lo": 0.04142043950638061,
+    "hi": 0.04874293599954124,
+    "half": 0.0036612482465803193
+   },
+   "G_HW_best_val": {
+    "name": "dz=0.3",
+    "mean": 0.026048617640612455
+   },
+   "delta_val": {
+    "mean": 0.019033070112348477,
+    "lo": 0.014416230966899373,
+    "hi": 0.02364990925779758,
+    "half": 0.0046168391454491035
+   },
+   "delta_train64": 0.016074146093750002,
+   "delta_train64_ci": {
+    "mean": 0.016074146093750002,
+    "lo": 0.012666967198304591,
+    "hi": 0.01948132498919541,
+    "half": 0.0034071788954454104
+   },
+   "calibration_part": "plan_v1",
+   "n_candidate_knobs_checked": 6,
+   "source": "designer_2",
+   "designer_name": "V1_RestedAuditDiscount",
+   "exact_from_recompute": true
+  },
+  {
+   "id": "D2",
+   "kind": "designer",
+   "operator": "D2",
+   "knob": 1650,
+   "size": 0.01,
+   "blind": false,
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "rule",
+    "name": "d2_parole",
+    "params": {
+     "dz": 0.3
+    }
+   },
+   "G_star_val": {
+    "mean": 0.03347561303699671,
+    "lo": 0.03020530134301394,
+    "hi": 0.036745924730979485,
+    "half": 0.003270311693982771
+   },
+   "G_HW_best_val": {
+    "name": "dz=0.3",
+    "mean": 0.023612891411781405
+   },
+   "delta_val": {
+    "mean": 0.009862721625215305,
+    "lo": 0.008215396268444536,
+    "hi": 0.011510046981986074,
+    "half": 0.0016473253567707688
+   },
+   "delta_train64": 0.010441282812500001,
+   "delta_train64_ci": {
+    "mean": 0.010441282812500001,
+    "lo": 0.00926238089497146,
+    "hi": 0.011620184730028542,
+    "half": 0.0011789019175285412
+   },
+   "calibration_part": "plan_v1",
+   "n_candidate_knobs_checked": 8,
+   "source": "designer_2",
+   "designer_name": "V2_SuspensionParole",
+   "exact_from_recompute": true
+  },
+  {
+   "id": "D2",
+   "kind": "designer",
+   "operator": "D2",
+   "knob": 1100,
+   "size": 0.02,
+   "blind": false,
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "rule",
+    "name": "d2_parole",
+    "params": {
+     "dz": 0.5
+    }
+   },
+   "G_star_val": {
+    "mean": 0.043090004974543655,
+    "lo": 0.03930006543587673,
+    "hi": 0.04687994451321058,
+    "half": 0.0037899395386669205
+   },
+   "G_HW_best_val": {
+    "name": "dz=0.3",
+    "mean": 0.023612891411781405
+   },
+   "delta_val": {
+    "mean": 0.019477113562762247,
+    "lo": 0.01523973816043841,
+    "hi": 0.023714488965086086,
+    "half": 0.004237375402323837
+   },
+   "delta_train64": 0.019005144374999998,
+   "delta_train64_ci": {
+    "mean": 0.019005144374999998,
+    "lo": 0.016440494129756855,
+    "hi": 0.02156979462024314,
+    "half": 0.0025646502452431443
+   },
+   "calibration_part": "plan_v1",
+   "n_candidate_knobs_checked": 8,
+   "source": "designer_2",
+   "designer_name": "V2_SuspensionParole",
+   "exact_from_recompute": true
+  },
+  {
+   "id": "D4",
+   "kind": "designer",
+   "operator": "D4",
+   "knob": 0.086,
+   "size": 0.01,
+   "blind": false,
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "rule",
+    "name": "d2_climb",
+    "params": {
+     "kappa": 0.00172,
+     "dz_max": 2.0
+    }
+   },
+   "G_star_val": {
+    "mean": 0.24550186059497192,
+    "lo": 0.2377875442853124,
+    "hi": 0.25321617690463144,
+    "half": 0.007714316309659512
+   },
+   "G_HW_best_val": {
+    "name": "dz=2.0",
+    "mean": 0.2356598975523267
+   },
+   "delta_val": {
+    "mean": 0.009841963042645233,
+    "lo": 0.003683211354440532,
+    "hi": 0.016000714730849935,
+    "half": 0.006158751688204701
+   },
+   "delta_train64": 0.008250041718749997,
+   "delta_train64_ci": {
+    "mean": 0.008250041718749997,
+    "lo": 0.004273203856582772,
+    "hi": 0.01222687958091722,
+    "half": 0.003976837862167224
+   },
+   "calibration_part": "plan_v1",
+   "n_candidate_knobs_checked": 8,
+   "source": "designer_2",
+   "designer_name": "V4_SelfCalibratingSlope",
+   "exact_from_recompute": true
+  },
+  {
+   "id": "D4",
+   "kind": "designer",
+   "operator": "D4",
+   "knob": 0.052,
+   "size": 0.02,
+   "blind": false,
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "rule",
+    "name": "d2_climb",
+    "params": {
+     "kappa": 0.00104,
+     "dz_max": 2.0
+    }
+   },
+   "G_star_val": {
+    "mean": 0.2439918598604764,
+    "lo": 0.23606618874088126,
+    "hi": 0.2519175309800715,
+    "half": 0.007925671119595142
+   },
+   "G_HW_best_val": {
+    "name": "stealth m=2.0 f=0.5",
+    "mean": 0.22541242955658095
+   },
+   "delta_val": {
+    "mean": 0.018579430303895438,
+    "lo": 0.008090318411278035,
+    "hi": 0.02906854219651284,
+    "half": 0.010489111892617402
+   },
+   "delta_train64": 0.021409486874999998,
+   "delta_train64_ci": {
+    "mean": 0.021409486874999998,
+    "lo": 0.014468001242641044,
+    "hi": 0.028350972507358952,
+    "half": 0.006941485632358955
+   },
+   "calibration_part": "plan_v1",
+   "n_candidate_knobs_checked": 8,
+   "source": "designer_2",
+   "designer_name": "V4_SelfCalibratingSlope",
+   "exact_from_recompute": true
+  },
+  {
+   "id": "O1",
+   "kind": "auto",
+   "operator": "O1",
+   "knob": 0.895,
+   "size": 0.01,
+   "blind": false,
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "rule",
+    "name": "streak_lie",
+    "params": {
+     "dz": 2.0,
+     "m": 3.0
+    }
+   },
+   "G_star_val": {
+    "mean": 0.03520521393919063,
+    "lo": 0.03152052983852878,
+    "hi": 0.038889898039852475,
+    "half": 0.0036846841006618453
+   },
+   "G_HW_best_val": {
+    "name": "dz=0.3",
+    "mean": 0.025595354222929523
+   },
+   "delta_val": {
+    "mean": 0.009609859716261096,
+    "lo": 0.0057864433463495945,
+    "hi": 0.013433276086172598,
+    "half": 0.0038234163699115012
+   },
+   "delta_train64": 0.011835681875,
+   "delta_train64_ci": {
+    "mean": 0.011835681875,
+    "lo": 0.00877904911002968,
+    "hi": 0.01489231463997032,
+    "half": 0.00305663276497032
+   },
+   "calibration_part": "plan_v1",
+   "n_candidate_knobs_checked": 8,
+   "source": "auto",
+   "exact_from_recompute": true
+  },
+  {
+   "id": "O1",
+   "kind": "auto",
+   "operator": "O1",
+   "knob": 0.93,
+   "size": 0.02,
+   "blind": false,
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "rule",
+    "name": "streak_lie",
+    "params": {
+     "dz": 2.5,
+     "m": 3.0
+    }
+   },
+   "G_star_val": {
+    "mean": 0.047872474009849564,
+    "lo": 0.04293834110103281,
+    "hi": 0.052806606918666316,
+    "half": 0.00493413290881675
+   },
+   "G_HW_best_val": {
+    "name": "dz=0.3",
+    "mean": 0.025285546890243794
+   },
+   "delta_val": {
+    "mean": 0.02258692711960577,
+    "lo": 0.017463335021421184,
+    "hi": 0.027710519217790355,
+    "half": 0.005123592098184585
+   },
+   "delta_train64": 0.0194702503125,
+   "delta_train64_ci": {
+    "mean": 0.0194702503125,
+    "lo": 0.014991923562381581,
+    "hi": 0.023948577062618416,
+    "half": 0.004478326750118418
+   },
+   "calibration_part": "plan_v1",
+   "n_candidate_knobs_checked": 8,
+   "source": "auto",
+   "exact_from_recompute": true
+  },
+  {
+   "id": "O2",
+   "kind": "auto",
+   "operator": "O2",
+   "knob": 0.285,
+   "size": 0.01,
+   "blind": false,
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "adapter",
+    "scols": {
+     "dzc": 2.6
+    }
+   },
+   "G_star_val": {
+    "mean": 0.28246078461686963,
+    "lo": 0.2801418243501054,
+    "hi": 0.2847797448836339,
+    "half": 0.002318960266764286
+   },
+   "G_HW_best_val": {
+    "name": "dz=2.0",
+    "mean": 0.27207900876827296
+   },
+   "delta_val": {
+    "mean": 0.010381775848596664,
+    "lo": 0.008518453917257463,
+    "hi": 0.012245097779935866,
+    "half": 0.001863321931339202
+   },
+   "delta_train64": 0.0076125125000000024,
+   "delta_train64_ci": {
+    "mean": 0.0076125125000000024,
+    "lo": 0.00578782569070916,
+    "hi": 0.009437199309290845,
+    "half": 0.001824686809290842
+   },
+   "calibration_part": "plan_v1",
+   "n_candidate_knobs_checked": 8,
+   "source": "auto",
+   "exact_from_recompute": true
+  },
+  {
+   "id": "O2",
+   "kind": "auto",
+   "operator": "O2",
+   "knob": 0.312,
+   "size": 0.02,
+   "blind": false,
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "adapter",
+    "scols": {
+     "dz": 2.7
+    }
+   },
+   "G_star_val": {
+    "mean": 0.2941744338144848,
+    "lo": 0.2917164170723097,
+    "hi": 0.29663245055665993,
+    "half": 0.002458016742175099
+   },
+   "G_HW_best_val": {
+    "name": "dz=2.0",
+    "mean": 0.27207900876827296
+   },
+   "delta_val": {
+    "mean": 0.02209542504621187,
+    "lo": 0.019959658610287916,
+    "hi": 0.024231191482135823,
+    "half": 0.0021357664359239552
+   },
+   "delta_train64": 0.019083115781249996,
+   "delta_train64_ci": {
+    "mean": 0.019083115781249996,
+    "lo": 0.017052489458605578,
+    "hi": 0.021113742103894415,
+    "half": 0.0020306263226444183
+   },
+   "calibration_part": "plan_v1",
+   "n_candidate_knobs_checked": 8,
+   "source": "auto",
+   "exact_from_recompute": true
+  },
+  {
+   "id": "O3",
+   "kind": "auto",
+   "operator": "O3",
+   "knob": 0.588,
+   "size": 0.01,
+   "blind": false,
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "adapter",
+    "scols": {
+     "dzc": 2.6
+    }
+   },
+   "G_star_val": {
+    "mean": 0.2820853369014754,
+    "lo": 0.2794594794205317,
+    "hi": 0.28471119438241915,
+    "half": 0.002625857480943739
+   },
+   "G_HW_best_val": {
+    "name": "dz=2.0",
+    "mean": 0.27207900876827296
+   },
+   "delta_val": {
+    "mean": 0.0100063281332024,
+    "lo": 0.00801193292570492,
+    "hi": 0.012000723340699881,
+    "half": 0.00199439520749748
+   },
+   "delta_train64": 0.0102729053125,
+   "delta_train64_ci": {
+    "mean": 0.0102729053125,
+    "lo": 0.009057578012998151,
+    "hi": 0.01148823261200185,
+    "half": 0.0012153272995018495
+   },
+   "calibration_part": "plan_v1",
+   "n_candidate_knobs_checked": 8,
+   "source": "auto",
+   "exact_from_recompute": true
+  },
+  {
+   "id": "O3",
+   "kind": "auto",
+   "operator": "O3",
+   "knob": 0.562,
+   "size": 0.02,
+   "blind": false,
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "adapter",
+    "scols": {
+     "dz": 2.6
+    }
+   },
+   "G_star_val": {
+    "mean": 0.2921844551767704,
+    "lo": 0.28949629754283723,
+    "hi": 0.29487261281070354,
+    "half": 0.0026881576339331725
+   },
+   "G_HW_best_val": {
+    "name": "dz=2.0",
+    "mean": 0.27207900876827296
+   },
+   "delta_val": {
+    "mean": 0.02010544640849741,
+    "lo": 0.017966498231797814,
+    "hi": 0.022244394585197003,
+    "half": 0.002138948176699596
+   },
+   "delta_train64": 0.02034297109375,
+   "delta_train64_ci": {
+    "mean": 0.02034297109375,
+    "lo": 0.01914365525307059,
+    "hi": 0.021542286934429406,
+    "half": 0.0011993158406794064
+   },
+   "calibration_part": "plan_v1",
+   "n_candidate_knobs_checked": 8,
+   "source": "auto",
+   "exact_from_recompute": true
+  },
+  {
+   "id": "O5",
+   "kind": "blind",
+   "operator": "O5",
+   "knob": 26,
+   "size": 0.02,
+   "blind": true,
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "rule",
+    "name": "launder",
+    "params": {
+     "dz": 0.7,
+     "W": 100.0,
+     "Z": 26.0
+    }
+   },
+   "G_star_val": {
+    "mean": 0.04525688534673608,
+    "lo": 0.041024677756314125,
+    "hi": 0.04948909293715804,
+    "half": 0.004232207590421956
+   },
+   "G_HW_best_val": {
+    "name": "dz=0.3",
+    "mean": 0.025384624045063486
+   },
+   "delta_val": {
+    "mean": 0.0198722613016726,
+    "lo": 0.014055292571893786,
+    "hi": 0.02568923003145141,
+    "half": 0.005816968729778812
+   },
+   "delta_train64": 0.0228484096875,
+   "delta_train64_ci": {
+    "mean": 0.0228484096875,
+    "lo": 0.019250173264681224,
+    "hi": 0.02644664611031878,
+    "half": 0.0035982364228187777
+   },
+   "calibration_part": "plan_v1",
+   "n_candidate_knobs_checked": 8,
+   "source": "blind",
+   "exact_from_recompute": true
+  },
+  {
+   "id": "NAIVE",
+   "kind": "anchor",
+   "source": "anchor",
+   "operator": null,
+   "knob": null,
+   "size": null,
+   "blind": false,
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "adapter",
+    "scols": {
+     "dz": 2.0
+    }
+   },
+   "G_star_ref": {
+    "mean": 0.27909212421035584,
+    "lo": 0.2785559060739357,
+    "hi": 0.27962834234677597,
+    "half": 0.0005362181364201152,
+    "sd": 0.0014872703335310335
+   },
+   "measured_in": "results/direction2/measure_naive.json",
+   "definition": "M3C, p=0, r=0.5 (REQ-S1-08); G rule, not the increment definition"
+  },
+  {
+   "id": "M4rw0",
+   "kind": "anchor",
+   "source": "anchor",
+   "operator": null,
+   "knob": null,
+   "size": null,
+   "blind": false,
+   "r": 0.99,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "adapter",
+    "scols": {
+     "b": 0.3
+    }
+   },
+   "G_star_ref": {
+    "mean": 0.11894942872808331,
+    "lo": 0.11714345904637669,
+    "hi": 0.12075539840978994,
+    "half": 0.001805969681706627,
+    "sd": 0.005009090421280258
+   },
+   "measured_in": "results/direction2/measure_m4.json",
+   "m4_anchor_status": "counted",
+   "definition": "M4, eps=0.2, L=20, rw=0, r=0.99 (REQ-S1-09)"
+  }
+ ],
+ "uncalibratable": [
+  {
+   "id": "D3",
+   "kind": "designer",
+   "size": 0.01,
+   "source": "designer_2",
+   "status": "uncalibratable",
+   "reason": "no tested knob reaches the band [0.8s,1.2s] (training seeds)",
+   "best_train": {
+    "knob": 0.3,
+    "delta_train64": -0.0032875290625000017,
+    "lo": -0.006855307997104016,
+    "hi": 0.0002802498721040129,
+    "ref_policy": {
+     "kind": "rule",
+     "name": "d2_slope",
+     "params": {
+      "s": 0.3,
+      "gain": 1.0,
+      "dz0": 0.5
+     }
+    }
+   },
+   "literal_best_train": {
+    "knob": 0.05,
+    "delta_train64": -0.023226977343749997,
+    "lo": -0.025321014606936643,
+    "hi": -0.02113294008056335,
+    "ref_policy": {
+     "kind": "rule",
+     "name": "d2_slope",
+     "params": {
+      "s": 0.05,
+      "gain": 2.0
+     }
+    }
+   },
+   "hybrid_best_train": {
+    "knob": 0.3,
+    "delta_train64": -0.0032875290625000017,
+    "lo": -0.006855307997104016,
+    "hi": 0.0002802498721040129,
+    "ref_policy": {
+     "kind": "rule",
+     "name": "d2_slope",
+     "params": {
+      "s": 0.3,
+      "gain": 1.0,
+      "dz0": 0.5
+     }
+    }
+   }
+  },
+  {
+   "id": "D3",
+   "kind": "designer",
+   "size": 0.02,
+   "source": "designer_2",
+   "status": "uncalibratable",
+   "reason": "no tested knob reaches the band [0.8s,1.2s] (training seeds)",
+   "best_train": {
+    "knob": 0.3,
+    "delta_train64": -0.0032875290625000017,
+    "lo": -0.006855307997104016,
+    "hi": 0.0002802498721040129,
+    "ref_policy": {
+     "kind": "rule",
+     "name": "d2_slope",
+     "params": {
+      "s": 0.3,
+      "gain": 1.0,
+      "dz0": 0.5
+     }
+    }
+   },
+   "literal_best_train": {
+    "knob": 0.05,
+    "delta_train64": -0.023226977343749997,
+    "lo": -0.025321014606936643,
+    "hi": -0.02113294008056335,
+    "ref_policy": {
+     "kind": "rule",
+     "name": "d2_slope",
+     "params": {
+      "s": 0.05,
+      "gain": 2.0
+     }
+    }
+   },
+   "hybrid_best_train": {
+    "knob": 0.3,
+    "delta_train64": -0.0032875290625000017,
+    "lo": -0.006855307997104016,
+    "hi": 0.0002802498721040129,
+    "ref_policy": {
+     "kind": "rule",
+     "name": "d2_slope",
+     "params": {
+      "s": 0.3,
+      "gain": 1.0,
+      "dz0": 0.5
+     }
+    }
+   }
+  },
+  {
+   "id": "O6",
+   "kind": "auto",
+   "size": 0.01,
+   "source": "auto",
+   "status": "uncalibratable",
+   "reason": "no tested knob reaches the band [0.8s,1.2s] (training seeds)",
+   "best_train": {
+    "knob": 0.9,
+    "delta_train64": 0.0035500134375,
+    "lo": 0.002749900532482535,
+    "hi": 0.004350126342517465,
+    "ref_policy": {
+     "kind": "adapter",
+     "scols": {
+      "dz": 0.8
+     }
+    }
+   }
+  },
+  {
+   "id": "O6",
+   "kind": "auto",
+   "size": 0.02,
+   "source": "auto",
+   "status": "uncalibratable",
+   "reason": "no tested knob reaches the band [0.8s,1.2s] (training seeds)",
+   "best_train": {
+    "knob": 0.9,
+    "delta_train64": 0.0035500134375,
+    "lo": 0.002749900532482535,
+    "hi": 0.004350126342517465,
+    "ref_policy": {
+     "kind": "adapter",
+     "scols": {
+      "dz": 0.8
+     }
+    }
+   }
+  },
+  {
+   "id": "O4",
+   "kind": "blind",
+   "size": 0.02,
+   "source": "blind",
+   "status": "uncalibratable",
+   "reason": "no tested knob reaches the band [0.8s,1.2s] (training seeds)",
+   "best_train": {
+    "knob": 0.6,
+    "delta_train64": 0.0026814998437499995,
+    "lo": 0.0003652893835555983,
+    "hi": 0.004997710303944401,
+    "ref_policy": {
+     "kind": "adapter",
+     "scols": {
+      "dzc": 0.4
+     }
+    }
+   }
+  },
+  {
+   "id": "B1",
+   "kind": "blind",
+   "size": 0.02,
+   "status": "not_implemented",
+   "reason": "spec 8.2 gives only an example (absolute-time window / 600-round memory) and no designer definition was supplied"
+  },
+  {
+   "id": "B2",
+   "kind": "blind",
+   "size": 0.02,
+   "status": "not_implemented",
+   "reason": "spec 8.2 gives only an example (absolute-time window / 600-round memory) and no designer definition was supplied"
+  }
+ ],
+ "excluded": {
+  "designer_1": {
+   "reason": "contaminated blind design (docs/direction2-blind-vulns.md); not read, not implemented, not counted"
+  }
+ },
+ "checks": {
+  "file": "results/direction2/vuln_checks.json",
+  "all_identity_ok": true,
+  "all_hook_level_ok": true,
+  "all_rules_ok": true
+ },
+ "meta": {
+  "designer_mapping": "D1..D4 = V1..V4 of docs/direction2-blind-vulns-2.md (designer_2): V1 RestedAuditDiscount, V2 SuspensionParole, V3 SlopeShrink, V4 SelfCalibratingSlope",
+  "interpretations": [
+   "env.py uses the true slope r_true as the audit slope (frontier's r_as branch). V3 therefore shrinks r_true: rh = r_true*(1-s); V4's rh_a starts at r_true (the 'prior' r_as).",
+   "V4 (conservative reading of 'online calibration'): rh_a[B,K] is per agent, initial value r_true, NLMS step eta exactly as written (zv*err/(1+zv^2), clamp [0,0.995]), updated on every eligible audit of that agent, reset to r_true when that agent is flagged; honest agents are calibrated too (as written). eta is the knob (eta=0: rh_c=rh, rh_a never read or written).",
+   "V1: lose_run is kept for all K agents and the audit discount applies to whoever wins the round (the mutation is on the mechanism's audit assignment, not on agent 1 only); suspended rounds do not count; a flag zeroes the flagged agent's counter; G=5 fixed.",
+   "V2: calm/parole kept for all K agents; the release hook runs right after pen += ~elig and before the audit settlement; Q integer, Q=+inf is the identity; Q>=L has no effect (natural release first).",
+   "Hooks: designer mutations act on the 5 existing hooks (V1 audit_prob, V3/V4 resid) plus one new hook 'release' (V2, logged only when present); they carry an extension object for state and set VulnOperator.full=True (hook output applies to every agent). O1..O6 code paths are untouched.",
+   "Reference policies are 'rule' policies: a public-history function (PUBLIC_RULES, runs in the sandbox) plus an in-loop vectorised twin (LOOP_RULES) used by the simulator; scripts/run_d2_vulns.py check verifies they agree to 1e-9 on recorded runs. The sandbox now keeps the own suspension end susp1 of the current round (public at the round start, obs: susp_minus_t); v1 and won1 of the current round stay hidden.",
+   "Free parameters of the reference policies (lie sizes dz, kappa/eta ratio, dz_max, W) were chosen on TRAINING seeds 0-63 only (grid search, the winner per knob); validation seeds were used to measure and to choose among 4 neighbouring knobs the one whose validation delta lies in [0.8s,1.2s] with CI lower bound > 0.",
+   "Size = Delta = G*_V - G_HW_best_V per REQ-S1-02. Because Delta is measured against the best of the 32 coarse-grid handwritten strategies, Delta(knob) is not always monotone (e.g. O3, O2 near 0.25 where the HW grid point dz=2.0 is optimal, D4 where Delta FALLS as eta grows because HW strategies also learn to exploit larger eta).",
+   "Only the sizes s in {0.01, 0.02} were calibrated (task instruction; spec 8.4 gate set G_s); 0.003 and 0.005 are not in the registry, blind vulnerabilities only at 0.02. T-39 (>=48 entries) and T-42 (4 sizes) therefore cannot pass on this registry by construction.",
+   "D1 and D3: the literal designer strategy (honest except one lie after G losses / lie only if z>0) never reaches the target sizes (see uncalibratable[].literal_best_train). D1 uses the hybrid 'literal strategy + constant lie dz0 in all other rounds' (rule d2_rested with dz0>0); D3 remained uncalibratable even with a hybrid (dz0 + z-proportional lie)."
+  ],
+  "calibration": "training seeds 0-63 (sweeps in results/direction2/vuln_parts/*_train_*.json), validation 2000-2031, T=100000, r=0.5, M3C {p=0.1,tol=6,L=2500,kref=0.5}",
+  "handwritten": "S_HW = 32 strategies of hw.build_s_hw(), best per environment on the same seeds"
+ }
+}

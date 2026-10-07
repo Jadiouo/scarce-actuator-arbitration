@@ -1,0 +1,82 @@
+{
+"0.052": [
+{
+"kind": "rule",
+"name": "d2_climb",
+"params": {
+"kappa": 0.00104,
+"dz_max": 2.0
+}
+}
+],
+"0.054": [
+{
+"kind": "rule",
+"name": "d2_climb",
+"params": {
+"kappa": 0.0010799999999999998,
+"dz_max": 2.0
+}
+}
+],
+"0.056": [
+{
+"kind": "rule",
+"name": "d2_climb",
+"params": {
+"kappa": 0.00112,
+"dz_max": 2.0
+}
+}
+],
+"0.058": [
+{
+"kind": "rule",
+"name": "d2_climb",
+"params": {
+"kappa": 0.00116,
+"dz_max": 2.0
+}
+}
+],
+"0.08": [
+{
+"kind": "rule",
+"name": "d2_climb",
+"params": {
+"kappa": 0.0016000000000000003,
+"dz_max": 2.0
+}
+}
+],
+"0.082": [
+{
+"kind": "rule",
+"name": "d2_climb",
+"params": {
+"kappa": 0.0016400000000000002,
+"dz_max": 2.0
+}
+}
+],
+"0.084": [
+{
+"kind": "rule",
+"name": "d2_climb",
+"params": {
+"kappa": 0.00168,
+"dz_max": 2.0
+}
+}
+],
+"0.086": [
+{
+"kind": "rule",
+"name": "d2_climb",
+"params": {
+"kappa": 0.00172,
+"dz_max": 2.0
+}
+}
+]
+}

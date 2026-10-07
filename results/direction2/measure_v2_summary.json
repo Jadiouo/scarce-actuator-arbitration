@@ -1,0 +1,170 @@
+{
+ "m2_summary": [
+  {
+   "r": 0.5,
+   "sigma": 0.03,
+   "vrf_median": 1.2459806400107207,
+   "vrf_min": 0.9287676759688352,
+   "sd_crn_median": 0.02173187307112725,
+   "sd_crn_max": 0.034464532182415485
+  },
+  {
+   "r": 0.5,
+   "sigma": 0.1,
+   "vrf_median": 1.2208209407231498,
+   "vrf_min": 0.96700614605054,
+   "sd_crn_median": 0.015224621546938493,
+   "sd_crn_max": 0.031556003896909976
+  },
+  {
+   "r": 0.5,
+   "sigma": 0.3,
+   "vrf_median": 1.2755167508846683,
+   "vrf_min": 0.9358738378915092,
+   "sd_crn_median": 0.008867210815758244,
+   "sd_crn_max": 0.027606134858254222
+  },
+  {
+   "r": 0.9,
+   "sigma": 0.03,
+   "vrf_median": 0.98074566709545,
+   "vrf_min": 0.8885176195023284,
+   "sd_crn_median": 0.02091507152179465,
+   "sd_crn_max": 0.027016263021256662
+  },
+  {
+   "r": 0.9,
+   "sigma": 0.1,
+   "vrf_median": 1.0766823053462338,
+   "vrf_min": 0.8285711307695905,
+   "sd_crn_median": 0.014042146385155968,
+   "sd_crn_max": 0.030865621910834987
+  },
+  {
+   "r": 0.9,
+   "sigma": 0.3,
+   "vrf_median": 1.579813030574781,
+   "vrf_min": 0.9951214951758105,
+   "sd_crn_median": 0.010288332766514793,
+   "sd_crn_max": 0.017292278699182054
+  }
+ ],
+ "nS_need": {
+  "0.5": {
+   "threshold": 0.00145,
+   "sd_worst_median": 0.02173187307112725,
+   "sd_worst_pair": 0.034464532182415485,
+   "nS_formula_continuous_median": 224.62511637554616,
+   "nS_formula_continuous_pair": 564.9483845673021,
+   "nS_from_median": 256,
+   "nS_from_worst_pair": null,
+   "nS_from_median_cap128": null
+  },
+  "0.9": {
+   "threshold": 0.0004,
+   "sd_worst_median": 0.02091507152179465,
+   "sd_worst_pair": 0.030865621910834987,
+   "nS_formula_continuous_median": 2734.0013547611597,
+   "nS_formula_continuous_pair": 5954.291349641354,
+   "nS_from_median": null,
+   "nS_from_worst_pair": null,
+   "nS_from_median_cap128": null
+  }
+ },
+ "run_time_lam256_T2e4_300gen": {
+  "nS64_mean": {
+   "n_S": 64,
+   "t_step_ms": 1.3797399972606923,
+   "train_s": 8278.439983564154,
+   "validation_s": 1592.6880220860003,
+   "total_s": 9871.128005650155,
+   "total_h": 2.7419800015694875,
+   "mem_peak_MB": 34.546875,
+   "ok_S1_2p5h": false,
+   "ok_main_3h": true
+  },
+  "nS64_p95": {
+   "n_S": 64,
+   "t_step_ms": 1.9443762171249546,
+   "train_s": 11666.257302749727,
+   "validation_s": 1592.6880220860003,
+   "total_s": 13258.945324835728,
+   "total_h": 3.6830403680099244,
+   "mem_peak_MB": 34.546875,
+   "ok_S1_2p5h": false,
+   "ok_main_3h": false
+  },
+  "nS128_mean": {
+   "n_S": 128,
+   "t_step_ms": 1.3317146348452462,
+   "train_s": 7990.287809071478,
+   "validation_s": 1592.6880220860003,
+   "total_s": 9582.975831157477,
+   "total_h": 2.661937730877077,
+   "mem_peak_MB": 69.09375,
+   "ok_S1_2p5h": false,
+   "ok_main_3h": true
+  },
+  "nS128_p95": {
+   "n_S": 128,
+   "t_step_ms": 1.9371186830236788,
+   "train_s": 11622.712098142072,
+   "validation_s": 1592.6880220860003,
+   "total_s": 13215.400120228072,
+   "total_h": 3.670944477841131,
+   "mem_peak_MB": 69.09375,
+   "ok_S1_2p5h": false,
+   "ok_main_3h": false
+  },
+  "nS256_mean": {
+   "n_S": 256,
+   "t_step_ms": 1.359011063186148,
+   "train_s": 8154.066379116888,
+   "validation_s": 1592.6880220860003,
+   "total_s": 9746.754401202888,
+   "total_h": 2.7074317781119133,
+   "mem_peak_MB": 140.6875,
+   "ok_S1_2p5h": false,
+   "ok_main_3h": true
+  },
+  "nS256_p95": {
+   "n_S": 256,
+   "t_step_ms": 1.9480773326298124,
+   "train_s": 11688.463995778875,
+   "validation_s": 1592.6880220860003,
+   "total_s": 13281.152017864875,
+   "total_h": 3.689208893851354,
+   "mem_peak_MB": 140.6875,
+   "ok_S1_2p5h": false,
+   "ok_main_3h": false
+  },
+  "nS512_mean": {
+   "n_S": 512,
+   "t_step_ms": 1.7594081825857508,
+   "train_s": 10556.449095514505,
+   "validation_s": 1592.6880220860003,
+   "total_s": 12149.137117600505,
+   "total_h": 3.374760310444585,
+   "mem_peak_MB": 276.375,
+   "ok_S1_2p5h": false,
+   "ok_main_3h": false
+  },
+  "nS512_p95": {
+   "n_S": 512,
+   "t_step_ms": 2.0181574833865543,
+   "train_s": 12108.944900319326,
+   "validation_s": 1592.6880220860003,
+   "total_s": 13701.632922405326,
+   "total_h": 3.8060091451125904,
+   "mem_peak_MB": 276.375,
+   "ok_S1_2p5h": false,
+   "ok_main_3h": false
+  }
+ },
+ "validation": {
+  "t_val_s": 132.72400184050002,
+  "n_val_per_run": 12,
+  "total_s": 1592.6880220860003
+ },
+ "B_max_note": "12 GB (or OOM) reached"
+}

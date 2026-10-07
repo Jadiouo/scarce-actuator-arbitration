@@ -1,0 +1,394 @@
+{
+ "identity": {
+  "D1/L300": true,
+  "D2/L300": true,
+  "D3/L300": true,
+  "D4/L300": true,
+  "D1/L300/with_rules": true,
+  "D2/L300/with_rules": true,
+  "D3/L300/with_rules": true,
+  "D4/L300/with_rules": true,
+  "D1/L2500": true,
+  "D2/L2500": true,
+  "D3/L2500": true,
+  "D4/L2500": true,
+  "D1/L2500/with_rules": true,
+  "D2/L2500/with_rules": true,
+  "D3/L2500/with_rules": true,
+  "D4/L2500/with_rules": true
+ },
+ "effect": {
+  "D1/L300": [
+   "reg_b",
+   "util_b",
+   "flags",
+   "pen",
+   "audits",
+   "susp"
+  ],
+  "D2/L300": [
+   "reg_b",
+   "util_b",
+   "flags",
+   "pen",
+   "susp"
+  ],
+  "D3/L300": [
+   "reg_b",
+   "util_b",
+   "flags",
+   "pen",
+   "susp"
+  ],
+  "D4/L300": [
+   "reg_b",
+   "util_b",
+   "flags",
+   "pen",
+   "susp"
+  ],
+  "D1/L2500": [
+   "reg_b",
+   "util_b",
+   "flags",
+   "pen",
+   "audits",
+   "susp"
+  ],
+  "D2/L2500": [
+   "reg_b",
+   "util_b",
+   "flags",
+   "pen",
+   "susp"
+  ],
+  "D3/L2500": [
+   "reg_b",
+   "util_b",
+   "flags",
+   "pen",
+   "susp"
+  ],
+  "D4/L2500": [
+   "reg_b",
+   "util_b",
+   "flags",
+   "pen",
+   "audits",
+   "susp"
+  ]
+ },
+ "hook_level": {
+  "D1": {
+   "audit_prob": {
+    "target": true,
+    "equals_formula": true,
+    "effective": true,
+    "calls": 70000
+   },
+   "resid": {
+    "target": false,
+    "equals_base": true,
+    "calls": 7858
+   },
+   "cusum": {
+    "target": false,
+    "equals_base": true,
+    "calls": 7797
+   },
+   "cusum_reset": {
+    "target": false,
+    "equals_base": true,
+    "calls": 70000
+   },
+   "pause_len": {
+    "target": false,
+    "equals_base": true,
+    "calls": 164
+   }
+  },
+  "D2": {
+   "audit_prob": {
+    "target": false,
+    "equals_base": true,
+    "calls": 70000
+   },
+   "resid": {
+    "target": false,
+    "equals_base": true,
+    "calls": 9766
+   },
+   "cusum": {
+    "target": false,
+    "equals_base": true,
+    "calls": 9705
+   },
+   "cusum_reset": {
+    "target": false,
+    "equals_base": true,
+    "calls": 70000
+   },
+   "pause_len": {
+    "target": false,
+    "equals_base": true,
+    "calls": 190
+   },
+   "release": {
+    "target": true,
+    "equals_formula": true,
+    "effective": true
+   }
+  },
+  "D3": {
+   "audit_prob": {
+    "target": false,
+    "equals_base": true,
+    "calls": 70000
+   },
+   "resid": {
+    "target": true,
+    "equals_formula": true,
+    "effective": true,
+    "calls": 34888
+   },
+   "cusum": {
+    "target": false,
+    "equals_base": true,
+    "calls": 10219
+   },
+   "cusum_reset": {
+    "target": false,
+    "equals_base": true,
+    "calls": 70000
+   },
+   "pause_len": {
+    "target": false,
+    "equals_base": true,
+    "calls": 99
+   }
+  },
+  "D4": {
+   "audit_prob": {
+    "target": false,
+    "equals_base": true,
+    "calls": 70000
+   },
+   "resid": {
+    "target": true,
+    "equals_formula": true,
+    "effective": true,
+    "calls": 34888
+   },
+   "cusum": {
+    "target": false,
+    "equals_base": true,
+    "calls": 10318
+   },
+   "cusum_reset": {
+    "target": false,
+    "equals_base": true,
+    "calls": 70000
+   },
+   "pause_len": {
+    "target": false,
+    "equals_base": true,
+    "calls": 107
+   }
+  }
+ },
+ "rules_sandbox": {
+  "d2_rested/D1": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 120
+  },
+  "d2_parole/D1": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 420
+  },
+  "d2_slope/D1": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 120
+  },
+  "d2_climb/D1": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 120
+  },
+  "streak_lie/D1": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 120
+  },
+  "late_lie/D1": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 413
+  },
+  "launder/D1": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 802
+  },
+  "d2_rested+dz0/D1": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 120
+  },
+  "d2_slope+dz0/D1": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 480
+  },
+  "d2_rested/D2": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 120
+  },
+  "d2_parole/D2": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 27
+  },
+  "d2_slope/D2": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 120
+  },
+  "d2_climb/D2": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 120
+  },
+  "streak_lie/D2": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 120
+  },
+  "late_lie/D2": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 413
+  },
+  "launder/D2": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 415
+  },
+  "d2_rested+dz0/D2": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 120
+  },
+  "d2_slope+dz0/D2": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 360
+  },
+  "d2_rested/D3": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 0
+  },
+  "d2_parole/D3": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 120
+  },
+  "d2_slope/D3": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 0
+  },
+  "d2_climb/D3": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 120
+  },
+  "streak_lie/D3": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 0
+  },
+  "late_lie/D3": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 360
+  },
+  "launder/D3": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 420
+  },
+  "d2_rested+dz0/D3": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 0
+  },
+  "d2_slope+dz0/D3": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 60
+  },
+  "d2_rested/D4": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 0
+  },
+  "d2_parole/D4": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 0
+  },
+  "d2_slope/D4": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 0
+  },
+  "d2_climb/D4": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 120
+  },
+  "streak_lie/D4": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 0
+  },
+  "late_lie/D4": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 60
+  },
+  "launder/D4": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 0
+  },
+  "d2_rested+dz0/D4": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 0
+  },
+  "d2_slope+dz0/D4": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 0
+  },
+  "d2_rested/None": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 120
+  },
+  "d2_parole/None": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 300
+  },
+  "d2_slope/None": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 120
+  },
+  "d2_climb/None": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 120
+  },
+  "streak_lie/None": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 120
+  },
+  "late_lie/None": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 413
+  },
+  "launder/None": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 810
+  },
+  "d2_rested+dz0/None": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 120
+  },
+  "d2_slope+dz0/None": {
+   "max_abs_diff": 2.220446049250313e-16,
+   "suspended_rounds": 360
+  }
+ },
+ "per_element_knob": {
+  "D1/L300": true,
+  "D2/L300": true,
+  "D3/L300": true,
+  "D4/L300": true,
+  "D1/L2500": true,
+  "D2/L2500": true,
+  "D3/L2500": true,
+  "D4/L2500": true
+ },
+ "all_identity_ok": true,
+ "all_hook_level_ok": true,
+ "all_rules_ok": true
+}

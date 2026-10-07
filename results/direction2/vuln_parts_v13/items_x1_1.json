@@ -1,0 +1,50 @@
+[
+ {
+  "op": "O1",
+  "knob": 0.9,
+  "size": 0.01,
+  "spec": {
+   "kind": "rule",
+   "name": "streak_lie",
+   "params": {
+    "dz": 2.0,
+    "m": 3.0
+   }
+  }
+ },
+ {
+  "op": "O1",
+  "knob": 0.93,
+  "size": 0.02,
+  "spec": {
+   "kind": "rule",
+   "name": "streak_lie",
+   "params": {
+    "dz": 2.5,
+    "m": 3.0
+   }
+  }
+ },
+ {
+  "op": "O2",
+  "knob": 0.285,
+  "size": 0.01,
+  "spec": {
+   "kind": "adapter",
+   "scols": {
+    "dzc": 2.6
+   }
+  }
+ },
+ {
+  "op": "O2",
+  "knob": 0.312,
+  "size": 0.02,
+  "spec": {
+   "kind": "adapter",
+   "scols": {
+    "dz": 2.7
+   }
+  }
+ }
+]

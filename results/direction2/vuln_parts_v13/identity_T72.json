@@ -1,0 +1,1 @@
+{"test":"test_T72_vuln_identity_long_horizon_O_series","ops":["O1","O2","O3","O5","O4","O6"],"T":100000,"bitwise_identical":true,"gpujob":120,"result":"6 passed"}

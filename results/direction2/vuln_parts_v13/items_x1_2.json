@@ -1,0 +1,52 @@
+[
+ {
+  "op": "O3",
+  "knob": 0.59,
+  "size": 0.01,
+  "spec": {
+   "kind": "adapter",
+   "scols": {
+    "dzc": 2.6
+   }
+  }
+ },
+ {
+  "op": "O3",
+  "knob": 0.562,
+  "size": 0.02,
+  "spec": {
+   "kind": "adapter",
+   "scols": {
+    "dz": 2.6
+   }
+  }
+ },
+ {
+  "op": "O5",
+  "knob": 27.0,
+  "size": 0.02,
+  "spec": {
+   "kind": "rule",
+   "name": "launder",
+   "params": {
+    "dz": 0.7,
+    "W": 100.0,
+    "Z": 27.0
+   }
+  }
+ },
+ {
+  "op": "D3",
+  "knob": 0.3,
+  "size": null,
+  "spec": {
+   "kind": "rule",
+   "name": "d2_slope",
+   "params": {
+    "s": 0.3,
+    "gain": 1.0,
+    "dz0": 0.5
+   }
+  }
+ }
+]

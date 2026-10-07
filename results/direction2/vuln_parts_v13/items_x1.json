@@ -1,0 +1,152 @@
+[
+ {
+  "op": "D1",
+  "knob": 0.9,
+  "size": 0.01,
+  "spec": {
+   "kind": "rule",
+   "name": "d2_rested",
+   "params": {
+    "dz": 2.0,
+    "G": 5.0,
+    "dz0": 0.2
+   }
+  }
+ },
+ {
+  "op": "D1",
+  "knob": 1.0,
+  "size": 0.02,
+  "spec": {
+   "kind": "rule",
+   "name": "d2_rested",
+   "params": {
+    "dz": 2.0,
+    "G": 5.0,
+    "dz0": 0.2
+   }
+  }
+ },
+ {
+  "op": "D2",
+  "knob": 1700.0,
+  "size": 0.01,
+  "spec": {
+   "kind": "rule",
+   "name": "d2_parole",
+   "params": {
+    "dz": 0.3
+   }
+  }
+ },
+ {
+  "op": "D2",
+  "knob": 1100.0,
+  "size": 0.02,
+  "spec": {
+   "kind": "rule",
+   "name": "d2_parole",
+   "params": {
+    "dz": 0.5
+   }
+  }
+ },
+ {
+  "op": "O1",
+  "knob": 0.9,
+  "size": 0.01,
+  "spec": {
+   "kind": "rule",
+   "name": "streak_lie",
+   "params": {
+    "dz": 2.0,
+    "m": 3.0
+   }
+  }
+ },
+ {
+  "op": "O1",
+  "knob": 0.93,
+  "size": 0.02,
+  "spec": {
+   "kind": "rule",
+   "name": "streak_lie",
+   "params": {
+    "dz": 2.5,
+    "m": 3.0
+   }
+  }
+ },
+ {
+  "op": "O2",
+  "knob": 0.285,
+  "size": 0.01,
+  "spec": {
+   "kind": "adapter",
+   "scols": {
+    "dzc": 2.6
+   }
+  }
+ },
+ {
+  "op": "O2",
+  "knob": 0.312,
+  "size": 0.02,
+  "spec": {
+   "kind": "adapter",
+   "scols": {
+    "dz": 2.7
+   }
+  }
+ },
+ {
+  "op": "O3",
+  "knob": 0.59,
+  "size": 0.01,
+  "spec": {
+   "kind": "adapter",
+   "scols": {
+    "dzc": 2.6
+   }
+  }
+ },
+ {
+  "op": "O3",
+  "knob": 0.562,
+  "size": 0.02,
+  "spec": {
+   "kind": "adapter",
+   "scols": {
+    "dz": 2.6
+   }
+  }
+ },
+ {
+  "op": "O5",
+  "knob": 27.0,
+  "size": 0.02,
+  "spec": {
+   "kind": "rule",
+   "name": "launder",
+   "params": {
+    "dz": 0.7,
+    "W": 100.0,
+    "Z": 27.0
+   }
+  }
+ },
+ {
+  "op": "D3",
+  "knob": 0.3,
+  "size": null,
+  "spec": {
+   "kind": "rule",
+   "name": "d2_slope",
+   "params": {
+    "s": 0.3,
+    "gain": 1.0,
+    "dz0": 0.5
+   }
+  }
+ }
+]

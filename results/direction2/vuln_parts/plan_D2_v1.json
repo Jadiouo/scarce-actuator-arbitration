@@ -1,0 +1,74 @@
+{
+"1000": [
+{
+"kind": "rule",
+"name": "d2_parole",
+"params": {
+"dz": 0.5
+}
+}
+],
+"1050": [
+{
+"kind": "rule",
+"name": "d2_parole",
+"params": {
+"dz": 0.5
+}
+}
+],
+"1100": [
+{
+"kind": "rule",
+"name": "d2_parole",
+"params": {
+"dz": 0.5
+}
+}
+],
+"1150": [
+{
+"kind": "rule",
+"name": "d2_parole",
+"params": {
+"dz": 0.3
+}
+}
+],
+"1600": [
+{
+"kind": "rule",
+"name": "d2_parole",
+"params": {
+"dz": 0.3
+}
+}
+],
+"1650": [
+{
+"kind": "rule",
+"name": "d2_parole",
+"params": {
+"dz": 0.3
+}
+}
+],
+"1700": [
+{
+"kind": "rule",
+"name": "d2_parole",
+"params": {
+"dz": 0.3
+}
+}
+],
+"1750": [
+{
+"kind": "rule",
+"name": "d2_parole",
+"params": {
+"dz": 0.3
+}
+}
+]
+}

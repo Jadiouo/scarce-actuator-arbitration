@@ -1,0 +1,54 @@
+[
+ {
+  "op": "D1",
+  "knob": 0.9,
+  "size": 0.01,
+  "spec": {
+   "kind": "rule",
+   "name": "d2_rested",
+   "params": {
+    "dz": 2.0,
+    "G": 5.0,
+    "dz0": 0.2
+   }
+  }
+ },
+ {
+  "op": "D1",
+  "knob": 1.0,
+  "size": 0.02,
+  "spec": {
+   "kind": "rule",
+   "name": "d2_rested",
+   "params": {
+    "dz": 2.0,
+    "G": 5.0,
+    "dz0": 0.2
+   }
+  }
+ },
+ {
+  "op": "D2",
+  "knob": 1700.0,
+  "size": 0.01,
+  "spec": {
+   "kind": "rule",
+   "name": "d2_parole",
+   "params": {
+    "dz": 0.3
+   }
+  }
+ },
+ {
+  "op": "D2",
+  "knob": 1100.0,
+  "size": 0.02,
+  "spec": {
+   "kind": "rule",
+   "name": "d2_parole",
+   "params": {
+    "dz": 0.5
+   }
+  }
+ }
+]

@@ -1,0 +1,90 @@
+{
+"26": [
+{
+"kind": "rule",
+"name": "launder",
+"params": {
+"dz": 0.7,
+"W": 100.0,
+"Z": 26.0
+}
+}
+],
+"27": [
+{
+"kind": "rule",
+"name": "launder",
+"params": {
+"dz": 0.7,
+"W": 100.0,
+"Z": 27.0
+}
+}
+],
+"28": [
+{
+"kind": "rule",
+"name": "launder",
+"params": {
+"dz": 0.7,
+"W": 100.0,
+"Z": 28.0
+}
+}
+],
+"29": [
+{
+"kind": "rule",
+"name": "launder",
+"params": {
+"dz": 0.7,
+"W": 100.0,
+"Z": 29.0
+}
+}
+],
+"36": [
+{
+"kind": "rule",
+"name": "launder",
+"params": {
+"dz": 0.7,
+"W": 150.0,
+"Z": 36.0
+}
+}
+],
+"37": [
+{
+"kind": "rule",
+"name": "launder",
+"params": {
+"dz": 0.5,
+"W": 200.0,
+"Z": 37.0
+}
+}
+],
+"38": [
+{
+"kind": "rule",
+"name": "launder",
+"params": {
+"dz": 0.5,
+"W": 200.0,
+"Z": 38.0
+}
+}
+],
+"39": [
+{
+"kind": "rule",
+"name": "launder",
+"params": {
+"dz": 0.7,
+"W": 150.0,
+"Z": 39.0
+}
+}
+]
+}

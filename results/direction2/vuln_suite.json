@@ -1,0 +1,2484 @@
+{
+ "schema": "REQ-S1-03 (v1.3): entries[] = (vulnerability, size) with id, kind, category, source, operator, knob, size, blind, size_basis, ref_policy, G_star_val, G_HW_best_val (36-list), ratio_HW_over_Gstar, delta_fine, delta_coarse, delta_val (= basis delta), delta_val_only, delta_val2_only, calib_seeds, honest_drift, knob_monotone, delta_train64; anchors carry G_star_ref",
+ "version": "v1.3",
+ "git_sha": "eae1f3a",
+ "generated": "2026-10-07",
+ "sizes_run": [
+  0.01,
+  0.02
+ ],
+ "size_definition": "Delta = G*_V - G_HW_best_V, paired per seed, on val U val2 (64 seeds); out_of_family and blind: best of 36 (fine); in_family: best of 32 (coarse)",
+ "calib_seeds": {
+  "name": "val+val2",
+  "n_seeds": 64,
+  "val": [
+   2000,
+   2031
+  ],
+  "val2": [
+   3000,
+   3031
+  ],
+  "order": "val then val2",
+  "t_df": 63
+ },
+ "acceptance": "basis Delta in [0.8 s, 1.2 s] and paired t(63) 95% CI lower bound > 0",
+ "entries": [
+  {
+   "id": "D1",
+   "kind": "designer",
+   "category": "out_of_family",
+   "source": "designer_2",
+   "operator": "D1",
+   "knob": 0.9,
+   "size": 0.01,
+   "blind": false,
+   "size_basis": "fine",
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "rule",
+    "name": "d2_rested",
+    "params": {
+     "dz": 2.0,
+     "G": 5.0,
+     "dz0": 0.2
+    }
+   },
+   "G_star_val": {
+    "mean": 0.034030254677081075,
+    "lo": 0.030202366232084516,
+    "hi": 0.03785814312207764,
+    "half": 0.003827888444996559
+   },
+   "G_HW_best_val": {
+    "name": "dz=0.3",
+    "mean": 0.024643967942685675
+   },
+   "G_HW_best_coarse_val": {
+    "name": "dz=0.3",
+    "mean": 0.024643967942685675
+   },
+   "ratio_HW_over_Gstar": 0.7241781813429408,
+   "delta_fine": {
+    "mean": 0.0093862867343954,
+    "lo": 0.005871131757249374,
+    "hi": 0.012901441711541424,
+    "half": 0.003515154977146025
+   },
+   "delta_coarse": {
+    "mean": 0.0093862867343954,
+    "lo": 0.005871131757249374,
+    "hi": 0.012901441711541424,
+    "half": 0.003515154977146025
+   },
+   "delta_val": {
+    "mean": 0.0093862867343954,
+    "lo": 0.005871131757249374,
+    "hi": 0.012901441711541424,
+    "half": 0.003515154977146025
+   },
+   "delta_val_only": 0.011650493950321719,
+   "delta_val2_only": 0.007122079518469082,
+   "calib_seeds": "val+val2",
+   "honest_drift": {
+    "mean": 0.00032065015625000004,
+    "lo": -0.0008739101359276803,
+    "hi": 0.0015152104484276803,
+    "half": 0.0011945602921776804
+   },
+   "knob_monotone": true,
+   "delta_train64": 0.007491789480427027,
+   "delta_train64_ci": {
+    "mean": 0.007491789480427027,
+    "lo": 0.004575734892493039,
+    "hi": 0.010407844068361014,
+    "half": 0.002916054587933988
+   },
+   "n_knobs_measured": 6,
+   "calibration_part": "D1_calib_a.json",
+   "in_band": true,
+   "ci_lo_positive": true,
+   "designer_name": "V1_RestedAuditDiscount"
+  },
+  {
+   "id": "D1",
+   "kind": "designer",
+   "category": "out_of_family",
+   "source": "designer_2",
+   "operator": "D1",
+   "knob": 1.0,
+   "size": 0.02,
+   "blind": false,
+   "size_basis": "fine",
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "rule",
+    "name": "d2_rested",
+    "params": {
+     "dz": 2.0,
+     "G": 5.0,
+     "dz0": 0.2
+    }
+   },
+   "G_star_val": {
+    "mean": 0.04454749089780096,
+    "lo": 0.04183737086259262,
+    "hi": 0.0472576109330093,
+    "half": 0.002710120035208343
+   },
+   "G_HW_best_val": {
+    "name": "dz=0.3",
+    "mean": 0.02410706169745597
+   },
+   "G_HW_best_coarse_val": {
+    "name": "dz=0.3",
+    "mean": 0.02410706169745597
+   },
+   "ratio_HW_over_Gstar": 0.5411541977248822,
+   "delta_fine": {
+    "mean": 0.020440429200344987,
+    "lo": 0.01740695642953729,
+    "hi": 0.023473901971152684,
+    "half": 0.003033472770807697
+   },
+   "delta_coarse": {
+    "mean": 0.020440429200344987,
+    "lo": 0.01740695642953729,
+    "hi": 0.023473901971152684,
+    "half": 0.003033472770807697
+   },
+   "delta_val": {
+    "mean": 0.020440429200344987,
+    "lo": 0.01740695642953729,
+    "hi": 0.023473901971152684,
+    "half": 0.003033472770807697
+   },
+   "delta_val_only": 0.022048849194596085,
+   "delta_val2_only": 0.018832009206093885,
+   "calib_seeds": "val+val2",
+   "honest_drift": {
+    "mean": 0.00013871171874999986,
+    "lo": -0.0011766787883877691,
+    "hi": 0.001454102225887769,
+    "half": 0.0013153905071377691
+   },
+   "knob_monotone": true,
+   "delta_train64": 0.017118280728679686,
+   "delta_train64_ci": {
+    "mean": 0.017118280728679686,
+    "lo": 0.013965775629083521,
+    "hi": 0.02027078582827585,
+    "half": 0.0031525050995961637
+   },
+   "n_knobs_measured": 6,
+   "calibration_part": "D1_calib_b.json",
+   "in_band": true,
+   "ci_lo_positive": true,
+   "designer_name": "V1_RestedAuditDiscount"
+  },
+  {
+   "id": "D2",
+   "kind": "designer",
+   "category": "out_of_family",
+   "source": "designer_2",
+   "operator": "D2",
+   "knob": 1700,
+   "size": 0.01,
+   "blind": false,
+   "size_basis": "fine",
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "rule",
+    "name": "d2_parole",
+    "params": {
+     "dz": 0.3
+    }
+   },
+   "G_star_val": {
+    "mean": 0.03248582726588066,
+    "lo": 0.029939116806503432,
+    "hi": 0.035032537725257884,
+    "half": 0.0025467104593772266
+   },
+   "G_HW_best_val": {
+    "name": "dz=0.3",
+    "mean": 0.0222442007391906
+   },
+   "G_HW_best_coarse_val": {
+    "name": "dz=0.3",
+    "mean": 0.0222442007391906
+   },
+   "ratio_HW_over_Gstar": 0.6847355481248072,
+   "delta_fine": {
+    "mean": 0.010241626526690063,
+    "lo": 0.009089272272437169,
+    "hi": 0.011393980780942958,
+    "half": 0.001152354254252895
+   },
+   "delta_coarse": {
+    "mean": 0.010241626526690063,
+    "lo": 0.009089272272437169,
+    "hi": 0.011393980780942958,
+    "half": 0.001152354254252895
+   },
+   "delta_val": {
+    "mean": 0.010241626526690063,
+    "lo": 0.009089272272437169,
+    "hi": 0.011393980780942958,
+    "half": 0.001152354254252895
+   },
+   "delta_val_only": 0.009285688375459645,
+   "delta_val2_only": 0.01119756467792048,
+   "calib_seeds": "val+val2",
+   "honest_drift": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0,
+    "half": 0.0
+   },
+   "knob_monotone": true,
+   "delta_train64": 0.009682283166459048,
+   "delta_train64_ci": {
+    "mean": 0.009682283166459048,
+    "lo": 0.008543330957852188,
+    "hi": 0.010821235375065907,
+    "half": 0.0011389522086068602
+   },
+   "n_knobs_measured": 8,
+   "calibration_part": "D2_calib_b.json",
+   "in_band": true,
+   "ci_lo_positive": true,
+   "designer_name": "V2_SuspensionParole"
+  },
+  {
+   "id": "D2",
+   "kind": "designer",
+   "category": "out_of_family",
+   "source": "designer_2",
+   "operator": "D2",
+   "knob": 1100,
+   "size": 0.02,
+   "blind": false,
+   "size_basis": "fine",
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "rule",
+    "name": "d2_parole",
+    "params": {
+     "dz": 0.5
+    }
+   },
+   "G_star_val": {
+    "mean": 0.041839687463702396,
+    "lo": 0.03918844154159964,
+    "hi": 0.044490933385805155,
+    "half": 0.0026512459221027557
+   },
+   "G_HW_best_val": {
+    "name": "dz=0.3",
+    "mean": 0.0222442007391906
+   },
+   "G_HW_best_coarse_val": {
+    "name": "dz=0.3",
+    "mean": 0.0222442007391906
+   },
+   "ratio_HW_over_Gstar": 0.5316531285872614,
+   "delta_fine": {
+    "mean": 0.0195954867245118,
+    "lo": 0.01635683518882988,
+    "hi": 0.02283413826019372,
+    "half": 0.003238651535681922
+   },
+   "delta_coarse": {
+    "mean": 0.0195954867245118,
+    "lo": 0.01635683518882988,
+    "hi": 0.02283413826019372,
+    "half": 0.003238651535681922
+   },
+   "delta_val": {
+    "mean": 0.0195954867245118,
+    "lo": 0.01635683518882988,
+    "hi": 0.02283413826019372,
+    "half": 0.003238651535681922
+   },
+   "delta_val_only": 0.019477113562762247,
+   "delta_val2_only": 0.01971385988626136,
+   "calib_seeds": "val+val2",
+   "honest_drift": {
+    "mean": 0.0,
+    "lo": 0.0,
+    "hi": 0.0,
+    "half": 0.0
+   },
+   "knob_monotone": true,
+   "delta_train64": 0.01900514480309074,
+   "delta_train64_ci": {
+    "mean": 0.01900514480309074,
+    "lo": 0.016440494675535645,
+    "hi": 0.021569794930645838,
+    "half": 0.002564650127555096
+   },
+   "n_knobs_measured": 8,
+   "calibration_part": "D2_calib_a.json",
+   "in_band": true,
+   "ci_lo_positive": true,
+   "designer_name": "V2_SuspensionParole"
+  },
+  {
+   "id": "O1",
+   "kind": "auto",
+   "category": "out_of_family",
+   "source": "auto",
+   "operator": "O1",
+   "knob": 0.9,
+   "size": 0.01,
+   "blind": false,
+   "size_basis": "fine",
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "rule",
+    "name": "streak_lie",
+    "params": {
+     "dz": 2.0,
+     "m": 3.0
+    }
+   },
+   "G_star_val": {
+    "mean": 0.03724880875542323,
+    "lo": 0.03476340794967948,
+    "hi": 0.03973420956116699,
+    "half": 0.002485400805743758
+   },
+   "G_HW_best_val": {
+    "name": "dz=0.3",
+    "mean": 0.027064461117644677
+   },
+   "G_HW_best_coarse_val": {
+    "name": "dz=0.3",
+    "mean": 0.027064461117644677
+   },
+   "ratio_HW_over_Gstar": 0.7265859505830299,
+   "delta_fine": {
+    "mean": 0.010184347637778559,
+    "lo": 0.00720313790422788,
+    "hi": 0.013165557371329238,
+    "half": 0.0029812097335506793
+   },
+   "delta_coarse": {
+    "mean": 0.010184347637778559,
+    "lo": 0.00720313790422788,
+    "hi": 0.013165557371329238,
+    "half": 0.0029812097335506793
+   },
+   "delta_val": {
+    "mean": 0.010184347637778559,
+    "lo": 0.00720313790422788,
+    "hi": 0.013165557371329238,
+    "half": 0.0029812097335506793
+   },
+   "delta_val_only": 0.010895545094802127,
+   "delta_val2_only": 0.009473150180754994,
+   "calib_seeds": "val+val2",
+   "honest_drift": {
+    "mean": -0.0006473246875000001,
+    "lo": -0.0014754457210272185,
+    "hi": 0.00018079634602721838,
+    "half": 0.0008281210335272185
+   },
+   "knob_monotone": true,
+   "delta_train64": 0.012732556896758429,
+   "delta_train64_ci": {
+    "mean": 0.012732556896758429,
+    "lo": 0.009629417462874573,
+    "hi": 0.015835696330642284,
+    "half": 0.0031031394338838563
+   },
+   "n_knobs_measured": 8,
+   "calibration_part": "O1_calib_a.json",
+   "in_band": true,
+   "ci_lo_positive": true
+  },
+  {
+   "id": "O1",
+   "kind": "auto",
+   "category": "out_of_family",
+   "source": "auto",
+   "operator": "O1",
+   "knob": 0.93,
+   "size": 0.02,
+   "blind": false,
+   "size_basis": "fine",
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "rule",
+    "name": "streak_lie",
+    "params": {
+     "dz": 2.5,
+     "m": 3.0
+    }
+   },
+   "G_star_val": {
+    "mean": 0.048740937575019114,
+    "lo": 0.04522496094409147,
+    "hi": 0.052256914205946754,
+    "half": 0.0035159766309276414
+   },
+   "G_HW_best_val": {
+    "name": "dz=0.3",
+    "mean": 0.02739089764442657
+   },
+   "G_HW_best_coarse_val": {
+    "name": "dz=0.3",
+    "mean": 0.02739089764442657
+   },
+   "ratio_HW_over_Gstar": 0.561969034802996,
+   "delta_fine": {
+    "mean": 0.021350039930592542,
+    "lo": 0.017455615473066587,
+    "hi": 0.025244464388118497,
+    "half": 0.003894424457525954
+   },
+   "delta_coarse": {
+    "mean": 0.021350039930592542,
+    "lo": 0.017455615473066587,
+    "hi": 0.025244464388118497,
+    "half": 0.003894424457525954
+   },
+   "delta_val": {
+    "mean": 0.021350039930592542,
+    "lo": 0.017455615473066587,
+    "hi": 0.025244464388118497,
+    "half": 0.003894424457525954
+   },
+   "delta_val_only": 0.02258692711960577,
+   "delta_val2_only": 0.020113152741579314,
+   "calib_seeds": "val+val2",
+   "honest_drift": {
+    "mean": -0.00048349312500000003,
+    "lo": -0.0013171405801889326,
+    "hi": 0.0003501543301889326,
+    "half": 0.0008336474551889326
+   },
+   "knob_monotone": true,
+   "delta_train64": 0.019470250584474845,
+   "delta_train64_ci": {
+    "mean": 0.019470250584474845,
+    "lo": 0.014991923692752948,
+    "hi": 0.02394857747619674,
+    "half": 0.004478326891721897
+   },
+   "n_knobs_measured": 8,
+   "calibration_part": "O1_calib_b.json",
+   "in_band": true,
+   "ci_lo_positive": true
+  },
+  {
+   "id": "O2",
+   "kind": "auto",
+   "category": "in_family",
+   "source": "auto",
+   "operator": "O2",
+   "knob": 0.285,
+   "size": 0.01,
+   "blind": false,
+   "size_basis": "coarse",
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "adapter",
+    "scols": {
+     "dzc": 2.6
+    }
+   },
+   "G_star_val": {
+    "mean": 0.28248335979008804,
+    "lo": 0.28054714006312,
+    "hi": 0.2844195795170561,
+    "half": 0.0019362197269680325
+   },
+   "G_HW_best_val": {
+    "name": "dz=2.5",
+    "mean": 0.2751807319975398
+   },
+   "G_HW_best_coarse_val": {
+    "name": "dz=2.0",
+    "mean": 0.2722667858941757
+   },
+   "ratio_HW_over_Gstar": 0.9741484673717602,
+   "delta_fine": {
+    "mean": 0.0073026277925482865,
+    "lo": 0.0034224835946695085,
+    "hi": 0.011182771990427064,
+    "half": 0.003880144197878778
+   },
+   "delta_coarse": {
+    "mean": 0.010216573895912351,
+    "lo": 0.008883684671984105,
+    "hi": 0.011549463119840597,
+    "half": 0.0013328892239282463
+   },
+   "delta_val": {
+    "mean": 0.010216573895912351,
+    "lo": 0.008883684671984105,
+    "hi": 0.011549463119840597,
+    "half": 0.0013328892239282463
+   },
+   "delta_val_only": 0.010381775848596664,
+   "delta_val2_only": 0.010051371943228036,
+   "calib_seeds": "val+val2",
+   "honest_drift": {
+    "mean": 0.00392027859375,
+    "lo": 0.00286640885235613,
+    "hi": 0.0049741483351438695,
+    "half": 0.00105386974139387
+   },
+   "knob_monotone": true,
+   "delta_train64": 0.00761251205544936,
+   "delta_train64_ci": {
+    "mean": 0.00761251205544936,
+    "lo": 0.00578782545047259,
+    "hi": 0.00943719866042613,
+    "half": 0.0018246866049767697
+   },
+   "n_knobs_measured": 8,
+   "calibration_part": "O2_calib_a.json",
+   "in_band": true,
+   "ci_lo_positive": true
+  },
+  {
+   "id": "O2",
+   "kind": "auto",
+   "category": "in_family",
+   "source": "auto",
+   "operator": "O2",
+   "knob": 0.312,
+   "size": 0.02,
+   "blind": false,
+   "size_basis": "coarse",
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "adapter",
+    "scols": {
+     "dz": 2.7
+    }
+   },
+   "G_star_val": {
+    "mean": 0.2937811597840819,
+    "lo": 0.29168638094762583,
+    "hi": 0.295875938620538,
+    "half": 0.0020947788364560896
+   },
+   "G_HW_best_val": {
+    "name": "dz=2.5",
+    "mean": 0.29231009550411
+   },
+   "G_HW_best_coarse_val": {
+    "name": "dz=2.0",
+    "mean": 0.2728383668407951
+   },
+   "ratio_HW_over_Gstar": 0.9949926527587641,
+   "delta_fine": {
+    "mean": 0.0014710642799719686,
+    "lo": 2.0802249071318795e-05,
+    "hi": 0.0029213263108726186,
+    "half": 0.0014502620309006498
+   },
+   "delta_coarse": {
+    "mean": 0.020942792943286898,
+    "lo": 0.019307067963376213,
+    "hi": 0.022578517923197584,
+    "half": 0.0016357249799106863
+   },
+   "delta_val": {
+    "mean": 0.020942792943286898,
+    "lo": 0.019307067963376213,
+    "hi": 0.022578517923197584,
+    "half": 0.0016357249799106863
+   },
+   "delta_val_only": 0.02209542504621187,
+   "delta_val2_only": 0.019790160840361927,
+   "calib_seeds": "val+val2",
+   "honest_drift": {
+    "mean": 0.00392027859375,
+    "lo": 0.00286640885235613,
+    "hi": 0.0049741483351438695,
+    "half": 0.00105386974139387
+   },
+   "knob_monotone": true,
+   "delta_train64": 0.019083115762502295,
+   "delta_train64_ci": {
+    "mean": 0.019083115762502295,
+    "lo": 0.017052489505214534,
+    "hi": 0.021113742019790056,
+    "half": 0.0020306262572877625
+   },
+   "n_knobs_measured": 8,
+   "calibration_part": "O2_calib_b.json",
+   "in_band": true,
+   "ci_lo_positive": true
+  },
+  {
+   "id": "O3",
+   "kind": "auto",
+   "category": "in_family",
+   "source": "auto",
+   "operator": "O3",
+   "knob": 0.59,
+   "size": 0.01,
+   "blind": false,
+   "size_basis": "coarse",
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "adapter",
+    "scols": {
+     "dzc": 2.6
+    }
+   },
+   "G_star_val": {
+    "mean": 0.2828900337859114,
+    "lo": 0.2812029818895473,
+    "hi": 0.28457708568227547,
+    "half": 0.001687051896364098
+   },
+   "G_HW_best_val": {
+    "name": "dz=2.0",
+    "mean": 0.2728383668407951
+   },
+   "G_HW_best_coarse_val": {
+    "name": "dz=2.0",
+    "mean": 0.2728383668407951
+   },
+   "ratio_HW_over_Gstar": 0.9644679354355647,
+   "delta_fine": {
+    "mean": 0.010051666945116363,
+    "lo": 0.008788947923573303,
+    "hi": 0.011314385966659422,
+    "half": 0.0012627190215430593
+   },
+   "delta_coarse": {
+    "mean": 0.010051666945116363,
+    "lo": 0.008788947923573303,
+    "hi": 0.011314385966659422,
+    "half": 0.0012627190215430593
+   },
+   "delta_val": {
+    "mean": 0.010051666945116363,
+    "lo": 0.008788947923573303,
+    "hi": 0.011314385966659422,
+    "half": 0.0012627190215430593
+   },
+   "delta_val_only": 0.009632349033641836,
+   "delta_val2_only": 0.01047098485659089,
+   "calib_seeds": "val+val2",
+   "honest_drift": {
+    "mean": 0.00392027859375,
+    "lo": 0.00286640885235613,
+    "hi": 0.0049741483351438695,
+    "half": 0.00105386974139387
+   },
+   "knob_monotone": false,
+   "delta_train64": 0.009884700820583316,
+   "delta_train64_ci": {
+    "mean": 0.009884700820583316,
+    "lo": 0.008589417133714547,
+    "hi": 0.011179984507452086,
+    "half": 0.0012952836868687703
+   },
+   "n_knobs_measured": 8,
+   "calibration_part": "O3_calib_b.json",
+   "in_band": true,
+   "ci_lo_positive": true
+  },
+  {
+   "id": "O3",
+   "kind": "auto",
+   "category": "in_family",
+   "source": "auto",
+   "operator": "O3",
+   "knob": 0.562,
+   "size": 0.02,
+   "blind": false,
+   "size_basis": "coarse",
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "adapter",
+    "scols": {
+     "dz": 2.6
+    }
+   },
+   "G_star_val": {
+    "mean": 0.2929750744309708,
+    "lo": 0.2912987948121414,
+    "hi": 0.29465135404980025,
+    "half": 0.0016762796188294533
+   },
+   "G_HW_best_val": {
+    "name": "dz=2.5",
+    "mean": 0.29251494751066986
+   },
+   "G_HW_best_coarse_val": {
+    "name": "dz=2.0",
+    "mean": 0.2728383668407951
+   },
+   "ratio_HW_over_Gstar": 0.9984294673490752,
+   "delta_fine": {
+    "mean": 0.00046012692030093956,
+    "lo": -0.0006812104823331524,
+    "hi": 0.0016014643229350315,
+    "half": 0.001141337402634092
+   },
+   "delta_coarse": {
+    "mean": 0.020136707590175766,
+    "lo": 0.01879003405052888,
+    "hi": 0.021483381129822652,
+    "half": 0.001346673539646887
+   },
+   "delta_val": {
+    "mean": 0.020136707590175766,
+    "lo": 0.01879003405052888,
+    "hi": 0.021483381129822652,
+    "half": 0.001346673539646887
+   },
+   "delta_val_only": 0.02010544640849741,
+   "delta_val2_only": 0.020167968771854124,
+   "calib_seeds": "val+val2",
+   "honest_drift": {
+    "mean": 0.00392027859375,
+    "lo": 0.00286640885235613,
+    "hi": 0.0049741483351438695,
+    "half": 0.00105386974139387
+   },
+   "knob_monotone": false,
+   "delta_train64": 0.02034297026509793,
+   "delta_train64_ci": {
+    "mean": 0.02034297026509793,
+    "lo": 0.019143654470937396,
+    "hi": 0.021542286059258467,
+    "half": 0.0011993157941605354
+   },
+   "n_knobs_measured": 8,
+   "calibration_part": "O3_calib_a.json",
+   "in_band": true,
+   "ci_lo_positive": true
+  },
+  {
+   "id": "D4",
+   "kind": "designer",
+   "category": "in_family",
+   "source": "designer_2",
+   "operator": "D4",
+   "knob": 0.06,
+   "size": 0.01,
+   "blind": false,
+   "size_basis": "coarse",
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "rule",
+    "name": "d2_climb",
+    "params": {
+     "kappa": 0.0012,
+     "dz_max": 2.0,
+     "L": 2500.0
+    }
+   },
+   "G_star_val": {
+    "mean": 0.24331827796720462,
+    "lo": 0.23775482731351408,
+    "hi": 0.24888172862089517,
+    "half": 0.005563450653690557
+   },
+   "G_HW_best_val": {
+    "name": "stealth m=2.0 f=0.5",
+    "mean": 0.23371499667262424
+   },
+   "G_HW_best_coarse_val": {
+    "name": "stealth m=2.0 f=0.5",
+    "mean": 0.23371499667262424
+   },
+   "ratio_HW_over_Gstar": 0.9605320184952372,
+   "delta_fine": {
+    "mean": 0.00960328129458038,
+    "lo": 0.0039493510786992175,
+    "hi": 0.01525721151046154,
+    "half": 0.005653930215881162
+   },
+   "delta_coarse": {
+    "mean": 0.00960328129458038,
+    "lo": 0.0039493510786992175,
+    "hi": 0.01525721151046154,
+    "half": 0.005653930215881162
+   },
+   "delta_val": {
+    "mean": 0.00960328129458038,
+    "lo": 0.0039493510786992175,
+    "hi": 0.01525721151046154,
+    "half": 0.005653930215881162
+   },
+   "delta_val_only": 0.006180472258073188,
+   "delta_val2_only": 0.013026090331087568,
+   "calib_seeds": "val+val2",
+   "honest_drift": {
+    "mean": 0.00208577953125,
+    "lo": 0.00030031866241841216,
+    "hi": 0.003871240400081588,
+    "half": 0.0017854608688315878
+   },
+   "knob_monotone": false,
+   "delta_train64": 0.012286712299638604,
+   "delta_train64_ci": {
+    "mean": 0.012286712299638604,
+    "lo": 0.007595389948831625,
+    "hi": 0.016978034650445582,
+    "half": 0.0046913223508069785
+   },
+   "n_knobs_measured": 13,
+   "calibration_part": "D4_calib_c.json",
+   "in_band": true,
+   "ci_lo_positive": true,
+   "designer_name": "V4_SelfCalibratingSlope"
+  },
+  {
+   "id": "D4",
+   "kind": "designer",
+   "category": "in_family",
+   "source": "designer_2",
+   "operator": "D4",
+   "knob": 0.047,
+   "size": 0.02,
+   "blind": false,
+   "size_basis": "coarse",
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "rule",
+    "name": "d2_climb",
+    "params": {
+     "kappa": 0.00094,
+     "dz_max": 2.0,
+     "L": 2500.0
+    }
+   },
+   "G_star_val": {
+    "mean": 0.2415698208021571,
+    "lo": 0.2362118057291201,
+    "hi": 0.24692783587519412,
+    "half": 0.005358015073037002
+   },
+   "G_HW_best_val": {
+    "name": "stealth m=2.0 f=0.5",
+    "mean": 0.22094181036204052
+   },
+   "G_HW_best_coarse_val": {
+    "name": "stealth m=2.0 f=0.5",
+    "mean": 0.22094181036204052
+   },
+   "ratio_HW_over_Gstar": 0.9146084954998965,
+   "delta_fine": {
+    "mean": 0.02062801044011657,
+    "lo": 0.012341929744568983,
+    "hi": 0.028914091135664156,
+    "half": 0.008286080695547588
+   },
+   "delta_coarse": {
+    "mean": 0.02062801044011657,
+    "lo": 0.012341929744568983,
+    "hi": 0.028914091135664156,
+    "half": 0.008286080695547588
+   },
+   "delta_val": {
+    "mean": 0.02062801044011657,
+    "lo": 0.012341929744568983,
+    "hi": 0.028914091135664156,
+    "half": 0.008286080695547588
+   },
+   "delta_val_only": 0.016186811385313127,
+   "delta_val2_only": 0.02506920949492001,
+   "calib_seeds": "val+val2",
+   "honest_drift": {
+    "mean": 0.0009186220312499998,
+    "lo": -0.0008998426567948137,
+    "hi": 0.0027370867192948135,
+    "half": 0.0018184646880448135
+   },
+   "knob_monotone": false,
+   "delta_train64": 0.02306911147596612,
+   "delta_train64_ci": {
+    "mean": 0.02306911147596612,
+    "lo": 0.013675290629029243,
+    "hi": 0.032462932322902996,
+    "half": 0.009393820846936877
+   },
+   "n_knobs_measured": 13,
+   "calibration_part": "D4_calib_b.json",
+   "in_band": true,
+   "ci_lo_positive": true,
+   "designer_name": "V4_SelfCalibratingSlope"
+  },
+  {
+   "id": "O5",
+   "kind": "blind",
+   "category": "blind",
+   "source": "blind",
+   "operator": "O5",
+   "knob": 27,
+   "size": 0.02,
+   "blind": true,
+   "size_basis": "fine",
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "rule",
+    "name": "launder",
+    "params": {
+     "dz": 0.7,
+     "W": 100.0,
+     "Z": 27.0
+    }
+   },
+   "G_star_val": {
+    "mean": 0.04226502727038839,
+    "lo": 0.03962104072468426,
+    "hi": 0.04490901381609252,
+    "half": 0.0026439865457041295
+   },
+   "G_HW_best_val": {
+    "name": "dz=0.3",
+    "mean": 0.022787549780678554
+   },
+   "G_HW_best_coarse_val": {
+    "name": "dz=0.3",
+    "mean": 0.022787549780678554
+   },
+   "ratio_HW_over_Gstar": 0.5391585254375053,
+   "delta_fine": {
+    "mean": 0.019477477489709835,
+    "lo": 0.015531975818542744,
+    "hi": 0.023422979160876926,
+    "half": 0.00394550167116709
+   },
+   "delta_coarse": {
+    "mean": 0.019477477489709835,
+    "lo": 0.015531975818542744,
+    "hi": 0.023422979160876926,
+    "half": 0.00394550167116709
+   },
+   "delta_val": {
+    "mean": 0.019477477489709835,
+    "lo": 0.015531975818542744,
+    "hi": 0.023422979160876926,
+    "half": 0.00394550167116709
+   },
+   "delta_val_only": 0.01648081333565437,
+   "delta_val2_only": 0.022474141643765298,
+   "calib_seeds": "val+val2",
+   "honest_drift": {
+    "mean": 0.0016587509375,
+    "lo": 0.0008669611501410405,
+    "hi": 0.0024505407248589595,
+    "half": 0.0007917897873589595
+   },
+   "knob_monotone": false,
+   "delta_train64": 0.020156070089487825,
+   "delta_train64_ci": {
+    "mean": 0.020156070089487825,
+    "lo": 0.0170189303399771,
+    "hi": 0.02329320983899855,
+    "half": 0.0031371397495107258
+   },
+   "n_knobs_measured": 8,
+   "calibration_part": "O5_calib_a.json",
+   "in_band": true,
+   "ci_lo_positive": true
+  },
+  {
+   "id": "D3",
+   "kind": "designer",
+   "category": "in_family_known",
+   "source": "designer_2",
+   "operator": "D3",
+   "knob": 0.3,
+   "size": null,
+   "blind": false,
+   "size_basis": null,
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "rule",
+    "name": "d2_slope",
+    "params": {
+     "s": 0.3,
+     "gain": 1.0,
+     "dz0": 0.5
+    }
+   },
+   "G_star_val": {
+    "mean": 0.08347976538656808,
+    "lo": 0.08021371120904455,
+    "hi": 0.08674581956409161,
+    "half": 0.0032660541775235215
+   },
+   "G_HW_best_val": {
+    "name": "dzcrit=1.0",
+    "mean": 0.0836998557629719
+   },
+   "G_HW_best_coarse_val": {
+    "name": "dzcrit=1.0",
+    "mean": 0.0836998557629719
+   },
+   "ratio_HW_over_Gstar": 1.0026364517842694,
+   "delta_fine": {
+    "mean": -0.00022009037640382135,
+    "lo": -0.004925674901237811,
+    "hi": 0.004485494148430168,
+    "half": 0.004705584524833989
+   },
+   "delta_coarse": {
+    "mean": -0.00022009037640382135,
+    "lo": -0.004925674901237811,
+    "hi": 0.004485494148430168,
+    "half": 0.004705584524833989
+   },
+   "delta_val": null,
+   "calib_seeds": "val+val2",
+   "honest_drift": {
+    "mean": -0.00230532578125,
+    "lo": -0.0038004480970151326,
+    "hi": -0.0008102034654848672,
+    "half": 0.0014951223157651328
+   },
+   "knob_monotone": null,
+   "delta_train64": -0.003287528511762542,
+   "designer_name": "V3_SlopeShrink",
+   "descriptive_only": true
+  },
+  {
+   "id": "NAIVE",
+   "kind": "anchor",
+   "category": "anchor",
+   "source": "anchor",
+   "operator": null,
+   "knob": null,
+   "size": null,
+   "blind": false,
+   "r": 0.5,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "adapter",
+    "scols": {
+     "dz": 2.0
+    }
+   },
+   "G_star_ref": {
+    "mean": 0.27919417821233317,
+    "lo": 0.27887634254372456,
+    "hi": 0.27951201388094177,
+    "half": 0.0003178356686086023
+   },
+   "G_star_ref_val_only": {
+    "mean": 0.27909212421035584,
+    "lo": 0.2785559060739357,
+    "hi": 0.27962834234677597,
+    "half": 0.0005362181364201152,
+    "sd": 0.0014872703335310335
+   },
+   "calib_seeds": "val+val2",
+   "measured_in": "results/direction2/vuln_parts_v13/anchors.json",
+   "definition": "M3C, p=0, r=0.5 (REQ-S1-08); G rule, not the increment definition"
+  },
+  {
+   "id": "M4rw0",
+   "kind": "anchor",
+   "category": "anchor",
+   "source": "anchor",
+   "operator": null,
+   "knob": null,
+   "size": null,
+   "blind": false,
+   "r": 0.99,
+   "T": 100000,
+   "ref_policy": {
+    "kind": "adapter",
+    "scols": {
+     "b": 0.3
+    }
+   },
+   "G_star_ref": {
+    "mean": 0.11991441728119936,
+    "lo": 0.11853484080469358,
+    "hi": 0.12129399375770515,
+    "half": 0.0013795764765057858
+   },
+   "G_star_ref_val_only": {
+    "mean": 0.11894942872808331,
+    "lo": 0.11714345904637669,
+    "hi": 0.12075539840978994,
+    "half": 0.001805969681706627,
+    "sd": 0.005009090421280258
+   },
+   "m4_anchor_status": "counted",
+   "calib_seeds": "val+val2",
+   "measured_in": "results/direction2/vuln_parts_v13/anchors.json",
+   "definition": "M4, eps=0.2, L=20, rw=0, r=0.99 (REQ-S1-09)"
+  },
+  {
+   "id": "designer_1",
+   "kind": "contaminated",
+   "category": "contaminated_excluded",
+   "source": "designer_1",
+   "operator": null,
+   "knob": null,
+   "size": null,
+   "blind": false,
+   "status": "excluded: contaminated blind design (it read the specification); not read, not implemented, not counted"
+  }
+ ],
+ "uncalibratable": [],
+ "removed_from_suite": [
+  {
+   "id": "O6",
+   "size": 0.01,
+   "status": "uncalibratable (v1.2: cannot reach 0.01)",
+   "best_train": {
+    "knob": 0.9,
+    "delta_train64": 0.0035500134375,
+    "lo": 0.002749900532482535,
+    "hi": 0.004350126342517465,
+    "ref_policy": {
+     "kind": "adapter",
+     "scols": {
+      "dz": 0.8
+     }
+    }
+   },
+   "reason": "no tested knob reaches the band [0.8s,1.2s] (training seeds)"
+  },
+  {
+   "id": "O6",
+   "size": 0.02,
+   "status": "uncalibratable (v1.2: cannot reach 0.01)",
+   "best_train": {
+    "knob": 0.9,
+    "delta_train64": 0.0035500134375,
+    "lo": 0.002749900532482535,
+    "hi": 0.004350126342517465,
+    "ref_policy": {
+     "kind": "adapter",
+     "scols": {
+      "dz": 0.8
+     }
+    }
+   },
+   "reason": "no tested knob reaches the band [0.8s,1.2s] (training seeds)"
+  },
+  {
+   "id": "O4",
+   "size": 0.02,
+   "status": "uncalibratable (v1.2: cannot reach 0.01)",
+   "best_train": {
+    "knob": 0.6,
+    "delta_train64": 0.0026814998437499995,
+    "lo": 0.0003652893835555983,
+    "hi": 0.004997710303944401,
+    "ref_policy": {
+     "kind": "adapter",
+     "scols": {
+      "dzc": 0.4
+     }
+    }
+   },
+   "reason": "no tested knob reaches the band [0.8s,1.2s] (training seeds)"
+  },
+  {
+   "id": "B1",
+   "size": 0.02,
+   "status": "not_implemented",
+   "best_train": null,
+   "reason": "spec 8.2 gives only an example (absolute-time window / 600-round memory) and no designer definition was supplied"
+  },
+  {
+   "id": "B2",
+   "size": 0.02,
+   "status": "not_implemented",
+   "best_train": null,
+   "reason": "spec 8.2 gives only an example (absolute-time window / 600-round memory) and no designer definition was supplied"
+  }
+ ],
+ "calibration_log": {
+  "D1/0.01": {
+   "status": "ok",
+   "knob": 0.9,
+   "n_knobs_measured": 6,
+   "knob_monotone": true,
+   "table": [
+    {
+     "knob": 0.9,
+     "delta_fine": 0.009386286875,
+     "fine_lo": 0.005871131826765004,
+     "delta_coarse": 0.009386286875,
+     "coarse_lo": 0.005871131826765004,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D1_calib_a.json"
+    },
+    {
+     "knob": 0.92,
+     "delta_fine": 0.011192039843750001,
+     "fine_lo": 0.007633846683019894,
+     "delta_coarse": 0.011192039843750001,
+     "coarse_lo": 0.007633846683019894,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D1_calib_a.json"
+    },
+    {
+     "knob": 0.93,
+     "delta_fine": 0.0119895165625,
+     "fine_lo": 0.008488416832739133,
+     "delta_coarse": 0.0119895165625,
+     "coarse_lo": 0.008488416832739133,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D1_calib_a.json"
+    },
+    {
+     "knob": 0.95,
+     "delta_fine": 0.015246539375,
+     "fine_lo": 0.011912889240704234,
+     "delta_coarse": 0.015246539375,
+     "coarse_lo": 0.011912889240704234,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D1_calib_b.json"
+    },
+    {
+     "knob": 0.98,
+     "delta_fine": 0.01841878328125,
+     "fine_lo": 0.015243840432189147,
+     "delta_coarse": 0.01841878328125,
+     "coarse_lo": 0.015243840432189147,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D1_calib_b.json"
+    },
+    {
+     "knob": 1.0,
+     "delta_fine": 0.02044042875,
+     "fine_lo": 0.017406955901401146,
+     "delta_coarse": 0.02044042875,
+     "coarse_lo": 0.017406955901401146,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D1_calib_b.json"
+    }
+   ]
+  },
+  "D1/0.02": {
+   "status": "ok",
+   "knob": 1.0,
+   "n_knobs_measured": 6,
+   "knob_monotone": true,
+   "table": [
+    {
+     "knob": 0.9,
+     "delta_fine": 0.009386286875,
+     "fine_lo": 0.005871131826765004,
+     "delta_coarse": 0.009386286875,
+     "coarse_lo": 0.005871131826765004,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D1_calib_a.json"
+    },
+    {
+     "knob": 0.92,
+     "delta_fine": 0.011192039843750001,
+     "fine_lo": 0.007633846683019894,
+     "delta_coarse": 0.011192039843750001,
+     "coarse_lo": 0.007633846683019894,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D1_calib_a.json"
+    },
+    {
+     "knob": 0.93,
+     "delta_fine": 0.0119895165625,
+     "fine_lo": 0.008488416832739133,
+     "delta_coarse": 0.0119895165625,
+     "coarse_lo": 0.008488416832739133,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D1_calib_a.json"
+    },
+    {
+     "knob": 0.95,
+     "delta_fine": 0.015246539375,
+     "fine_lo": 0.011912889240704234,
+     "delta_coarse": 0.015246539375,
+     "coarse_lo": 0.011912889240704234,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D1_calib_b.json"
+    },
+    {
+     "knob": 0.98,
+     "delta_fine": 0.01841878328125,
+     "fine_lo": 0.015243840432189147,
+     "delta_coarse": 0.01841878328125,
+     "coarse_lo": 0.015243840432189147,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D1_calib_b.json"
+    },
+    {
+     "knob": 1.0,
+     "delta_fine": 0.02044042875,
+     "fine_lo": 0.017406955901401146,
+     "delta_coarse": 0.02044042875,
+     "coarse_lo": 0.017406955901401146,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D1_calib_b.json"
+    }
+   ]
+  },
+  "D2/0.01": {
+   "status": "ok",
+   "knob": 1700.0,
+   "n_knobs_measured": 8,
+   "knob_monotone": true,
+   "table": [
+    {
+     "knob": 1000.0,
+     "delta_fine": 0.02326677171875,
+     "fine_lo": 0.020193667492624256,
+     "delta_coarse": 0.02326677171875,
+     "coarse_lo": 0.020193667492624256,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D2_calib_a.json"
+    },
+    {
+     "knob": 1050.0,
+     "delta_fine": 0.02157361015625,
+     "fine_lo": 0.01838450829077562,
+     "delta_coarse": 0.02157361015625,
+     "coarse_lo": 0.01838450829077562,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D2_calib_a.json"
+    },
+    {
+     "knob": 1100.0,
+     "delta_fine": 0.01959548609375,
+     "fine_lo": 0.01635683447829925,
+     "delta_coarse": 0.01959548609375,
+     "coarse_lo": 0.01635683447829925,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D2_calib_a.json"
+    },
+    {
+     "knob": 1150.0,
+     "delta_fine": 0.0172608625,
+     "fine_lo": 0.015482250029766184,
+     "delta_coarse": 0.0172608625,
+     "coarse_lo": 0.015482250029766184,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D2_calib_a.json"
+    },
+    {
+     "knob": 1600.0,
+     "delta_fine": 0.011493500781249999,
+     "fine_lo": 0.010224964967593094,
+     "delta_coarse": 0.011493500781249999,
+     "coarse_lo": 0.010224964967593094,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D2_calib_b.json"
+    },
+    {
+     "knob": 1650.0,
+     "delta_fine": 0.010793775156250001,
+     "fine_lo": 0.009604169752839594,
+     "delta_coarse": 0.010793775156250001,
+     "coarse_lo": 0.009604169752839594,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D2_calib_b.json"
+    },
+    {
+     "knob": 1700.0,
+     "delta_fine": 0.01024162640625,
+     "fine_lo": 0.009089272248226303,
+     "delta_coarse": 0.01024162640625,
+     "coarse_lo": 0.009089272248226303,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D2_calib_b.json"
+    },
+    {
+     "knob": 1750.0,
+     "delta_fine": 0.00963643640625,
+     "fine_lo": 0.008569665879357825,
+     "delta_coarse": 0.00963643640625,
+     "coarse_lo": 0.008569665879357825,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D2_calib_b.json"
+    }
+   ]
+  },
+  "D2/0.02": {
+   "status": "ok",
+   "knob": 1100.0,
+   "n_knobs_measured": 8,
+   "knob_monotone": true,
+   "table": [
+    {
+     "knob": 1000.0,
+     "delta_fine": 0.02326677171875,
+     "fine_lo": 0.020193667492624256,
+     "delta_coarse": 0.02326677171875,
+     "coarse_lo": 0.020193667492624256,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D2_calib_a.json"
+    },
+    {
+     "knob": 1050.0,
+     "delta_fine": 0.02157361015625,
+     "fine_lo": 0.01838450829077562,
+     "delta_coarse": 0.02157361015625,
+     "coarse_lo": 0.01838450829077562,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D2_calib_a.json"
+    },
+    {
+     "knob": 1100.0,
+     "delta_fine": 0.01959548609375,
+     "fine_lo": 0.01635683447829925,
+     "delta_coarse": 0.01959548609375,
+     "coarse_lo": 0.01635683447829925,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D2_calib_a.json"
+    },
+    {
+     "knob": 1150.0,
+     "delta_fine": 0.0172608625,
+     "fine_lo": 0.015482250029766184,
+     "delta_coarse": 0.0172608625,
+     "coarse_lo": 0.015482250029766184,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D2_calib_a.json"
+    },
+    {
+     "knob": 1600.0,
+     "delta_fine": 0.011493500781249999,
+     "fine_lo": 0.010224964967593094,
+     "delta_coarse": 0.011493500781249999,
+     "coarse_lo": 0.010224964967593094,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D2_calib_b.json"
+    },
+    {
+     "knob": 1650.0,
+     "delta_fine": 0.010793775156250001,
+     "fine_lo": 0.009604169752839594,
+     "delta_coarse": 0.010793775156250001,
+     "coarse_lo": 0.009604169752839594,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D2_calib_b.json"
+    },
+    {
+     "knob": 1700.0,
+     "delta_fine": 0.01024162640625,
+     "fine_lo": 0.009089272248226303,
+     "delta_coarse": 0.01024162640625,
+     "coarse_lo": 0.009089272248226303,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D2_calib_b.json"
+    },
+    {
+     "knob": 1750.0,
+     "delta_fine": 0.00963643640625,
+     "fine_lo": 0.008569665879357825,
+     "delta_coarse": 0.00963643640625,
+     "coarse_lo": 0.008569665879357825,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "D2_calib_b.json"
+    }
+   ]
+  },
+  "O1/0.01": {
+   "status": "ok",
+   "knob": 0.9,
+   "n_knobs_measured": 8,
+   "knob_monotone": true,
+   "table": [
+    {
+     "knob": 0.885,
+     "delta_fine": 0.0075962309375,
+     "fine_lo": 0.004569175779748748,
+     "delta_coarse": 0.0075962309375,
+     "coarse_lo": 0.004569175779748748,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O1_calib_a.json"
+    },
+    {
+     "knob": 0.89,
+     "delta_fine": 0.00837225078125,
+     "fine_lo": 0.0053009328802158025,
+     "delta_coarse": 0.00837225078125,
+     "coarse_lo": 0.0053009328802158025,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O1_calib_a.json"
+    },
+    {
+     "knob": 0.895,
+     "delta_fine": 0.00960377828125,
+     "fine_lo": 0.006737596828215839,
+     "delta_coarse": 0.00960377828125,
+     "coarse_lo": 0.006737596828215839,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O1_calib_a.json"
+    },
+    {
+     "knob": 0.9,
+     "delta_fine": 0.010184346718749999,
+     "fine_lo": 0.007203136904951505,
+     "delta_coarse": 0.010184346718749999,
+     "coarse_lo": 0.007203136904951505,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O1_calib_a.json"
+    },
+    {
+     "knob": 0.92,
+     "delta_fine": 0.014456732031249999,
+     "fine_lo": 0.011410966888932042,
+     "delta_coarse": 0.014456732031249999,
+     "coarse_lo": 0.011410966888932042,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O1_calib_b.json"
+    },
+    {
+     "knob": 0.925,
+     "delta_fine": 0.01553667140625,
+     "fine_lo": 0.012491826515840708,
+     "delta_coarse": 0.01553667140625,
+     "coarse_lo": 0.012491826515840708,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O1_calib_b.json"
+    },
+    {
+     "knob": 0.93,
+     "delta_fine": 0.0213500396875,
+     "fine_lo": 0.017455615250379114,
+     "delta_coarse": 0.0213500396875,
+     "coarse_lo": 0.017455615250379114,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O1_calib_b.json"
+    },
+    {
+     "knob": 0.935,
+     "delta_fine": 0.02426332515625,
+     "fine_lo": 0.020770734225964822,
+     "delta_coarse": 0.02426332515625,
+     "coarse_lo": 0.020770734225964822,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O1_calib_b.json"
+    }
+   ]
+  },
+  "O1/0.02": {
+   "status": "ok",
+   "knob": 0.93,
+   "n_knobs_measured": 8,
+   "knob_monotone": true,
+   "table": [
+    {
+     "knob": 0.885,
+     "delta_fine": 0.0075962309375,
+     "fine_lo": 0.004569175779748748,
+     "delta_coarse": 0.0075962309375,
+     "coarse_lo": 0.004569175779748748,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O1_calib_a.json"
+    },
+    {
+     "knob": 0.89,
+     "delta_fine": 0.00837225078125,
+     "fine_lo": 0.0053009328802158025,
+     "delta_coarse": 0.00837225078125,
+     "coarse_lo": 0.0053009328802158025,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O1_calib_a.json"
+    },
+    {
+     "knob": 0.895,
+     "delta_fine": 0.00960377828125,
+     "fine_lo": 0.006737596828215839,
+     "delta_coarse": 0.00960377828125,
+     "coarse_lo": 0.006737596828215839,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O1_calib_a.json"
+    },
+    {
+     "knob": 0.9,
+     "delta_fine": 0.010184346718749999,
+     "fine_lo": 0.007203136904951505,
+     "delta_coarse": 0.010184346718749999,
+     "coarse_lo": 0.007203136904951505,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O1_calib_a.json"
+    },
+    {
+     "knob": 0.92,
+     "delta_fine": 0.014456732031249999,
+     "fine_lo": 0.011410966888932042,
+     "delta_coarse": 0.014456732031249999,
+     "coarse_lo": 0.011410966888932042,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O1_calib_b.json"
+    },
+    {
+     "knob": 0.925,
+     "delta_fine": 0.01553667140625,
+     "fine_lo": 0.012491826515840708,
+     "delta_coarse": 0.01553667140625,
+     "coarse_lo": 0.012491826515840708,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O1_calib_b.json"
+    },
+    {
+     "knob": 0.93,
+     "delta_fine": 0.0213500396875,
+     "fine_lo": 0.017455615250379114,
+     "delta_coarse": 0.0213500396875,
+     "coarse_lo": 0.017455615250379114,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O1_calib_b.json"
+    },
+    {
+     "knob": 0.935,
+     "delta_fine": 0.02426332515625,
+     "fine_lo": 0.020770734225964822,
+     "delta_coarse": 0.02426332515625,
+     "coarse_lo": 0.020770734225964822,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O1_calib_b.json"
+    }
+   ]
+  },
+  "O2/0.01": {
+   "status": "ok",
+   "knob": 0.285,
+   "n_knobs_measured": 8,
+   "knob_monotone": true,
+   "table": [
+    {
+     "knob": 0.285,
+     "delta_fine": 0.0073026275000000005,
+     "fine_lo": 0.003422483255942177,
+     "delta_coarse": 0.010216573281250002,
+     "coarse_lo": 0.008883683908205492,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O2_calib_a.json"
+    },
+    {
+     "knob": 0.288,
+     "delta_fine": 0.0030341632812499993,
+     "fine_lo": 8.247182257690566e-06,
+     "delta_coarse": 0.010793349687500004,
+     "coarse_lo": 0.009593421506281022,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O2_calib_a.json"
+    },
+    {
+     "knob": 0.29,
+     "delta_fine": 0.0012765923437499972,
+     "fine_lo": -0.0013697033507541643,
+     "delta_coarse": 0.011184698437500005,
+     "coarse_lo": 0.010092277462268331,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O2_calib_a.json"
+    },
+    {
+     "knob": 0.292,
+     "delta_fine": 0.0,
+     "fine_lo": 0.0,
+     "delta_coarse": 0.012824554218750006,
+     "coarse_lo": 0.010489682815002902,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O2_calib_a.json"
+    },
+    {
+     "knob": 0.312,
+     "delta_fine": 0.0014710645312499921,
+     "fine_lo": 2.0802604672087678e-05,
+     "delta_coarse": 0.0209427925,
+     "coarse_lo": 0.01930706746786771,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O2_calib_b.json"
+    },
+    {
+     "knob": 0.315,
+     "delta_fine": 0.002256104062499993,
+     "fine_lo": 0.001066922398602462,
+     "delta_coarse": 0.021928937187500004,
+     "coarse_lo": 0.020649035506983295,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O2_calib_b.json"
+    },
+    {
+     "knob": 0.318,
+     "delta_fine": 0.0024545392187499933,
+     "fine_lo": 0.0013105837183201659,
+     "delta_coarse": 0.022127372343750003,
+     "coarse_lo": 0.020881023025772643,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O2_calib_b.json"
+    },
+    {
+     "knob": 0.32,
+     "delta_fine": 0.003428137812499994,
+     "fine_lo": 0.0025767731236275076,
+     "delta_coarse": 0.023100970937500003,
+     "coarse_lo": 0.022076609039101778,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O2_calib_b.json"
+    }
+   ]
+  },
+  "O2/0.02": {
+   "status": "ok",
+   "knob": 0.312,
+   "n_knobs_measured": 8,
+   "knob_monotone": true,
+   "table": [
+    {
+     "knob": 0.285,
+     "delta_fine": 0.0073026275000000005,
+     "fine_lo": 0.003422483255942177,
+     "delta_coarse": 0.010216573281250002,
+     "coarse_lo": 0.008883683908205492,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O2_calib_a.json"
+    },
+    {
+     "knob": 0.288,
+     "delta_fine": 0.0030341632812499993,
+     "fine_lo": 8.247182257690566e-06,
+     "delta_coarse": 0.010793349687500004,
+     "coarse_lo": 0.009593421506281022,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O2_calib_a.json"
+    },
+    {
+     "knob": 0.29,
+     "delta_fine": 0.0012765923437499972,
+     "fine_lo": -0.0013697033507541643,
+     "delta_coarse": 0.011184698437500005,
+     "coarse_lo": 0.010092277462268331,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O2_calib_a.json"
+    },
+    {
+     "knob": 0.292,
+     "delta_fine": 0.0,
+     "fine_lo": 0.0,
+     "delta_coarse": 0.012824554218750006,
+     "coarse_lo": 0.010489682815002902,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O2_calib_a.json"
+    },
+    {
+     "knob": 0.312,
+     "delta_fine": 0.0014710645312499921,
+     "fine_lo": 2.0802604672087678e-05,
+     "delta_coarse": 0.0209427925,
+     "coarse_lo": 0.01930706746786771,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O2_calib_b.json"
+    },
+    {
+     "knob": 0.315,
+     "delta_fine": 0.002256104062499993,
+     "fine_lo": 0.001066922398602462,
+     "delta_coarse": 0.021928937187500004,
+     "coarse_lo": 0.020649035506983295,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O2_calib_b.json"
+    },
+    {
+     "knob": 0.318,
+     "delta_fine": 0.0024545392187499933,
+     "fine_lo": 0.0013105837183201659,
+     "delta_coarse": 0.022127372343750003,
+     "coarse_lo": 0.020881023025772643,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O2_calib_b.json"
+    },
+    {
+     "knob": 0.32,
+     "delta_fine": 0.003428137812499994,
+     "fine_lo": 0.0025767731236275076,
+     "delta_coarse": 0.023100970937500003,
+     "coarse_lo": 0.022076609039101778,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O2_calib_b.json"
+    }
+   ]
+  },
+  "O3/0.01": {
+   "status": "ok",
+   "knob": 0.59,
+   "n_knobs_measured": 8,
+   "knob_monotone": false,
+   "table": [
+    {
+     "knob": 0.56,
+     "delta_fine": 0.000849285624999991,
+     "fine_lo": -0.00018277990442588455,
+     "delta_coarse": 0.02072420875,
+     "coarse_lo": 0.019492490391160775,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O3_calib_a.json"
+    },
+    {
+     "knob": 0.562,
+     "delta_fine": 0.0004601273437499914,
+     "fine_lo": -0.0006812101480161458,
+     "delta_coarse": 0.020136707343750004,
+     "coarse_lo": 0.018790033634664728,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O3_calib_a.json"
+    },
+    {
+     "knob": 0.565,
+     "delta_fine": -0.0015579442187500063,
+     "fine_lo": -0.0034039905320487327,
+     "delta_coarse": 0.017562040468750005,
+     "coarse_lo": 0.015579984808642089,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O3_calib_a.json"
+    },
+    {
+     "knob": 0.568,
+     "delta_fine": 0.0,
+     "fine_lo": 0.0,
+     "delta_coarse": 0.01834394656250001,
+     "coarse_lo": 0.017134573635832144,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O3_calib_a.json"
+    },
+    {
+     "knob": 0.586,
+     "delta_fine": 0.010622856562500005,
+     "fine_lo": 0.009486929359086975,
+     "delta_coarse": 0.010622856562500005,
+     "coarse_lo": 0.009486929359086975,
+     "best_fine": "dz=2.0",
+     "best_coarse": "dz=2.0",
+     "part": "O3_calib_b.json"
+    },
+    {
+     "knob": 0.588,
+     "delta_fine": 0.010240052968750007,
+     "fine_lo": 0.009014779664723575,
+     "delta_coarse": 0.010240052968750007,
+     "coarse_lo": 0.009014779664723575,
+     "best_fine": "dz=2.0",
+     "best_coarse": "dz=2.0",
+     "part": "O3_calib_b.json"
+    },
+    {
+     "knob": 0.59,
+     "delta_fine": 0.010051666406250007,
+     "fine_lo": 0.008788947372852206,
+     "delta_coarse": 0.010051666406250007,
+     "coarse_lo": 0.008788947372852206,
+     "best_fine": "dz=2.0",
+     "best_coarse": "dz=2.0",
+     "part": "O3_calib_b.json"
+    },
+    {
+     "knob": 0.592,
+     "delta_fine": 0.009482923281250007,
+     "fine_lo": 0.007906423091119266,
+     "delta_coarse": 0.009482923281250007,
+     "coarse_lo": 0.007906423091119266,
+     "best_fine": "dz=2.0",
+     "best_coarse": "dz=2.0",
+     "part": "O3_calib_b.json"
+    }
+   ]
+  },
+  "O3/0.02": {
+   "status": "ok",
+   "knob": 0.562,
+   "n_knobs_measured": 8,
+   "knob_monotone": false,
+   "table": [
+    {
+     "knob": 0.56,
+     "delta_fine": 0.000849285624999991,
+     "fine_lo": -0.00018277990442588455,
+     "delta_coarse": 0.02072420875,
+     "coarse_lo": 0.019492490391160775,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O3_calib_a.json"
+    },
+    {
+     "knob": 0.562,
+     "delta_fine": 0.0004601273437499914,
+     "fine_lo": -0.0006812101480161458,
+     "delta_coarse": 0.020136707343750004,
+     "coarse_lo": 0.018790033634664728,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O3_calib_a.json"
+    },
+    {
+     "knob": 0.565,
+     "delta_fine": -0.0015579442187500063,
+     "fine_lo": -0.0034039905320487327,
+     "delta_coarse": 0.017562040468750005,
+     "coarse_lo": 0.015579984808642089,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O3_calib_a.json"
+    },
+    {
+     "knob": 0.568,
+     "delta_fine": 0.0,
+     "fine_lo": 0.0,
+     "delta_coarse": 0.01834394656250001,
+     "coarse_lo": 0.017134573635832144,
+     "best_fine": "dz=2.5",
+     "best_coarse": "dz=2.0",
+     "part": "O3_calib_a.json"
+    },
+    {
+     "knob": 0.586,
+     "delta_fine": 0.010622856562500005,
+     "fine_lo": 0.009486929359086975,
+     "delta_coarse": 0.010622856562500005,
+     "coarse_lo": 0.009486929359086975,
+     "best_fine": "dz=2.0",
+     "best_coarse": "dz=2.0",
+     "part": "O3_calib_b.json"
+    },
+    {
+     "knob": 0.588,
+     "delta_fine": 0.010240052968750007,
+     "fine_lo": 0.009014779664723575,
+     "delta_coarse": 0.010240052968750007,
+     "coarse_lo": 0.009014779664723575,
+     "best_fine": "dz=2.0",
+     "best_coarse": "dz=2.0",
+     "part": "O3_calib_b.json"
+    },
+    {
+     "knob": 0.59,
+     "delta_fine": 0.010051666406250007,
+     "fine_lo": 0.008788947372852206,
+     "delta_coarse": 0.010051666406250007,
+     "coarse_lo": 0.008788947372852206,
+     "best_fine": "dz=2.0",
+     "best_coarse": "dz=2.0",
+     "part": "O3_calib_b.json"
+    },
+    {
+     "knob": 0.592,
+     "delta_fine": 0.009482923281250007,
+     "fine_lo": 0.007906423091119266,
+     "delta_coarse": 0.009482923281250007,
+     "coarse_lo": 0.007906423091119266,
+     "best_fine": "dz=2.0",
+     "best_coarse": "dz=2.0",
+     "part": "O3_calib_b.json"
+    }
+   ]
+  },
+  "D4/0.01": {
+   "status": "ok",
+   "knob": 0.06,
+   "n_knobs_measured": 13,
+   "knob_monotone": false,
+   "table": [
+    {
+     "knob": 0.027,
+     "delta_fine": 0.02201206765625,
+     "fine_lo": 0.010459498005822408,
+     "delta_coarse": 0.02201206765625,
+     "coarse_lo": 0.010459498005822408,
+     "best_fine": "dzcrit=1.5",
+     "best_coarse": "dzcrit=1.5",
+     "part": "D4_calib_a.json"
+    },
+    {
+     "knob": 0.028,
+     "delta_fine": 0.010804542656249997,
+     "fine_lo": 0.004227837683673388,
+     "delta_coarse": 0.010804542656249997,
+     "coarse_lo": 0.004227837683673388,
+     "best_fine": "dzcrit=1.5",
+     "best_coarse": "dzcrit=1.5",
+     "part": "D4_calib_a.json"
+    },
+    {
+     "knob": 0.029,
+     "delta_fine": 0.0158326265625,
+     "fine_lo": 0.009332248787309825,
+     "delta_coarse": 0.0158326265625,
+     "coarse_lo": 0.009332248787309825,
+     "best_fine": "dzcrit=1.5",
+     "best_coarse": "dzcrit=1.5",
+     "part": "D4_calib_a.json"
+    },
+    {
+     "knob": 0.03,
+     "delta_fine": 0.0208065578125,
+     "fine_lo": 0.015072563241078241,
+     "delta_coarse": 0.0208065578125,
+     "coarse_lo": 0.015072563241078241,
+     "best_fine": "dzcrit=1.5",
+     "best_coarse": "dzcrit=1.5",
+     "part": "D4_calib_a.json"
+    },
+    {
+     "knob": 0.045,
+     "delta_fine": 0.02585098453125,
+     "fine_lo": 0.01541668390787294,
+     "delta_coarse": 0.02585098453125,
+     "coarse_lo": 0.01541668390787294,
+     "best_fine": "stealth m=2.0 f=0.5",
+     "best_coarse": "stealth m=2.0 f=0.5",
+     "part": "D4_calib_b.json"
+    },
+    {
+     "knob": 0.047,
+     "delta_fine": 0.0206280103125,
+     "fine_lo": 0.012341929662105624,
+     "delta_coarse": 0.0206280103125,
+     "coarse_lo": 0.012341929662105624,
+     "best_fine": "stealth m=2.0 f=0.5",
+     "best_coarse": "stealth m=2.0 f=0.5",
+     "part": "D4_calib_b.json"
+    },
+    {
+     "knob": 0.05,
+     "delta_fine": 0.019165835625000002,
+     "fine_lo": 0.012019959510555941,
+     "delta_coarse": 0.019165835625000002,
+     "coarse_lo": 0.012019959510555941,
+     "best_fine": "stealth m=2.0 f=0.5",
+     "best_coarse": "stealth m=2.0 f=0.5",
+     "part": "D4_calib_b.json"
+    },
+    {
+     "knob": 0.052,
+     "delta_fine": 0.015775301562499996,
+     "fine_lo": 0.008988584566717406,
+     "delta_coarse": 0.015775301562499996,
+     "coarse_lo": 0.008988584566717406,
+     "best_fine": "stealth m=2.0 f=0.5",
+     "best_coarse": "stealth m=2.0 f=0.5",
+     "part": "D4_calib_b.json"
+    },
+    {
+     "knob": 0.06,
+     "delta_fine": 0.009603281718749999,
+     "fine_lo": 0.003949351707943408,
+     "delta_coarse": 0.009603281718749999,
+     "coarse_lo": 0.003949351707943408,
+     "best_fine": "stealth m=2.0 f=0.5",
+     "best_coarse": "stealth m=2.0 f=0.5",
+     "part": "D4_calib_c.json"
+    },
+    {
+     "knob": 0.065,
+     "delta_fine": 0.00749810328125,
+     "fine_lo": 0.0019985898827891407,
+     "delta_coarse": 0.00749810328125,
+     "coarse_lo": 0.0019985898827891407,
+     "best_fine": "stealth m=2.0 f=0.5",
+     "best_coarse": "stealth m=2.0 f=0.5",
+     "part": "D4_calib_c.json"
+    },
+    {
+     "knob": 0.07,
+     "delta_fine": 0.006824279531249998,
+     "fine_lo": 0.0016592177769702123,
+     "delta_coarse": 0.006824279531249998,
+     "coarse_lo": 0.0016592177769702123,
+     "best_fine": "stealth m=2.0 f=0.5",
+     "best_coarse": "stealth m=2.0 f=0.5",
+     "part": "D4_calib_c.json"
+    },
+    {
+     "knob": 0.075,
+     "delta_fine": 0.0064801185937500005,
+     "fine_lo": 0.0021101362976433807,
+     "delta_coarse": 0.0064801185937500005,
+     "coarse_lo": 0.0021101362976433807,
+     "best_fine": "stealth m=2.0 f=0.5",
+     "best_coarse": "stealth m=2.0 f=0.5",
+     "part": "D4_calib_c.json"
+    },
+    {
+     "knob": 0.08,
+     "delta_fine": 0.006005807031249996,
+     "fine_lo": 0.0019171044536279115,
+     "delta_coarse": 0.006005807031249996,
+     "coarse_lo": 0.0019171044536279115,
+     "best_fine": "stealth m=2.0 f=0.5",
+     "best_coarse": "stealth m=2.0 f=0.5",
+     "part": "D4_calib_c.json"
+    }
+   ]
+  },
+  "D4/0.02": {
+   "status": "ok",
+   "knob": 0.047,
+   "n_knobs_measured": 13,
+   "knob_monotone": false,
+   "table": [
+    {
+     "knob": 0.027,
+     "delta_fine": 0.02201206765625,
+     "fine_lo": 0.010459498005822408,
+     "delta_coarse": 0.02201206765625,
+     "coarse_lo": 0.010459498005822408,
+     "best_fine": "dzcrit=1.5",
+     "best_coarse": "dzcrit=1.5",
+     "part": "D4_calib_a.json"
+    },
+    {
+     "knob": 0.028,
+     "delta_fine": 0.010804542656249997,
+     "fine_lo": 0.004227837683673388,
+     "delta_coarse": 0.010804542656249997,
+     "coarse_lo": 0.004227837683673388,
+     "best_fine": "dzcrit=1.5",
+     "best_coarse": "dzcrit=1.5",
+     "part": "D4_calib_a.json"
+    },
+    {
+     "knob": 0.029,
+     "delta_fine": 0.0158326265625,
+     "fine_lo": 0.009332248787309825,
+     "delta_coarse": 0.0158326265625,
+     "coarse_lo": 0.009332248787309825,
+     "best_fine": "dzcrit=1.5",
+     "best_coarse": "dzcrit=1.5",
+     "part": "D4_calib_a.json"
+    },
+    {
+     "knob": 0.03,
+     "delta_fine": 0.0208065578125,
+     "fine_lo": 0.015072563241078241,
+     "delta_coarse": 0.0208065578125,
+     "coarse_lo": 0.015072563241078241,
+     "best_fine": "dzcrit=1.5",
+     "best_coarse": "dzcrit=1.5",
+     "part": "D4_calib_a.json"
+    },
+    {
+     "knob": 0.045,
+     "delta_fine": 0.02585098453125,
+     "fine_lo": 0.01541668390787294,
+     "delta_coarse": 0.02585098453125,
+     "coarse_lo": 0.01541668390787294,
+     "best_fine": "stealth m=2.0 f=0.5",
+     "best_coarse": "stealth m=2.0 f=0.5",
+     "part": "D4_calib_b.json"
+    },
+    {
+     "knob": 0.047,
+     "delta_fine": 0.0206280103125,
+     "fine_lo": 0.012341929662105624,
+     "delta_coarse": 0.0206280103125,
+     "coarse_lo": 0.012341929662105624,
+     "best_fine": "stealth m=2.0 f=0.5",
+     "best_coarse": "stealth m=2.0 f=0.5",
+     "part": "D4_calib_b.json"
+    },
+    {
+     "knob": 0.05,
+     "delta_fine": 0.019165835625000002,
+     "fine_lo": 0.012019959510555941,
+     "delta_coarse": 0.019165835625000002,
+     "coarse_lo": 0.012019959510555941,
+     "best_fine": "stealth m=2.0 f=0.5",
+     "best_coarse": "stealth m=2.0 f=0.5",
+     "part": "D4_calib_b.json"
+    },
+    {
+     "knob": 0.052,
+     "delta_fine": 0.015775301562499996,
+     "fine_lo": 0.008988584566717406,
+     "delta_coarse": 0.015775301562499996,
+     "coarse_lo": 0.008988584566717406,
+     "best_fine": "stealth m=2.0 f=0.5",
+     "best_coarse": "stealth m=2.0 f=0.5",
+     "part": "D4_calib_b.json"
+    },
+    {
+     "knob": 0.06,
+     "delta_fine": 0.009603281718749999,
+     "fine_lo": 0.003949351707943408,
+     "delta_coarse": 0.009603281718749999,
+     "coarse_lo": 0.003949351707943408,
+     "best_fine": "stealth m=2.0 f=0.5",
+     "best_coarse": "stealth m=2.0 f=0.5",
+     "part": "D4_calib_c.json"
+    },
+    {
+     "knob": 0.065,
+     "delta_fine": 0.00749810328125,
+     "fine_lo": 0.0019985898827891407,
+     "delta_coarse": 0.00749810328125,
+     "coarse_lo": 0.0019985898827891407,
+     "best_fine": "stealth m=2.0 f=0.5",
+     "best_coarse": "stealth m=2.0 f=0.5",
+     "part": "D4_calib_c.json"
+    },
+    {
+     "knob": 0.07,
+     "delta_fine": 0.006824279531249998,
+     "fine_lo": 0.0016592177769702123,
+     "delta_coarse": 0.006824279531249998,
+     "coarse_lo": 0.0016592177769702123,
+     "best_fine": "stealth m=2.0 f=0.5",
+     "best_coarse": "stealth m=2.0 f=0.5",
+     "part": "D4_calib_c.json"
+    },
+    {
+     "knob": 0.075,
+     "delta_fine": 0.0064801185937500005,
+     "fine_lo": 0.0021101362976433807,
+     "delta_coarse": 0.0064801185937500005,
+     "coarse_lo": 0.0021101362976433807,
+     "best_fine": "stealth m=2.0 f=0.5",
+     "best_coarse": "stealth m=2.0 f=0.5",
+     "part": "D4_calib_c.json"
+    },
+    {
+     "knob": 0.08,
+     "delta_fine": 0.006005807031249996,
+     "fine_lo": 0.0019171044536279115,
+     "delta_coarse": 0.006005807031249996,
+     "coarse_lo": 0.0019171044536279115,
+     "best_fine": "stealth m=2.0 f=0.5",
+     "best_coarse": "stealth m=2.0 f=0.5",
+     "part": "D4_calib_c.json"
+    }
+   ]
+  },
+  "O5/0.02": {
+   "status": "ok",
+   "knob": 27.0,
+   "n_knobs_measured": 8,
+   "knob_monotone": false,
+   "table": [
+    {
+     "knob": 26.0,
+     "delta_fine": 0.0224058490625,
+     "fine_lo": 0.01844646234357904,
+     "delta_coarse": 0.0224058490625,
+     "coarse_lo": 0.01844646234357904,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O5_calib_a.json"
+    },
+    {
+     "knob": 27.0,
+     "delta_fine": 0.0194774775,
+     "fine_lo": 0.015531975745808467,
+     "delta_coarse": 0.0194774775,
+     "coarse_lo": 0.015531975745808467,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O5_calib_a.json"
+    },
+    {
+     "knob": 28.0,
+     "delta_fine": 0.01869477,
+     "fine_lo": 0.014557764032044,
+     "delta_coarse": 0.01869477,
+     "coarse_lo": 0.014557764032044,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O5_calib_a.json"
+    },
+    {
+     "knob": 29.0,
+     "delta_fine": 0.018413408906249998,
+     "fine_lo": 0.014257475825279205,
+     "delta_coarse": 0.018413408906249998,
+     "coarse_lo": 0.014257475825279205,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O5_calib_a.json"
+    },
+    {
+     "knob": 36.0,
+     "delta_fine": 0.010343370937499999,
+     "fine_lo": 0.005555029287850957,
+     "delta_coarse": 0.010343370937499999,
+     "coarse_lo": 0.005555029287850957,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O5_calib_b.json"
+    },
+    {
+     "knob": 37.0,
+     "delta_fine": 0.01093338015625,
+     "fine_lo": 0.007457720526914009,
+     "delta_coarse": 0.01093338015625,
+     "coarse_lo": 0.007457720526914009,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O5_calib_b.json"
+    },
+    {
+     "knob": 38.0,
+     "delta_fine": 0.00872479265625,
+     "fine_lo": 0.0052334049286268305,
+     "delta_coarse": 0.00872479265625,
+     "coarse_lo": 0.0052334049286268305,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O5_calib_b.json"
+    },
+    {
+     "knob": 39.0,
+     "delta_fine": 0.00838595296875,
+     "fine_lo": 0.0040702013375165675,
+     "delta_coarse": 0.00838595296875,
+     "coarse_lo": 0.0040702013375165675,
+     "best_fine": "dz=0.3",
+     "best_coarse": "dz=0.3",
+     "part": "O5_calib_b.json"
+    }
+   ]
+  }
+ },
+ "identity": {
+  "checks_file": "results/direction2/vuln_parts_v13/vuln_checks_v13.json",
+  "all_identity_ok": true,
+  "all_hook_level_ok": true,
+  "all_rules_ok": true,
+  "long_horizon_T1e5_O_series": {
+   "test": "test_T72_vuln_identity_long_horizon_O_series",
+   "ops": [
+    "O1",
+    "O2",
+    "O3",
+    "O5",
+    "O4",
+    "O6"
+   ],
+   "T": 100000,
+   "bitwise_identical": true,
+   "gpujob": 120,
+   "result": "6 passed"
+  }
+ },
+ "o4_max": 0.0026814998437499995,
+ "o6_max": 0.0035500134375,
+ "honest_drift_summary": "D1:+0.0001/D2:+0.0000/D4:+0.0009",
+ "meta": {
+  "disclosures": [
+   "D1 uses a HYBRID reference policy (the literal designer strategy plus a constant lie dz0=0.2 in all other rounds); the constant lie was added to reach the registered sizes (to make the size), not part of the designer's text; the literal strategy alone never reaches 0.01 (v1.2 registry, uncalibratable[].literal_best_train).",
+   "honest_drift: the honest policy's utility in the vulnerable environment minus the base environment (paired, per round); the honest benchmark drifts with the knob but the paired G is unaffected; recorded per entry.",
+   "D4's knob response is not monotone (Delta rises, peaks and falls again as eta grows; knob_monotone is false for D4 and O3); the scan therefore covers the whole measured grid and the knob closest to the target among acceptors is chosen.",
+   "Survivor bias: the suite keeps only vulnerabilities whose Delta can be calibrated above zero; D3 (Delta <= 0, in_family_known), O4 and O6 (cannot reach 0.01) were removed or left unsized and B1, B2 were never implemented; the suite is NOT a random sample of vulnerabilities.",
+   "designer_1 is contaminated (it read the specification before designing); it is excluded, not read, not implemented, not counted.",
+   "Blind-zone evidence is ONE example (O5); there is no B1/B2 (absolute-time, long-memory) evidence; statements are limited to a description of the single blind example O5.",
+   "The fine handwritten grid (36 strategies: dz in {2.5, 3, 4} and b=1 added) makes the handwritten family stronger, so the comparison 'RL vs handwritten best' is conservative for RL.",
+   "val2 (seeds 3000-3031) is used only for calibration and selection together with val (2000-2031); it is never a test set (REQ-SEED-08); the red team had already used these seeds for reconnaissance (gpujob #77-#79).",
+   "n_S=256 does not cover the single-pair worst case (n_S about 565, REQ-OPT-13); this is NOT covered.",
+   "The handwritten 'burst' strategies use the agent's own clock (REQ-HW-05) and the O5 reference policy `launder` uses the agent's own clock (REQ-S1-27 scope: blind zone); RL observations contain no time.",
+   "in_family vulnerabilities (O2, O3, D4) are sized by Delta_coarse (best of the 32 coarse-grid strategies), not Delta_fine; their Delta_fine can be <= 0 (that is what in_family means); they are described, not counted in the pass criterion.",
+   "Knob selection is done on the same 64 seeds on which the registry reports Delta (selection on the calibration seeds: the reported Delta of the chosen knob is in-sample); reference-policy parameters were chosen on TRAINING seeds 0-63 only; val2 was added against the winner's curse but does not remove it.",
+   "D4's reference policy was changed in v1.3 (final) from the absolute-round `_LClimb` to the age since recovery max(since-L, 0) with `since` rebuilt from the public susp history; its reference parameters (kappa, dz_max) were re-selected on TRAINING seeds (D4_train_d4a/d4b parts) and the knob re-calibrated.",
+   "D3 is measured descriptively once (knob 0.3, hybrid slope-shrink reference chosen on training seeds): Delta_fine and Delta_coarse are negative and not sized; no RL is run on D3.",
+   "Honest-benchmark note: the 36-strategy best-handwritten choice is made on the same seeds as the reference policy; ties go to the earlier strategy."
+  ],
+  "designer_mapping": "D1..D4 = V1..V4 of docs/direction2-blind-vulns-2.md (designer_2): V1 RestedAuditDiscount, V2 SuspensionParole, V3 SlopeShrink, V4 SelfCalibratingSlope",
+  "interpretations": [
+   "env.py uses the true slope r_true as the audit slope (frontier's r_as branch). V3 therefore shrinks r_true: rh = r_true*(1-s); V4's rh_a starts at r_true (the 'prior' r_as).",
+   "V4 (conservative reading of 'online calibration'): rh_a[B,K] is per agent, initial value r_true, NLMS step eta exactly as written (zv*err/(1+zv^2), clamp [0,0.995]), updated on every eligible audit of that agent, reset to r_true when that agent is flagged; honest agents are calibrated too (as written). eta is the knob (eta=0: rh_c=rh, rh_a never read or written).",
+   "V1: lose_run is kept for all K agents and the audit discount applies to whoever wins the round (the mutation is on the mechanism's audit assignment, not on agent 1 only); suspended rounds do not count; a flag zeroes the flagged agent's counter; G=5 fixed.",
+   "V2: calm/parole kept for all K agents; the release hook runs right after pen += ~elig and before the audit settlement; Q integer, Q=+inf is the identity; Q>=L has no effect (natural release first).",
+   "Hooks: designer mutations act on the 5 existing hooks (V1 audit_prob, V3/V4 resid) plus one new hook 'release' (V2, logged only when present); they carry an extension object for state and set VulnOperator.full=True (hook output applies to every agent). O1..O6 code paths are untouched.",
+   "Reference policies are 'rule' policies: a public-history function (PUBLIC_RULES, runs in the sandbox) plus an in-loop vectorised twin (LOOP_RULES) used by the simulator; scripts/run_d2_vulns.py check verifies they agree to 1e-9 on recorded runs. The sandbox now keeps the own suspension end susp1 of the current round (public at the round start, obs: susp_minus_t); v1 and won1 of the current round stay hidden.",
+   "Free parameters of the reference policies (lie sizes dz, kappa/eta ratio, dz_max, W) were chosen on TRAINING seeds 0-63 only (grid search, the winner per knob); validation seeds were used to measure and to choose among 4 neighbouring knobs the one whose validation delta lies in [0.8s,1.2s] with CI lower bound > 0.",
+   "Size = Delta = G*_V - G_HW_best_V per REQ-S1-02. Because Delta is measured against the best of the 32 coarse-grid handwritten strategies, Delta(knob) is not always monotone (e.g. O3, O2 near 0.25 where the HW grid point dz=2.0 is optimal, D4 where Delta FALLS as eta grows because HW strategies also learn to exploit larger eta).",
+   "Only the sizes s in {0.01, 0.02} were calibrated (task instruction; spec 8.4 gate set G_s); 0.003 and 0.005 are not in the registry, blind vulnerabilities only at 0.02. T-39 (>=48 entries) and T-42 (4 sizes) therefore cannot pass on this registry by construction.",
+   "D1 and D3: the literal designer strategy (honest except one lie after G losses / lie only if z>0) never reaches the target sizes (see uncalibratable[].literal_best_train). D1 uses the hybrid 'literal strategy + constant lie dz0 in all other rounds' (rule d2_rested with dz0>0); D3 remained uncalibratable even with a hybrid (dz0 + z-proportional lie)."
+  ],
+  "calibration": "v1.3: 64 seeds val 2000-2031 + val2 3000-3031 (REQ-S1-28), T=100000, r=0.5, M3C {p=0.1,tol=6,L=2500,kref=0.5}; reference-policy parameters chosen on TRAINING seeds 0-63; knob chosen on the 64 calibration seeds",
+  "handwritten": "S_HW = 36 strategies of hw.build_s_hw() (fine); the 32-strategy list is the coarse list (in_family sizing)",
+  "files": {
+   "parts": "results/direction2/vuln_parts_v13/",
+   "previous": "results/direction2/vuln_suite_v12.json"
+  }
+ }
+}

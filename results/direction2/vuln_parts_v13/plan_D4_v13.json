@@ -1,0 +1,145 @@
+{
+"0.027": [
+{
+"kind": "rule",
+"name": "d2_climb",
+"params": {
+"kappa": 0.0013500000000000003,
+"dz_max": 2.0,
+"L": 2500.0
+}
+}
+],
+"0.028": [
+{
+"kind": "rule",
+"name": "d2_climb",
+"params": {
+"kappa": 0.00056,
+"dz_max": 2.0,
+"L": 2500.0
+}
+}
+],
+"0.029": [
+{
+"kind": "rule",
+"name": "d2_climb",
+"params": {
+"kappa": 0.00058,
+"dz_max": 2.0,
+"L": 2500.0
+}
+}
+],
+"0.03": [
+{
+"kind": "rule",
+"name": "d2_climb",
+"params": {
+"kappa": 0.0006,
+"dz_max": 2.0,
+"L": 2500.0
+}
+}
+],
+"0.045": [
+{
+"kind": "rule",
+"name": "d2_climb",
+"params": {
+"kappa": 0.0009,
+"dz_max": 2.0,
+"L": 2500.0
+}
+}
+],
+"0.047": [
+{
+"kind": "rule",
+"name": "d2_climb",
+"params": {
+"kappa": 0.00094,
+"dz_max": 2.0,
+"L": 2500.0
+}
+}
+],
+"0.05": [
+{
+"kind": "rule",
+"name": "d2_climb",
+"params": {
+"kappa": 0.001,
+"dz_max": 2.0,
+"L": 2500.0
+}
+}
+],
+"0.052": [
+{
+"kind": "rule",
+"name": "d2_climb",
+"params": {
+"kappa": 0.00104,
+"dz_max": 2.0,
+"L": 2500.0
+}
+}
+],
+"0.06": [
+{
+"kind": "rule",
+"name": "d2_climb",
+"params": {
+"kappa": 0.0012,
+"dz_max": 2.0,
+"L": 2500.0
+}
+}
+],
+"0.065": [
+{
+"kind": "rule",
+"name": "d2_climb",
+"params": {
+"kappa": 0.0013000000000000002,
+"dz_max": 2.0,
+"L": 2500.0
+}
+}
+],
+"0.07": [
+{
+"kind": "rule",
+"name": "d2_climb",
+"params": {
+"kappa": 0.0014000000000000002,
+"dz_max": 2.0,
+"L": 2500.0
+}
+}
+],
+"0.075": [
+{
+"kind": "rule",
+"name": "d2_climb",
+"params": {
+"kappa": 0.0015,
+"dz_max": 2.0,
+"L": 2500.0
+}
+}
+],
+"0.08": [
+{
+"kind": "rule",
+"name": "d2_climb",
+"params": {
+"kappa": 0.0016000000000000003,
+"dz_max": 2.0,
+"L": 2500.0
+}
+}
+]
+}
