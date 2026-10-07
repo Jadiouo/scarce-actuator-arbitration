@@ -22,7 +22,7 @@
 
 ## 更正紀錄（凍結補登，早於任何正式訓練）
 
-- **補登 commit**：`ADDENDUM_SHA`（分支 direction2-freeze，本機，未 push）。補登晚於上述凍結 commit（a72d3d7、5165666），但**早於任何 S1／主實驗的正式訓練**（本分支沒有任何正式的 part 檔、檢查點或 pilot 結果；只有凍結前的煙霧測試 results/direction2/smoke_d2）；本節與下列檔案均為補登，照實記錄。
+- **補登 commit**：`f2fe70b73b23cbfe7b6815123f68915a328e0bb1`（分支 direction2-freeze，本機，未 push）。補登晚於上述凍結 commit（a72d3d7、5165666），但**早於任何 S1／主實驗的正式訓練**（本分支沒有任何正式的 part 檔、檢查點或 pilot 結果；只有凍結前的煙霧測試 results/direction2/smoke_d2）；本節與下列檔案均為補登，照實記錄。
 - **更正內容**：上方「預算規則」一行原寫 n_S=64、300 世代，已更正為規格 v1.3 §5.5 的定稿值（λ=256、T_train=20000、n_S=256、G_gens 416／499、每 50 世代驗證）；原文以刪除線保留。
 - **原寫成舊值的原因**：舊值取自 MEAS v1（`results/direction2_meas.json`）的決定規則推薦（`rules.S1.choice.n_S`＝64、300 世代）。v1 的 `sd_CRN` 以 σ0=0.3 的隨機策略對量得（約 0.0104），低估訓練後期接近誠實時的變異；規格 v1.2 起改取 MEAS v2 最壞情況（`measure_v2_summary.json: nS_need["0.5"]`，σ=0.03 的 `sd_CRN` 中位數 0.021732）→ n_S=256，世代數改依 OPT-10 公式取 416／499（v1.1 的 300 與規則不一致）。凍結紀錄撰寫時誤把 v1 的推薦值抄入，規格 v1.3 本身（§5.5）一直是定稿值。**沒有任何正式訓練用到舊值**（凍結前只有管線煙霧測試 smoke_d2，依 REQ-S1-14 例外）。
 - **為何不能依賴執行時讀到的檔案**：`arbitration/rl/budget.py` 的 `decide_params` 依輸入即時算出 n_S；以 v1 輸入會得到 n_S=64，以 v2 最壞情況才得到 256（交叉檢查見 run_plan.json 的 `budget_crosscheck`：v2 輸入 → λ=256、T_train=20000、n_S=256、G_gens=416／499，與定稿值一致；v1 輸入 → n_S=64）。因此訓練參數寫死在 run_plan.json，訓練入口只讀計畫檔，並在啟動時驗證計畫檔 sha256 與本檔 `RUN_PLAN_SHA256` 一致。
