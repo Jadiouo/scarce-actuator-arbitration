@@ -74,24 +74,33 @@ def select_run(run_results: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
 
 # ------------------------------------------------------------------------------------------------ simulator glue
 def make_sim_fn(mech: str, T: int, cfg: Dict[str, float], r: float, dev: str = "cuda", T_score: Optional[int] = None,
-                F: int = 25, hidden: int = 2, obs_version: str = "public") -> Callable[[Any, Sequence[int]], Any]:
+                F: int = 25, hidden: int = 2, obs_version: str = "public", operator: Any = None,
+                knob: Any = None) -> Callable[[Any, Sequence[int]], Any]:
     """sim_fn(theta_rows, seeds) -> U[P,S] = util_b[:,:,1] at the score snapshot (REQ-OPT-02).  obs_version is forwarded explicitly
-    to every MLPPolicy and to env.simulate (REQ-OPT-12)."""
+    to every MLPPolicy and to env.simulate (REQ-OPT-12).  operator/knob (run plan, REQ-S1-10): train inside the vulnerable environment
+    (vulns.simulate_vuln, public observation only); operator=None is the plain simulator."""
     from . import env, policy
 
     def sim_fn(thetas, seeds_):
         pols = [policy.MLPPolicy(F=F, hidden=hidden, theta=t, obs_version=obs_version) for t in np.asarray(thetas)]
-        out = env.simulate(mech, T, cfg, pols, seeds_, r=r, T_score=T_score, dev=dev, obs_version=obs_version)
+        if operator is not None:
+            from . import vulns
+            if obs_version != "public":
+                raise ValueError("vulnerability environments are simulated with the public observation only")
+            out = vulns.simulate_vuln(operator, knob, mech, T, cfg, pols, seeds_, r=r, dev=dev, T_score=T_score)
+        else:
+            out = env.simulate(mech, T, cfg, pols, seeds_, r=r, T_score=T_score, dev=dev, obs_version=obs_version)
         return out["snap"]["util_b"][:, :, 1].cpu().numpy()
     return sim_fn
 
 
 def make_val_fn(mech: str, T_val: int, cfg: Dict[str, float], r: float, dev: str = "cuda", F: int = 25,
-                hidden: int = 2, obs_version: str = "public") -> Callable[[np.ndarray], float]:
+                hidden: int = 2, obs_version: str = "public", operator: Any = None,
+                knob: Any = None) -> Callable[[np.ndarray], float]:
     """G_val(theta): paired mean gain over the 32 VALIDATION seeds (REQ-OPT-06)."""
     vs = list(_seeds.splits()["val"])
     _seeds.require_split(vs, "val")
-    sim = make_sim_fn(mech, T_val, cfg, r, dev, None, F, hidden, obs_version)
+    sim = make_sim_fn(mech, T_val, cfg, r, dev, None, F, hidden, obs_version, operator, knob)
     from . import env
     L = int(cfg["L"])
     Ts = env.score_window(T_val, L) if T_val > L else T_val
@@ -261,10 +270,20 @@ def _cfg(args) -> Dict[str, float]:
     return env.m3c_config(args.r)
 
 
+def _explicit_locked_flags(argv: Sequence[str]) -> List[str]:
+    from .plan import PLAN_LOCKED_FLAGS
+    return [f for f in PLAN_LOCKED_FLAGS if any(t == f or t.startswith(f + "=") for t in argv)]
+
+
 def main(argv: Optional[Sequence[str]] = None) -> None:
     import argparse
+    import sys
+    argv = list(sys.argv[1:] if argv is None else argv)
     ap = argparse.ArgumentParser(description="Direction-2 training segment (submit with gpujob)")
     ap.add_argument("--cell", required=True)
+    ap.add_argument("--plan", default=None, help="frozen run plan (results/direction2/run_plan.json): cell parameters come ONLY from it; "
+                                                 "its sha256 must equal the one in FREEZE.md")
+    ap.add_argument("--freeze", default=None, help="FREEZE.md holding RUN_PLAN_SHA256 (default <root>/results/direction2/FREEZE.md)")
     ap.add_argument("--mech", default="NAIVE", choices=["NAIVE", "M3C"])
     ap.add_argument("--r", type=float, default=0.5)
     ap.add_argument("--run", type=int, default=0)
@@ -276,27 +295,45 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     ap.add_argument("--T-val", type=int, default=None)
     ap.add_argument("--val-every", type=int, default=50)
     ap.add_argument("--patience", type=int, default=None)
-    ap.add_argument("--start", choices=["cold", "warm"], default="cold")
+    ap.add_argument("--start", choices=["cold", "warm"], default=None)
     ap.add_argument("--warm-T", type=int, default=4096)
     ap.add_argument("--warm-seeds", type=int, default=16)
     ap.add_argument("--root", default=".")
     ap.add_argument("--dev", default="cuda")
     a = ap.parse_args(argv)
     from . import env, policy
-    cfg = _cfg(a)
-    mech = "M3C"
+    operator = knob = None
+    obs_version = "public"
+    if a.plan:                                   # the plan file is the only source of the budget (spec 5.5), not budget.py / measurements
+        from . import plan as _plan
+        bad = _explicit_locked_flags(argv)
+        if bad:
+            raise SystemExit(f"--plan forbids overriding {bad}: the frozen run plan is the only source of these values")
+        plan_path = a.plan if os.path.isabs(a.plan) else os.path.join(a.root, a.plan)
+        freeze_path = a.freeze or os.path.join(a.root, _plan.DEFAULT_FREEZE)
+        pl = _plan.load_plan(plan_path, freeze_path)
+        pc = _plan.get_cell(pl, a.cell)
+        _plan.check_run(pc, a.run, a.g0, a.g1)
+        S = _plan.cell_to_settings(pc)
+        start = _plan.resolve_start(pc, a.start, a.root)
+        mech, cfg, a.r, a.lam, a.nS, a.T, a.T_val = S["mech"], S["cfg"], S["r"], S["lam"], S["n_S"], S["T_train"], S["T_val"]
+        a.val_every, a.patience, obs_version, operator, knob = S["val_every"], S["patience"], S["obs_version"], S["operator"], S["knob"]
+        w = pl["start_registration"]["warm"]
+        a.warm_T, a.warm_seeds, sigma0, F, hidden = w["warm_T"], w["warm_seeds"], S["sigma0"], S["F"], S["hidden"]
+    else:
+        cfg, mech, start, sigma0, F, hidden = _cfg(a), "M3C", a.start or "cold", 0.3, 25, 2
     L = int(cfg["L"])
     T_score = env.score_window(a.T, L) if a.T > L else a.T
-    n = policy.n_params(25, 2)
-    cell = dict(name=a.cell, n=n, lam=a.lam, n_S=a.nS, T_score=T_score, T_train=a.T, sigma0=0.3, val_every=a.val_every, patience=a.patience)
+    n = policy.n_params(F, hidden)
+    cell = dict(name=a.cell, n=n, lam=a.lam, n_S=a.nS, T_score=T_score, T_train=a.T, sigma0=sigma0, val_every=a.val_every, patience=a.patience)
     theta0 = None
-    if a.start == "warm" and a.g0 == 0 and not os.path.exists(parts.ckpt_path(a.cell, a.run, a.root)):
+    if start == "warm" and a.g0 == 0 and not os.path.exists(parts.ckpt_path(a.cell, a.run, a.root)):
         tr = list(_seeds.splits()["train"])[:a.warm_seeds]
         best = best_handwritten_on_train(cfg, mech, a.r, a.warm_T, tr, a.dev)
         print(f"warm start: best handwritten on train = {best['name']} (G_train {best['G_train']:+.4f})", flush=True)
         theta0 = warm_start_theta(cfg, mech, a.r, best["scols"], a.warm_T, tr, a.dev)
-    sim_fn = make_sim_fn(mech, a.T, cfg, a.r, a.dev)
-    val_fn = make_val_fn(mech, a.T_val or a.T, cfg, a.r, a.dev)
+    sim_fn = make_sim_fn(mech, a.T, cfg, a.r, a.dev, None, F, hidden, obs_version, operator, knob)
+    val_fn = make_val_fn(mech, a.T_val or a.T, cfg, a.r, a.dev, F, hidden, obs_version, operator, knob)
     rec = train_segment(cell, a.run, a.g0, a.g1, sim_fn, val_fn, root=a.root, theta0=theta0, log=lambda s: print(s, flush=True))
     print(json.dumps({k: rec[k] for k in ("cell", "run_id", "gen0", "gen1", "status", "gens_done", "wall_s", "sigma", "best")
                       if k in rec}, default=float), flush=True)

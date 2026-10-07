@@ -101,7 +101,7 @@ def test_T51_measure_output_schema():
 def test_T52_gpu_job_manifest():
     """T-52 (REQ-GPU-01/02/05/06): every manifest line starts with gpujob, names a part file, est <= 1500 s; no 'gpujob slots'; no direct python; [gpu] test jobs go through gpujob."""
     part = "results/direction2/parts/cell__run0__g0000-0025.json"
-    py = "/home/lex/Documents/scarce-actuator-arbitration/.venv/bin/python"
+    py = sys.executable                                        # portable: no machine-specific venv path
     good = [dict(cmd=f"gpujob {py} scripts/d2_train.py --out {part}", est_s=1200.0)]
     assert gpu_rules.validate_manifest(good) == []
     for bad in (dict(cmd=f"{py} scripts/d2_train.py --out {part}", est_s=10.0), dict(cmd="gpujob slots 3", est_s=1.0),

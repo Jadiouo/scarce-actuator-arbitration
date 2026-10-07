@@ -1,0 +1,1797 @@
+{
+  "schema": "direction2-run-plan/1",
+  "spec": {
+    "file": "docs/direction2-spec.md",
+    "version": "v1.3",
+    "sha256": "b0963760b23f92a7ac3438f7b6c428bdcaf6920063c3650690c338cee4eb2d2d",
+    "section": "5.5 (final values), 8.4 REQ-S1-10, 8.4 REQ-S1-20/22/25, 5.4 REQ-OPT-07, REQ-OPT-12"
+  },
+  "vuln_suite": {
+    "file": "results/direction2/vuln_suite.json",
+    "sha256": "1ec74ae331e59a3d6692055d5939e3eb59373eb1d4929a9b214cdde9014fada0"
+  },
+  "budget_file": {
+    "file": "arbitration/rl/budget.py",
+    "sha256": "bf195bab453a03f20a3a8473eaacc12f4bc25bed07485822aac01fd9282765a0",
+    "role": "NOT consulted at training time: parameters come from this file; budget.py was only cross-checked (budget_crosscheck)"
+  },
+  "frozen_budget": {
+    "lam": 256,
+    "T_train": 20000,
+    "n_S": 256,
+    "G_gens": {
+      "0.5": 416,
+      "0.9": 499
+    },
+    "val_every": 50,
+    "patience": null,
+    "sigma0": 0.3,
+    "T_val": 100000,
+    "obs_version": "public",
+    "json_key_paths": {
+      "lam": "results/direction2_meas.json: rules.S1.choice.lam (= rules.main.choice.lam)",
+      "T_train": "results/direction2_meas.json: rules.S1.choice.T_train",
+      "n_S": "results/direction2/measure_v2_summary.json: nS_need[\"0.5\"].nS_from_median (=256)",
+      "G_gens": "results/direction2_meas.json: rules.S1.W_run_s=9000, rules.main.W_run_s=10800, rules.S1.choice.t_step_ms=1.0812 -> floor(W/(T_train*t_step)) = 416 / 499",
+      "t_step": "results/direction2/measure_v2_summary.json: run_time_lam256_T2e4_300gen.nS256_mean.t_step_ms / nS256_p95.t_step_ms",
+      "t_val": "results/direction2/measure_v2_summary.json: validation.t_val_s"
+    }
+  },
+  "budget_crosscheck": {
+    "inputs": {
+      "B_max": 2097152,
+      "t_step_ms": 1.0811940001076437,
+      "W_run_S1_s": 9000.0,
+      "W_run_main_s": 10800.0,
+      "sd_crn_worst_sigma_median_v2": {
+        "0.5": 0.02173187307112725,
+        "0.9": 0.02091507152179465
+      },
+      "note": "v2 measured sd_CRN at T=2e4 only; it is used for every T_train candidate (same convention as tests T-24b)"
+    },
+    "v2_S1": {
+      "feasible": true,
+      "lam": 256,
+      "T_train": 20000,
+      "n_S": 256,
+      "G_gens": 416,
+      "r09_underpowered": true
+    },
+    "v2_main": {
+      "feasible": true,
+      "lam": 256,
+      "T_train": 20000,
+      "n_S": 256,
+      "G_gens": 499,
+      "r09_underpowered": true
+    },
+    "v1_S1": {
+      "feasible": true,
+      "lam": 256,
+      "T_train": 20000,
+      "n_S": 64,
+      "G_gens": 416,
+      "r09_underpowered": true
+    },
+    "v1_main": {
+      "feasible": true,
+      "lam": 256,
+      "T_train": 20000,
+      "n_S": 64,
+      "G_gens": 499,
+      "r09_underpowered": true
+    },
+    "frozen": {
+      "lam": 256,
+      "T_train": 20000,
+      "n_S": 256,
+      "G_gens_r05": 416,
+      "G_gens_r09": 499
+    },
+    "v2_matches_frozen": true,
+    "v1_would_give_n_S": 64
+  },
+  "G_s_plan": {
+    "value": [
+      0.01,
+      0.02
+    ],
+    "status": "planning estimate; the gate value comes from M-3 MDE_D,plan (REQ-S1-22); s=0.01 cells are conditional"
+  },
+  "start_registration": {
+    "cold": {
+      "theta0": "zeros",
+      "sigma0": 0.3
+    },
+    "warm": {
+      "method": "least-squares regression of the MLP output onto the best S_HW handwritten strategy on train seeds (train.warm_start_theta)",
+      "warm_T": 4096,
+      "warm_seeds": 16,
+      "ridge": 0.0001,
+      "hidden": 2,
+      "F": 25,
+      "source": "arbitration/rl/train.py: main() defaults, fit_lstsq(ridge=1e-4)"
+    },
+    "chosen": "not yet decided: NAIVE pilot (REQ-S1-20) decides, recorded in results/direction2/pilot_decision.json"
+  },
+  "totals": {
+    "n_cells": 23,
+    "n_runs": 27,
+    "mean_h": 94.7562990921869,
+    "p95_h": 132.32890931153528,
+    "note": "all cells incl. the conditional warm pilot and s=0.01 cells; spec 5.5 table: about 94.8 h mean / 132.4 h p95"
+  },
+  "cells": [
+    {
+      "name": "pilot_naive_cold",
+      "group": "pilot",
+      "order": 0,
+      "mechanism": "M3C",
+      "variant": "NAIVE (p=0)",
+      "vuln_id": null,
+      "operator": null,
+      "knob": null,
+      "knob_source": null,
+      "size": null,
+      "category": null,
+      "r": 0.5,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 416,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "cold",
+        "allowed": [
+          "cold"
+        ],
+        "rule": "REQ-S1-20: the pilot starts cold (theta=0)"
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0
+      ],
+      "algo_seeds": [
+        9000
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 8,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 1,
+      "est_total": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404
+      },
+      "conditional": null,
+      "wired": true,
+      "notes": "REQ-S1-20 learnability pilot; NAIVE = M3C with p=0 (env.anchor_config('NAIVE'))",
+      "pilot_eval": {
+        "seeds": "train and validation seeds only (REQ-S1-20; s1.require_pilot_seeds); no test seeds",
+        "threshold": "validation G >= 0.8 * G*_ref (G*_ref re-measured on validation seeds, expected about 0.28)",
+        "always_report_1": {
+          "policy": "v1 == 1 (adapter b=1.0, clip(u+1)=1), public-information realizable",
+          "baseline_fn": "arbitration.rl.s1.naive_pilot_baseline",
+          "compare_with": "best handwritten strategy on NAIVE chosen on validation (REQ-HW-02; reference dz=2.0, 0.2793)",
+          "Ts": [
+            20000,
+            100000
+          ],
+          "seeds": [
+            2000,
+            2031
+          ],
+          "paired": true,
+          "same_T_same_seeds": true,
+          "report_T_change": true
+        }
+      }
+    },
+    {
+      "name": "pilot_naive_warm",
+      "group": "pilot",
+      "order": 1,
+      "mechanism": "M3C",
+      "variant": "NAIVE (p=0)",
+      "vuln_id": null,
+      "operator": null,
+      "knob": null,
+      "knob_source": null,
+      "size": null,
+      "category": null,
+      "r": 0.5,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 416,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "warm",
+        "allowed": [
+          "warm"
+        ],
+        "rule": "REQ-S1-20: runs only if the cold pilot is below 0.8*G*_ref (validation); same budget",
+        "warm_start": {
+          "method": "least-squares regression of the MLP output onto the best S_HW handwritten strategy on train seeds (train.warm_start_theta)",
+          "warm_T": 4096,
+          "warm_seeds": 16,
+          "ridge": 0.0001,
+          "hidden": 2,
+          "F": 25,
+          "source": "arbitration/rl/train.py: main() defaults, fit_lstsq(ridge=1e-4)"
+        }
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0
+      ],
+      "algo_seeds": [
+        9000
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 8,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 1,
+      "est_total": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404
+      },
+      "conditional": "only if pilot_naive_cold fails the 0.8*G*_ref threshold (REQ-S1-20)",
+      "wired": true,
+      "notes": "registered warm route (REQ-OPT-07)",
+      "pilot_eval": {
+        "seeds": "train and validation seeds only (REQ-S1-20; s1.require_pilot_seeds); no test seeds",
+        "threshold": "validation G >= 0.8 * G*_ref (G*_ref re-measured on validation seeds, expected about 0.28)",
+        "always_report_1": {
+          "policy": "v1 == 1 (adapter b=1.0, clip(u+1)=1), public-information realizable",
+          "baseline_fn": "arbitration.rl.s1.naive_pilot_baseline",
+          "compare_with": "best handwritten strategy on NAIVE chosen on validation (REQ-HW-02; reference dz=2.0, 0.2793)",
+          "Ts": [
+            20000,
+            100000
+          ],
+          "seeds": [
+            2000,
+            2031
+          ],
+          "paired": true,
+          "same_T_same_seeds": true,
+          "report_T_change": true
+        }
+      }
+    },
+    {
+      "name": "s1_D1_s0.02",
+      "group": "s1",
+      "order": 2,
+      "mechanism": "M3C",
+      "variant": null,
+      "vuln_id": "D1",
+      "operator": "D1",
+      "knob": 1.0,
+      "knob_source": "results/direction2/vuln_suite.json: entries[1].knob",
+      "size": 0.02,
+      "category": "out_of_family",
+      "r": 0.5,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 416,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "by_pilot",
+        "allowed": [
+          "cold",
+          "warm"
+        ],
+        "rule": "REQ-OPT-07: one route for all of S1 and main, chosen by the NAIVE pilot (REQ-S1-20); needs results/direction2/pilot_decision.json"
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0
+      ],
+      "algo_seeds": [
+        9000
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 8,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 1,
+      "est_total": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404
+      },
+      "conditional": null,
+      "wired": true,
+      "notes": null
+    },
+    {
+      "name": "s1_D2_s0.02",
+      "group": "s1",
+      "order": 3,
+      "mechanism": "M3C",
+      "variant": null,
+      "vuln_id": "D2",
+      "operator": "D2",
+      "knob": 1100,
+      "knob_source": "results/direction2/vuln_suite.json: entries[3].knob",
+      "size": 0.02,
+      "category": "out_of_family",
+      "r": 0.5,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 416,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "by_pilot",
+        "allowed": [
+          "cold",
+          "warm"
+        ],
+        "rule": "REQ-OPT-07: one route for all of S1 and main, chosen by the NAIVE pilot (REQ-S1-20); needs results/direction2/pilot_decision.json"
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0
+      ],
+      "algo_seeds": [
+        9000
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 8,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 1,
+      "est_total": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404
+      },
+      "conditional": null,
+      "wired": true,
+      "notes": null
+    },
+    {
+      "name": "s1_O1_s0.02",
+      "group": "s1",
+      "order": 4,
+      "mechanism": "M3C",
+      "variant": null,
+      "vuln_id": "O1",
+      "operator": "O1",
+      "knob": 0.93,
+      "knob_source": "results/direction2/vuln_suite.json: entries[5].knob",
+      "size": 0.02,
+      "category": "out_of_family",
+      "r": 0.5,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 416,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "by_pilot",
+        "allowed": [
+          "cold",
+          "warm"
+        ],
+        "rule": "REQ-OPT-07: one route for all of S1 and main, chosen by the NAIVE pilot (REQ-S1-20); needs results/direction2/pilot_decision.json"
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0
+      ],
+      "algo_seeds": [
+        9000
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 8,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 1,
+      "est_total": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404
+      },
+      "conditional": null,
+      "wired": true,
+      "notes": null
+    },
+    {
+      "name": "s1_O2_s0.02",
+      "group": "s1",
+      "order": 5,
+      "mechanism": "M3C",
+      "variant": null,
+      "vuln_id": "O2",
+      "operator": "O2",
+      "knob": 0.312,
+      "knob_source": "results/direction2/vuln_suite.json: entries[7].knob",
+      "size": 0.02,
+      "category": "in_family",
+      "r": 0.5,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 416,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "by_pilot",
+        "allowed": [
+          "cold",
+          "warm"
+        ],
+        "rule": "REQ-OPT-07: one route for all of S1 and main, chosen by the NAIVE pilot (REQ-S1-20); needs results/direction2/pilot_decision.json"
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0
+      ],
+      "algo_seeds": [
+        9000
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 8,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 1,
+      "est_total": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404
+      },
+      "conditional": null,
+      "wired": true,
+      "notes": null
+    },
+    {
+      "name": "s1_O3_s0.02",
+      "group": "s1",
+      "order": 6,
+      "mechanism": "M3C",
+      "variant": null,
+      "vuln_id": "O3",
+      "operator": "O3",
+      "knob": 0.562,
+      "knob_source": "results/direction2/vuln_suite.json: entries[9].knob",
+      "size": 0.02,
+      "category": "in_family",
+      "r": 0.5,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 416,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "by_pilot",
+        "allowed": [
+          "cold",
+          "warm"
+        ],
+        "rule": "REQ-OPT-07: one route for all of S1 and main, chosen by the NAIVE pilot (REQ-S1-20); needs results/direction2/pilot_decision.json"
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0
+      ],
+      "algo_seeds": [
+        9000
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 8,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 1,
+      "est_total": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404
+      },
+      "conditional": null,
+      "wired": true,
+      "notes": null
+    },
+    {
+      "name": "s1_D4_s0.02",
+      "group": "s1",
+      "order": 7,
+      "mechanism": "M3C",
+      "variant": null,
+      "vuln_id": "D4",
+      "operator": "D4",
+      "knob": 0.047,
+      "knob_source": "results/direction2/vuln_suite.json: entries[11].knob",
+      "size": 0.02,
+      "category": "in_family",
+      "r": 0.5,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 416,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "by_pilot",
+        "allowed": [
+          "cold",
+          "warm"
+        ],
+        "rule": "REQ-OPT-07: one route for all of S1 and main, chosen by the NAIVE pilot (REQ-S1-20); needs results/direction2/pilot_decision.json"
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0
+      ],
+      "algo_seeds": [
+        9000
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 8,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 1,
+      "est_total": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404
+      },
+      "conditional": null,
+      "wired": true,
+      "notes": null
+    },
+    {
+      "name": "s1_O5_s0.02",
+      "group": "s1",
+      "order": 8,
+      "mechanism": "M3C",
+      "variant": null,
+      "vuln_id": "O5",
+      "operator": "O5",
+      "knob": 27,
+      "knob_source": "results/direction2/vuln_suite.json: entries[12].knob",
+      "size": 0.02,
+      "category": "blind",
+      "r": 0.5,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 416,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "by_pilot",
+        "allowed": [
+          "cold",
+          "warm"
+        ],
+        "rule": "REQ-OPT-07: one route for all of S1 and main, chosen by the NAIVE pilot (REQ-S1-20); needs results/direction2/pilot_decision.json"
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0
+      ],
+      "algo_seeds": [
+        9000
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 8,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 1,
+      "est_total": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404
+      },
+      "conditional": null,
+      "wired": true,
+      "notes": null
+    },
+    {
+      "name": "s1_NAIVE_anchor",
+      "group": "s1",
+      "order": 9,
+      "mechanism": "M3C",
+      "variant": "NAIVE (p=0)",
+      "vuln_id": "NAIVE",
+      "operator": null,
+      "knob": null,
+      "knob_source": "results/direction2/vuln_suite.json: entries[14].knob",
+      "size": null,
+      "category": "anchor",
+      "r": 0.5,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 416,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "by_pilot",
+        "allowed": [
+          "cold",
+          "warm"
+        ],
+        "rule": "REQ-OPT-07: one route for all of S1 and main, chosen by the NAIVE pilot (REQ-S1-20); needs results/direction2/pilot_decision.json"
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0
+      ],
+      "algo_seeds": [
+        9000
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 8,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 1,
+      "est_total": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404
+      },
+      "conditional": null,
+      "wired": true,
+      "notes": "REQ-S1-08 anchor: G rule, not the increment rule"
+    },
+    {
+      "name": "s1_M4rw0_anchor",
+      "group": "s1",
+      "order": 10,
+      "mechanism": "M4",
+      "variant": "M4 eps=0.2 L=20 rw=0",
+      "vuln_id": "M4rw0",
+      "operator": null,
+      "knob": null,
+      "knob_source": "results/direction2/vuln_suite.json: entries[15].knob",
+      "size": null,
+      "category": "anchor",
+      "r": 0.99,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 416,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "by_pilot",
+        "allowed": [
+          "cold",
+          "warm"
+        ],
+        "rule": "REQ-OPT-07: one route for all of S1 and main, chosen by the NAIVE pilot (REQ-S1-20); needs results/direction2/pilot_decision.json"
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0
+      ],
+      "algo_seeds": [
+        9000
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 8,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 1,
+      "est_total": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404
+      },
+      "conditional": null,
+      "wired": true,
+      "notes": "REQ-S1-09 anchor; the only S1 run not at r=0.5; informational if W1 G*_ref CI lower bound <= 0 (suite: m4_anchor_status=counted)",
+      "mech_cfg": {
+        "mech": "M4",
+        "eps": 0.2,
+        "L": 20,
+        "rw": 0.0,
+        "r": 0.99,
+        "strategy": "b=0.3"
+      }
+    },
+    {
+      "name": "s1_D1_s0.01",
+      "group": "s1",
+      "order": 11,
+      "mechanism": "M3C",
+      "variant": null,
+      "vuln_id": "D1",
+      "operator": "D1",
+      "knob": 0.9,
+      "knob_source": "results/direction2/vuln_suite.json: entries[0].knob",
+      "size": 0.01,
+      "category": "out_of_family",
+      "r": 0.5,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 416,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "by_pilot",
+        "allowed": [
+          "cold",
+          "warm"
+        ],
+        "rule": "REQ-OPT-07: one route for all of S1 and main, chosen by the NAIVE pilot (REQ-S1-20); needs results/direction2/pilot_decision.json"
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0
+      ],
+      "algo_seeds": [
+        9000
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 8,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 1,
+      "est_total": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404
+      },
+      "conditional": "only if 0.01 is in G_s (G_s = {s in {0.01,0.02}: s >= MDE_D,plan}, REQ-S1-22)",
+      "wired": true,
+      "notes": null
+    },
+    {
+      "name": "s1_D2_s0.01",
+      "group": "s1",
+      "order": 12,
+      "mechanism": "M3C",
+      "variant": null,
+      "vuln_id": "D2",
+      "operator": "D2",
+      "knob": 1700,
+      "knob_source": "results/direction2/vuln_suite.json: entries[2].knob",
+      "size": 0.01,
+      "category": "out_of_family",
+      "r": 0.5,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 416,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "by_pilot",
+        "allowed": [
+          "cold",
+          "warm"
+        ],
+        "rule": "REQ-OPT-07: one route for all of S1 and main, chosen by the NAIVE pilot (REQ-S1-20); needs results/direction2/pilot_decision.json"
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0
+      ],
+      "algo_seeds": [
+        9000
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 8,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 1,
+      "est_total": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404
+      },
+      "conditional": "only if 0.01 is in G_s (G_s = {s in {0.01,0.02}: s >= MDE_D,plan}, REQ-S1-22)",
+      "wired": true,
+      "notes": null
+    },
+    {
+      "name": "s1_O1_s0.01",
+      "group": "s1",
+      "order": 13,
+      "mechanism": "M3C",
+      "variant": null,
+      "vuln_id": "O1",
+      "operator": "O1",
+      "knob": 0.9,
+      "knob_source": "results/direction2/vuln_suite.json: entries[4].knob",
+      "size": 0.01,
+      "category": "out_of_family",
+      "r": 0.5,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 416,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "by_pilot",
+        "allowed": [
+          "cold",
+          "warm"
+        ],
+        "rule": "REQ-OPT-07: one route for all of S1 and main, chosen by the NAIVE pilot (REQ-S1-20); needs results/direction2/pilot_decision.json"
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0
+      ],
+      "algo_seeds": [
+        9000
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 8,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 1,
+      "est_total": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404
+      },
+      "conditional": "only if 0.01 is in G_s (G_s = {s in {0.01,0.02}: s >= MDE_D,plan}, REQ-S1-22)",
+      "wired": true,
+      "notes": null
+    },
+    {
+      "name": "main_M3C_r0.5",
+      "group": "main",
+      "order": 105,
+      "mechanism": "M3C",
+      "variant": null,
+      "vuln_id": null,
+      "operator": null,
+      "knob": null,
+      "knob_source": null,
+      "size": null,
+      "category": null,
+      "r": 0.5,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 416,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "by_pilot",
+        "allowed": [
+          "cold",
+          "warm"
+        ],
+        "rule": "REQ-OPT-07: one route for all of S1 and main, chosen by the NAIVE pilot (REQ-S1-20); needs results/direction2/pilot_decision.json"
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0,
+        1,
+        2
+      ],
+      "algo_seeds": [
+        9000,
+        9001,
+        9002
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 8,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 3,
+      "est_total": {
+        "mean_s": 37106.29218129825,
+        "p95_s": 51809.38626661211
+      },
+      "conditional": null,
+      "wired": true,
+      "notes": null
+    },
+    {
+      "name": "main_M3C_r0.9",
+      "group": "main",
+      "order": 109,
+      "mechanism": "M3C",
+      "variant": null,
+      "vuln_id": null,
+      "operator": null,
+      "knob": null,
+      "knob_source": null,
+      "size": null,
+      "category": null,
+      "r": 0.9,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 499,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "by_pilot",
+        "allowed": [
+          "cold",
+          "warm"
+        ],
+        "rule": "REQ-OPT-07: one route for all of S1 and main, chosen by the NAIVE pilot (REQ-S1-20); needs results/direction2/pilot_decision.json"
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0,
+        1,
+        2
+      ],
+      "algo_seeds": [
+        9000,
+        9001,
+        9002
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 14757.44642716226,
+        "p95_s": 20636.32779621003,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 9,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 3,
+      "est_total": {
+        "mean_s": 44272.339281486784,
+        "p95_s": 61908.98338863009
+      },
+      "conditional": null,
+      "wired": true,
+      "notes": "r=0.9 is underpowered at n_S<=256 (REQ-OPT-11): trained and reported descriptively only"
+    },
+    {
+      "name": "diag_ablate_g1",
+      "group": "diag",
+      "order": 200,
+      "mechanism": "M3C",
+      "variant": null,
+      "vuln_id": null,
+      "operator": null,
+      "knob": null,
+      "knob_source": null,
+      "size": null,
+      "category": null,
+      "r": 0.5,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 416,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "by_pilot",
+        "allowed": [
+          "cold",
+          "warm"
+        ],
+        "rule": "REQ-OPT-07: one route for all of S1 and main, chosen by the NAIVE pilot (REQ-S1-20); needs results/direction2/pilot_decision.json"
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0
+      ],
+      "algo_seeds": [
+        9000
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 8,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 1,
+      "est_total": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404
+      },
+      "conditional": null,
+      "wired": false,
+      "notes": "leave-one-group-out feature ablation; not blocking (decision 5); not yet wired in the training entry (T-55)",
+      "diag": {
+        "req": "REQ-S1-19(a)",
+        "drop_feature_indices_0based": [
+          0,
+          1
+        ],
+        "F_full": 25
+      }
+    },
+    {
+      "name": "diag_ablate_g2",
+      "group": "diag",
+      "order": 201,
+      "mechanism": "M3C",
+      "variant": null,
+      "vuln_id": null,
+      "operator": null,
+      "knob": null,
+      "knob_source": null,
+      "size": null,
+      "category": null,
+      "r": 0.5,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 416,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "by_pilot",
+        "allowed": [
+          "cold",
+          "warm"
+        ],
+        "rule": "REQ-OPT-07: one route for all of S1 and main, chosen by the NAIVE pilot (REQ-S1-20); needs results/direction2/pilot_decision.json"
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0
+      ],
+      "algo_seeds": [
+        9000
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 8,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 1,
+      "est_total": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404
+      },
+      "conditional": null,
+      "wired": false,
+      "notes": "leave-one-group-out feature ablation; not blocking (decision 5); not yet wired in the training entry (T-55)",
+      "diag": {
+        "req": "REQ-S1-19(a)",
+        "drop_feature_indices_0based": [
+          2,
+          3,
+          4
+        ],
+        "F_full": 25
+      }
+    },
+    {
+      "name": "diag_ablate_g3",
+      "group": "diag",
+      "order": 202,
+      "mechanism": "M3C",
+      "variant": null,
+      "vuln_id": null,
+      "operator": null,
+      "knob": null,
+      "knob_source": null,
+      "size": null,
+      "category": null,
+      "r": 0.5,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 416,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "by_pilot",
+        "allowed": [
+          "cold",
+          "warm"
+        ],
+        "rule": "REQ-OPT-07: one route for all of S1 and main, chosen by the NAIVE pilot (REQ-S1-20); needs results/direction2/pilot_decision.json"
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0
+      ],
+      "algo_seeds": [
+        9000
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 8,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 1,
+      "est_total": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404
+      },
+      "conditional": null,
+      "wired": false,
+      "notes": "leave-one-group-out feature ablation; not blocking (decision 5); not yet wired in the training entry (T-55)",
+      "diag": {
+        "req": "REQ-S1-19(a)",
+        "drop_feature_indices_0based": [
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12
+        ],
+        "F_full": 25
+      }
+    },
+    {
+      "name": "diag_ablate_g4",
+      "group": "diag",
+      "order": 203,
+      "mechanism": "M3C",
+      "variant": null,
+      "vuln_id": null,
+      "operator": null,
+      "knob": null,
+      "knob_source": null,
+      "size": null,
+      "category": null,
+      "r": 0.5,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 416,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "by_pilot",
+        "allowed": [
+          "cold",
+          "warm"
+        ],
+        "rule": "REQ-OPT-07: one route for all of S1 and main, chosen by the NAIVE pilot (REQ-S1-20); needs results/direction2/pilot_decision.json"
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0
+      ],
+      "algo_seeds": [
+        9000
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 8,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 1,
+      "est_total": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404
+      },
+      "conditional": null,
+      "wired": false,
+      "notes": "leave-one-group-out feature ablation; not blocking (decision 5); not yet wired in the training entry (T-55)",
+      "diag": {
+        "req": "REQ-S1-19(a)",
+        "drop_feature_indices_0based": [
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "F_full": 25
+      }
+    },
+    {
+      "name": "diag_ablate_g5",
+      "group": "diag",
+      "order": 204,
+      "mechanism": "M3C",
+      "variant": null,
+      "vuln_id": null,
+      "operator": null,
+      "knob": null,
+      "knob_source": null,
+      "size": null,
+      "category": null,
+      "r": 0.5,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 416,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "by_pilot",
+        "allowed": [
+          "cold",
+          "warm"
+        ],
+        "rule": "REQ-OPT-07: one route for all of S1 and main, chosen by the NAIVE pilot (REQ-S1-20); needs results/direction2/pilot_decision.json"
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0
+      ],
+      "algo_seeds": [
+        9000
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 8,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 1,
+      "est_total": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404
+      },
+      "conditional": null,
+      "wired": false,
+      "notes": "leave-one-group-out feature ablation; not blocking (decision 5); not yet wired in the training entry (T-55)",
+      "diag": {
+        "req": "REQ-S1-19(a)",
+        "drop_feature_indices_0based": [
+          21,
+          22
+        ],
+        "F_full": 25
+      }
+    },
+    {
+      "name": "diag_ablate_g6",
+      "group": "diag",
+      "order": 205,
+      "mechanism": "M3C",
+      "variant": null,
+      "vuln_id": null,
+      "operator": null,
+      "knob": null,
+      "knob_source": null,
+      "size": null,
+      "category": null,
+      "r": 0.5,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 416,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "by_pilot",
+        "allowed": [
+          "cold",
+          "warm"
+        ],
+        "rule": "REQ-OPT-07: one route for all of S1 and main, chosen by the NAIVE pilot (REQ-S1-20); needs results/direction2/pilot_decision.json"
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0
+      ],
+      "algo_seeds": [
+        9000
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 8,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 1,
+      "est_total": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404
+      },
+      "conditional": null,
+      "wired": false,
+      "notes": "leave-one-group-out feature ablation; not blocking (decision 5); not yet wired in the training entry (T-55)",
+      "diag": {
+        "req": "REQ-S1-19(a)",
+        "drop_feature_indices_0based": [
+          23,
+          24
+        ],
+        "F_full": 25
+      }
+    },
+    {
+      "name": "diag_history64",
+      "group": "diag",
+      "order": 206,
+      "mechanism": "M3C",
+      "variant": null,
+      "vuln_id": null,
+      "operator": null,
+      "knob": null,
+      "knob_source": null,
+      "size": null,
+      "category": null,
+      "r": 0.5,
+      "lam": 256,
+      "T_train": 20000,
+      "T_val": 100000,
+      "n_S": 256,
+      "G_gens": 416,
+      "val_every": 50,
+      "patience": null,
+      "sigma0": 0.3,
+      "start": {
+        "policy": "by_pilot",
+        "allowed": [
+          "cold",
+          "warm"
+        ],
+        "rule": "REQ-OPT-07: one route for all of S1 and main, chosen by the NAIVE pilot (REQ-S1-20); needs results/direction2/pilot_decision.json"
+      },
+      "obs_version": "public",
+      "F": 25,
+      "hidden": 2,
+      "run_ids": [
+        0
+      ],
+      "algo_seeds": [
+        9000
+      ],
+      "train_seeds": {
+        "pool": [
+          0,
+          999
+        ],
+        "schedule": "REQ-OPT-03: block [g*n_S,(g+1)*n_S) mod 1000 of perm_k, perm_k = Random(9000+run_id).shuffle(range(1000))"
+      },
+      "val_seeds": [
+        2000,
+        2031
+      ],
+      "est_per_run": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404,
+        "t_step_mean_ms": 1.359011063186148,
+        "t_step_p95_ms": 1.9480773326298124,
+        "t_val_s": 132.72400184050002,
+        "n_validations": 8,
+        "basis": "spec 5.5: G_gens*T_train*t_step + floor(G_gens/50)*t_val (v2.json run_time_lam256_T2e4_300gen.nS256_{mean,p95}.t_step_ms; validation.t_val_s); start-up not included"
+      },
+      "n_runs": 1,
+      "est_total": {
+        "mean_s": 12368.764060432752,
+        "p95_s": 17269.79542220404
+      },
+      "conditional": null,
+      "wired": false,
+      "notes": "not blocking; not yet wired in the training entry (T-55)",
+      "diag": {
+        "req": "REQ-S1-19(b)",
+        "F": 134,
+        "P_DIAG": 300,
+        "note": "64-step history; diagnostic observation F=134"
+      }
+    }
+  ]
+}

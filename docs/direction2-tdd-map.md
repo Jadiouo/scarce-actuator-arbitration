@@ -263,3 +263,18 @@ GPU 隊列被實作 agent 的量測 job（m1、m2）佔用，本次加強後的 
 3. **`final_eval.py`** 仍是骨架（對任何輸入都拋 NotImplementedError），不在本輪可改檔案內，所以 T-27／T-70 的「`final_eval` 拒絕 val2」目前無法區分「拒絕」與「未實作」。實作 `final_eval` 時須補成 ValueError。
 4. 規格 §9.3 範本的「檢測率」與 T-47 的禁字衝突（見上）。
 5. 錨點 id：規格寫 `M4`，registry 與既有測試用 `M4rw0`；沿用 `M4rw0`。
+
+## 凍結補登（2026-10-07，早於任何正式訓練）：run_plan.json 與 `--plan/--cell` 入口
+
+測試檔 `tests/direction2/test_d2_plan.py`（5 個 CPU 測試；模擬器與 `train_segment` 以 monkeypatch 取代）。規格依據：§5.5（定稿值）、REQ-OPT-07、REQ-OPT-12、REQ-S1-10、REQ-S1-14、REQ-S1-20／22／25。
+
+| T | 測試 | 對應 REQ | 驗證內容 |
+|---|---|---|---|
+| T-76 | `test_T76_plan_holds_the_final_5_5_values` | §5.5、OPT-12、S1-10 | 23 個 cell／27 個 run；λ=256、T_train=20000、n_S=256、每 50 世代驗證；G_gens 416（主實驗 r=0.9 為 499）；obs_version 明確為 public；S1 12 個 cell、主實驗每個 r 3 個 run；knob、operator、category 與 `vuln_suite.json` 相同；總時數與 §5.5 估算表相符（mean 約 94.8、p95 約 132.4 小時）；pilot 的冷／暖與「永遠報 1」評估設定 |
+| T-77 | `test_T77_plan_is_reproducible_from_the_script` | S1-14 | `scripts/make_d2_run_plan.py` 重新產生的檔案與 run_plan.json 逐位元相同 |
+| T-78 | `test_T78_plan_sha_matches_freeze_and_tampering_is_refused` | S1-13／14 | run_plan.json 的 sha256 ＝ FREEZE.md 的 `RUN_PLAN_SHA256`；改動計畫檔或 FREEZE 缺該行即拒絕；計畫檔內記錄的 spec、vuln_suite、budget.py sha256 與檔案相同 |
+| T-79 | `test_T79_budget_py_with_v2_inputs_agrees_with_the_frozen_values` | OPT-08／09／10 | `budget.decide_params` 搭配 v2 最壞情況輸入 → (256, 20000, 256, 416／499)；搭配 v1 輸入 → n_S=64（說明為何要寫死） |
+| T-80 | `test_T80_plan_entry_takes_the_cell_parameters_from_the_plan` | OPT-07、OPT-12、S1-10、S1-14 | `train --plan --cell`：參數取自計畫檔（含漏洞 operator／knob、M4 錨點）；覆寫 `--lam/--nS/--T/--val-every/--r/--mech` 被拒；改過的計畫檔被拒（sha256）；run 或世代超出計畫被拒；未登記 pilot 決定或與決定矛盾的暖／冷啟動被拒；未接線的診斷 cell 拋 NotImplementedError |
+
+- 另：`test_d2_misc.py::test_T52_gpu_job_manifest` 的 python 路徑改為 `sys.executable`（可攜，斷言不變）。
+- 限制：診斷 cell（REQ-S1-19，7 個）在計畫中登記為 `wired=false`，入口拒絕執行（T-55 仍為 NotImplementedError 的既有狀態）。`pilot_decision.json` 在 pilot 完成後才會產生；之前入口只允許 pilot 兩個 cell。
