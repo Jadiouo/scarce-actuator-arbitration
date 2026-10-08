@@ -316,3 +316,273 @@ def test_status_shows_unpushed_commits(prepo):
     lines = []
     q.print_status(prepo, jobs, out=lines.append, remote_branch=("origin", "direction2-freeze"))
     assert any(x.endswith("origin/direction2-freeze): 2") for x in lines)
+
+
+# ------------------------------------------------------------------------------------------------ --concurrent N (docs/direction2-speedup-plan.md, plan B)
+class _FakeWorker:
+    """Deterministic stand-in for the multitrain worker: jobs sit in flight until `events.get()` completes one (policy = which one)."""
+
+    def __init__(self, pick="first", fail_ids=(), crash_after=None, status="done"):
+        self.inflight, self.started, self.max_inflight, self.fail_ids = [], [], 0, set(fail_ids)
+        self.pick, self.events, self.closed, self.killed, self.status = pick, self, False, False, status
+        self.completed = 0
+        self.crash_after = crash_after
+
+    def submit(self, jid, job, logfile):
+        assert all(j["cell"] != job["cell"] for _, j, _ in self.inflight), "two segments of one cell in flight"
+        self.inflight.append((jid, job, logfile))
+        self.started.append((job["cell"], job["run"], job["g0"], job["g1"]))
+        self.max_inflight = max(self.max_inflight, len(self.inflight))
+
+    def get(self):
+        if self.crash_after is not None and self.completed >= self.crash_after:
+            return {"event": "eof", "returncode": -9}
+        jid, job, logfile = self.inflight.pop(0 if self.pick == "first" else -1)
+        self.completed += 1
+        root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(logfile))))
+        if jid in self.fail_ids:
+            return {"event": "done", "id": jid, "ok": False, "error": "boom"}
+        rec = dict(cell=job["cell"], run_id=job["run"], gen0=job["g0"], gen1=job["g1"], status=self.status, wall_s=1.0)
+        p = q.part_file(root, job)
+        os.makedirs(os.path.dirname(p), exist_ok=True)
+        json.dump(rec, open(p, "w"))
+        c = q.ckpt_file(root, job)
+        os.makedirs(os.path.dirname(c), exist_ok=True)
+        open(c, "wb").write(b"ckpt-%d" % job["g1"])
+        return {"event": "done", "id": jid, "ok": True, "status": self.status}
+
+    def close(self):
+        self.closed = True
+
+    def kill(self):
+        self.killed = True
+
+
+def _conc(repo, jobs, n, worker, **kw):
+    lines = []
+    rc = q.run_queue_concurrent(repo, jobs, n, worker_factory=lambda root, k: worker, out=lines.append, **kw)
+    return rc, lines
+
+
+def test_concurrent_runs_distinct_cells_together_and_keeps_every_cell_in_order(repo):
+    jobs = q.build_jobs(PLAN, "s1")[:34]
+    cells = list(dict.fromkeys(j["cell"] for j in jobs))
+    assert len(cells) >= 3
+    w = _FakeWorker(pick="last")
+    rc, _ = _conc(repo, jobs, 3, w)
+    assert rc == q.EXIT_OK and w.max_inflight == 3 and w.closed
+    assert sorted(w.started) == sorted((j["cell"], j["run"], j["g0"], j["g1"]) for j in jobs)         # same segment set as the sequential runner
+    for c in cells:                                                                                     # per cell: strictly in manifest order
+        mine = [s for s in w.started if s[0] == c]
+        assert mine == [(j["cell"], j["run"], j["g0"], j["g1"]) for j in jobs if j["cell"] == c]
+    assert all(q.is_done(repo, j) for j in jobs)
+    assert int(git(repo, "rev-list", "--count", "HEAD")) >= 34                                           # one commit per segment
+    assert git(repo, "status", "--porcelain", "--", "results/direction2/parts", "results/direction2/ckpt") == ""
+    assert git(repo, "show", "--stat", "--format=", "HEAD").count("results/direction2/") == 2          # a commit holds one part + that run's ckpt
+
+
+def test_concurrent_one_is_the_sequential_order_and_n1_main_path_unchanged(repo, monkeypatch):
+    jobs = q.build_jobs(PLAN, "s1")[:6]
+    w = _FakeWorker()
+    rc, _ = _conc(repo, jobs, 1, w)
+    assert rc == q.EXIT_OK and w.max_inflight == 1 and w.started == [(j["cell"], j["run"], j["g0"], j["g1"]) for j in jobs]
+    called = {}
+    monkeypatch.setattr(q, "run_queue", lambda *a, **k: called.setdefault("seq", 0) or 0)
+    monkeypatch.setattr(q, "run_queue_concurrent", lambda *a, **k: called.setdefault("conc", 1) or 1)
+    monkeypatch.setattr(q, "preflight", lambda *a, **k: None)
+    q.main(["--root", repo, "--no-push"])
+    assert "seq" in called and "conc" not in called                                                     # the default is the untouched sequential runner
+    called.clear()
+    q.main(["--root", repo, "--no-push", "--concurrent", "2"])
+    assert "conc" in called
+
+
+def test_concurrent_skips_finished_segments_and_late_commits(repo):
+    jobs = q.build_jobs(PLAN, "s1")[:12]
+    for j in jobs[:4]:
+        _fake_runner([])(j, [], os.devnull, repo)
+    w = _FakeWorker()
+    rc, _ = _conc(repo, jobs, 2, w)
+    assert rc == q.EXIT_OK and w.started and all((j["cell"], j["run"], j["g0"], j["g1"]) not in w.started for j in jobs[:4])
+    assert len(w.started) == 8
+
+
+def test_concurrent_failure_stops_new_segments_but_commits_the_running_ones(repo):
+    jobs = q.build_jobs(PLAN, "s1")[:34]
+    w = _FakeWorker(pick="last", fail_ids={2})          # the second segment started fails first (while the first one is still running)
+    rc, lines = _conc(repo, jobs, 2, w, rerun_hint="python3 scripts/d2_run_queue.py --concurrent 2")
+    assert rc == q.EXIT_FAIL
+    text = "\n".join(lines)
+    assert "STOPPED" in text and "boom" in text and "--concurrent 2" in text
+    assert w.completed == 2 and len(w.started) == 2 and w.closed                         # nothing started after the failure; the running one finished
+    done = [j for j in jobs if q.is_done(repo, j)]
+    assert len(done) == 1 and (done[0]["cell"], done[0]["run"], done[0]["g0"], done[0]["g1"]) == w.started[0]
+    assert git(repo, "status", "--porcelain", "--", "results/direction2/parts", "results/direction2/ckpt") == ""      # the finished one IS committed
+    hist = [json.loads(x) for x in open(os.path.join(repo, q.RUNLOG_REL, "queue_history.jsonl"))]
+    assert sorted(h["result"] for h in hist) == ["failed", "ok"]
+    w2 = _FakeWorker()                                  # restart: the failed segment (and everything after it) runs, the finished one is skipped
+    rc, _ = _conc(repo, jobs, 2, w2)
+    assert rc == q.EXIT_OK and w.started[0] not in w2.started and w.started[1] in w2.started
+
+
+def test_concurrent_part_not_done_counts_as_failure(repo):
+    jobs = q.build_jobs(PLAN, "s1")[:34]
+    w = _FakeWorker(status="partial")
+    rc, lines = _conc(repo, jobs, 2, w)
+    assert rc == q.EXIT_FAIL and "not 'done'" in "\n".join(lines) and w.completed == 2 and len(w.started) == 2
+
+
+def test_concurrent_worker_crash_is_a_failure(repo):
+    jobs = q.build_jobs(PLAN, "s1")[:12]
+    w = _FakeWorker(crash_after=1)
+    rc, lines = _conc(repo, jobs, 2, w)
+    assert rc == q.EXIT_FAIL and "worker process exited" in "\n".join(lines)
+    assert len([j for j in jobs if q.is_done(repo, j)]) == 1
+
+
+def test_concurrent_max_segments_counts_started_segments(repo):
+    jobs = q.build_jobs(PLAN, "s1")[:34]
+    w = _FakeWorker()
+    rc, lines = _conc(repo, jobs, 3, w, max_segments=5)
+    assert rc == q.EXIT_OK and len(w.started) == 5 and sum(q.is_done(repo, j) for j in jobs) == 5
+    assert "--max-segments" in "\n".join(lines) and "all 34 segments" not in "\n".join(lines)
+
+
+def test_concurrent_interrupt_is_resumable(repo):
+    jobs = q.build_jobs(PLAN, "s1")[:12]
+
+    class Intr(_FakeWorker):
+        def get(self):
+            if self.completed >= 2:
+                raise KeyboardInterrupt
+            return super().get()
+    w = Intr()
+    rc, lines = _conc(repo, jobs, 2, w)
+    assert rc == q.EXIT_INTR and w.killed and "Nothing is lost" in "\n".join(lines)
+    done_now = [j for j in jobs if q.is_done(repo, j)]
+    assert len(done_now) == 2
+    w2 = _FakeWorker()
+    assert _conc(repo, jobs, 2, w2)[0] == q.EXIT_OK and len(w2.started) == 10
+
+
+def test_concurrent_pushes_after_each_committed_segment(prepo):
+    jobs = q.build_jobs(PLAN, "s1")[:8]
+    p = _Push()
+    w = _FakeWorker()
+    rc, _ = _conc(prepo, jobs, 2, w, push_every=1, pusher=p)
+    assert rc == q.EXIT_OK and p.cmds == [["git", "push", "origin", "direction2-freeze"]] * 8
+
+
+def test_concurrent_option_validation(repo, capsys):
+    assert q.main(["--root", repo, "--no-push", "--concurrent", "0"]) in (q.EXIT_REFUSED, q.EXIT_FAIL)
+
+
+# ------------------------------------------------------------------------------------------------ --graph-fallback (red-team H2)
+TB_GRAPH = ("Traceback (most recent call last):\n  File \"/x/arbitration/rl/graphsim.py\", line 185, in _capture\n"
+            "    with torch.cuda.graph(g, capture_error_mode=self.gs.capture_mode):\nRuntimeError: CUDA error: operation not permitted when stream is capturing\n")
+TB_PLAIN = "Traceback (most recent call last):\n  File \"/x/arbitration/rl/cmaes.py\", line 99, in tell\nValueError: matrix is not positive definite\n"
+TB_NAN = ("Traceback (most recent call last):\n  File \"/x/arbitration/rl/graphsim.py\", line 300, in simulate\n"
+          "FloatingPointError: non-finite reward in graph block\n")
+
+
+@pytest.mark.parametrize("text,expect", [(TB_GRAPH, True), (TB_PLAIN, False), (TB_NAN, False), ("", False),
+                                         ("gen 3 ok\ntorch.OutOfMemoryError: CUDA out of memory\n", False),
+                                         ("Traceback (most recent call last):\n  File \"torch/cuda/graphs.py\", line 1, in __exit__\n"
+                                          "torch.AcceleratorError: CUDA error: operation failed due to a previous error during capture\n", True),
+                                         ("Traceback (most recent call last):\n  File \"torch/cuda/graphs.py\", line 1, in replay\nRuntimeError: CUDA graph replay failed\n", True)])
+def test_is_graph_failure_classifier(text, expect):
+    assert q.is_graph_failure(text) is expect
+
+
+def _graph_runner(calls, envs, fail_graph_on=1, tb=TB_GRAPH, fail_always=None, tb_eager=TB_PLAIN):
+    """A fake train.py that fails with `tb` while D2_GRAPH is on (at the fail_graph_on-th call) and behaves normally under eager."""
+    base = _fake_runner(calls)
+
+    def run(job, cmd, logfile, root):
+        envs.append(os.environ.get("D2_GRAPH"))
+        graph_on = os.environ.get("D2_GRAPH", "0") not in ("", "0")
+        gfail = graph_on and len(calls) + 1 == fail_graph_on
+        if gfail or (fail_always is not None and len(envs) == fail_always):
+            calls.append((job["cell"], job["run"], job["g0"], job["g1"]))
+            with open(logfile, "a") as f:
+                f.write("gen 1 fake\n" + (tb if gfail else tb_eager))
+            return 1
+        return base(job, cmd, logfile, root)
+    return run
+
+
+def test_graph_failure_falls_back_to_eager_for_this_and_all_later_segments(repo, monkeypatch):
+    monkeypatch.setenv("D2_GRAPH", "1")
+    jobs = q.build_jobs(PLAN, "s1")[:4]
+    calls, envs, lines = [], [], []
+    rc = q.run_queue(repo, jobs, runner=_graph_runner(calls, envs, fail_graph_on=2), out=lines.append, graph_fallback=True)
+    assert rc == q.EXIT_OK and all(q.is_done(repo, j) for j in jobs)
+    assert envs == ["1", "1", "0", "0", "0"]                                  # seg1 graph ok, seg2 graph fails, seg2 retried eager, seg3/4 eager
+    assert calls[1] == calls[2] == (jobs[1]["cell"], jobs[1]["run"], jobs[1]["g0"], jobs[1]["g1"])       # same segment, same checkpoint
+    text = "\n".join(lines)
+    assert "GRAPH FALLBACK" in text
+    hist = [json.loads(x) for x in open(os.path.join(repo, q.RUNLOG_REL, "queue_history.jsonl"))]
+    assert [h["result"] for h in hist].count("graph_fallback") == 1
+    assert "GRAPH FALLBACK" in open(os.path.join(repo, hist[1]["log"])).read()
+    mark = json.load(open(os.path.join(repo, q.GRAPH_FALLBACK_MARK)))
+    assert mark["cell"] == jobs[1]["cell"] and "stream is capturing" in mark["reason"]
+
+
+def test_graph_fallback_is_only_for_graph_errors_and_only_once(repo, monkeypatch):
+    monkeypatch.setenv("D2_GRAPH", "1")
+    jobs = q.build_jobs(PLAN, "s1")[:3]
+    calls, envs = [], []
+    rc = q.run_queue(repo, jobs, runner=_graph_runner(calls, envs, fail_graph_on=1, tb=TB_PLAIN), out=_quiet, graph_fallback=True)
+    assert rc == q.EXIT_FAIL and len(calls) == 1 and envs == ["1"]            # an ordinary training error: stop, no retry
+    assert not os.path.exists(os.path.join(repo, q.GRAPH_FALLBACK_MARK))
+    # graph error, eager retry fails too (a real error): stop after exactly one retry, no loop
+    calls, envs = [], []
+    rc = q.run_queue(repo, jobs, runner=_graph_runner(calls, envs, fail_graph_on=1, fail_always=2), out=_quiet, graph_fallback=True)
+    assert rc == q.EXIT_FAIL and len(envs) == 2 and envs == ["1", "0"]
+
+
+def test_graph_failure_without_the_option_still_stops(repo, monkeypatch):
+    monkeypatch.setenv("D2_GRAPH", "1")
+    jobs = q.build_jobs(PLAN, "s1")[:3]
+    calls, envs = [], []
+    assert q.run_queue(repo, jobs, runner=_graph_runner(calls, envs, fail_graph_on=1), out=_quiet) == q.EXIT_FAIL and len(envs) == 1
+
+
+def test_no_fallback_when_graph_is_not_on(repo, monkeypatch):
+    monkeypatch.delenv("D2_GRAPH", raising=False)
+    jobs = q.build_jobs(PLAN, "s1")[:2]
+    calls, envs = [], []
+    assert q.run_queue(repo, jobs, runner=_graph_runner(calls, envs, fail_always=1), out=_quiet, graph_fallback=True) == q.EXIT_FAIL and len(envs) == 1
+
+
+def test_main_graph_fallback_options(repo, monkeypatch, capsys):
+    monkeypatch.delenv("D2_GRAPH", raising=False)
+    assert q.main(["--root", repo, "--graph", "--graph-fallback", "--no-push", "--dry-run"]) == q.EXIT_OK          # option is accepted
+    assert q.main(["--root", repo, "--graph-fallback", "--no-push"]) == q.EXIT_REFUSED                   # needs --graph
+    assert q.main(["--root", repo, "--graph", "--graph-fallback", "--concurrent", "2", "--no-push"]) == q.EXIT_REFUSED
+    assert "graph-fallback" in capsys.readouterr().out
+
+
+def test_main_skips_graph_when_fallback_marker_exists(repo, monkeypatch):
+    monkeypatch.delenv("D2_GRAPH", raising=False)
+    os.makedirs(os.path.join(repo, q.RUNLOG_REL), exist_ok=True)
+    json.dump(dict(cell="x", reason="r"), open(os.path.join(repo, q.GRAPH_FALLBACK_MARK), "w"))
+    seen = {}
+    monkeypatch.setattr(q, "preflight", lambda *a, **k: None)
+    monkeypatch.setattr(q, "run_queue", lambda *a, **k: seen.update(env=os.environ.get("D2_GRAPH"), fb=k.get("graph_fallback")) or q.EXIT_OK)
+    assert q.main(["--root", repo, "--graph", "--graph-fallback", "--no-push", "--max-segments", "0"]) == q.EXIT_OK
+    assert seen["env"] in (None, "0")                                                                      # marker => stays eager
+    monkeypatch.delenv("D2_GRAPH", raising=False)
+    os.remove(os.path.join(repo, q.GRAPH_FALLBACK_MARK))
+    q.main(["--root", repo, "--graph", "--graph-fallback", "--no-push", "--max-segments", "0"])
+    assert seen["env"] == "1" and seen["fb"] is True
+    monkeypatch.delenv("D2_GRAPH", raising=False)
+
+
+def test_s1_launch_wrapper_uses_graph_with_fallback():
+    sh = os.path.join(ROOT, "scripts", "d2_s1_launch.sh")
+    body = open(sh).read()
+    assert "--graph" in body and "--graph-fallback" in body and "--stage s1" in body and "--concurrent" not in body
+    assert os.access(sh, os.X_OK)
+    r = subprocess.run(["bash", sh, "--dry-run"], capture_output=True, text=True, cwd=ROOT)
+    assert r.returncode == 0 and "s1_" in r.stdout

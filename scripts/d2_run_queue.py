@@ -23,6 +23,16 @@ to push (and refuses to start, exit 3) unless the checked-out branch IS --branch
 A failed push is logged (runlogs/push.log, queue_history.jsonl) and never stops the training: it is retried after the next finished segment
 (and once more at the end of the queue).  --status shows how many commits are not on <remote>/<branch> yet.
 
+speed-up options (docs/direction2-speedup-plan.md; both off by default, the default behaviour is exactly the sequential runner above).
+  --graph          every segment steps with CUDA graphs (same as D2_GRAPH=1 in the environment): bitwise identical results, faster.
+  --graph-fallback with --graph: a segment that fails with a CUDA-graph error is run again eager (and so are all later segments); other errors stop.
+                   scripts/d2_s1_launch.sh = the S1 command with --graph --graph-fallback.
+  --concurrent N   advance the next segment of N DIFFERENT cells at the same time on the one GPU (CUDA-graph stepping unless --no-graph):
+                   a long-lived worker process (python -m arbitration.rl.multitrain --serve) runs each segment in its own thread + CUDA stream;
+                   every cell's results are bitwise what it would be alone.  The runner keeps: segments of one cell strictly in order, a part+checkpoint
+                   commit (and push) per finished segment, stop at the first failure (segments already running are allowed to finish and are committed;
+                   nothing new is started), skipping finished segments on restart, the same segment list (manifest) and --max-segments (= segments started).
+
 Usage:
   python3 scripts/d2_run_queue.py --dry-run              # list the segments (done / todo)
   python3 scripts/d2_run_queue.py --status               # progress and remaining-time estimate
@@ -56,6 +66,9 @@ MAX_SEG_S = 1500.0
 TRAILER = ("Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>\n"
            "Claude-Session: https://claude.ai/code/session_01Vcin4FdSJwvFyTg4u3RSiU")
 EXIT_OK, EXIT_FAIL, EXIT_REFUSED, EXIT_INTR = 0, 2, 3, 130
+GRAPH_FALLBACK_MARK = os.path.join(RUNLOG_REL, "graph_fallback.json")     # written when a segment fell back from CUDA graphs to eager; delete it to try graphs again
+_GRAPH_MARKERS = ("graphsim", "cudagraph", "cuda graph", "cudagraphs", "stream is capturing", "during capture", "streamcapture", "stream_capture",
+                  "capture_error_mode", "torch/cuda/graphs.py")
 
 
 PROTECTED_BRANCHES = ("master", "main")
@@ -240,6 +253,26 @@ def subprocess_runner(job: Dict[str, Any], cmd: List[str], logfile: str, root: s
             raise
 
 
+def is_graph_failure(log_tail: str) -> bool:
+    """True iff the LAST traceback in `log_tail` comes from the CUDA-graph machinery (arbitration/rl/graphsim.py, torch.cuda.graph capture / replay).
+    An ordinary training error (CMA-ES, out of memory outside a graph, a NaN found by the finite check, ...) is never a graph failure: the eager retry
+    would only repeat it, so such a segment still stops the queue."""
+    i = log_tail.rfind("Traceback (most recent call last)")
+    if i < 0:
+        return False
+    block = log_tail[i:]
+    lines = [x for x in block.splitlines() if x.strip()]
+    last = lines[-1] if lines else ""
+    if last.startswith("FloatingPointError") or "non-finite" in last:
+        return False
+    low = block.lower()
+    return any(m in low for m in _GRAPH_MARKERS)
+
+
+def _graph_on() -> bool:
+    return os.environ.get("D2_GRAPH", "0") not in ("", "0", "false", "False")
+
+
 def _now() -> str:
     return _dt.datetime.now().astimezone().isoformat(timespec="seconds")
 
@@ -255,8 +288,9 @@ def _tail(path: str, n: int) -> List[str]:
 def run_queue(root: str, jobs: List[Dict[str, Any]], *, runner: Callable[[Dict[str, Any], List[str], str, str], int] = subprocess_runner,
               commit: bool = True, max_segments: Optional[int] = None, python: str = sys.executable, out=print,
               rerun_hint: str = "python3 scripts/d2_run_queue.py", push_every: int = 0, remote: str = "origin", branch: str = "direction2-freeze",
-              pusher: Optional[Callable[[str, List[str]], Any]] = None) -> int:
-    """Run the not-yet-done jobs in order.  Returns the exit code (see module doc).  push_every=N>0 (needs commit=True): push after every N committed
+              pusher: Optional[Callable[[str, List[str]], Any]] = None, graph_fallback: bool = False) -> int:
+    """Run the not-yet-done jobs in order.  graph_fallback (needs D2_GRAPH on): if a segment fails with a CUDA-graph error (is_graph_failure) the segment is run
+    again, once, with eager stepping (bitwise the same results, from the same checkpoint) and so are all later segments; any other failure stops as before.  Returns the exit code (see module doc).  push_every=N>0 (needs commit=True): push after every N committed
     segments, retrying after each later segment while a push is outstanding."""
     since_push, pending = 0, False
 
@@ -295,6 +329,11 @@ def run_queue(root: str, jobs: List[Dict[str, Any]], *, runner: Callable[[Dict[s
         out(f"[{start}] START {job_label(j)}  (est {j['est_mean_s'] / 60:.0f}-{j['est_p95_s'] / 60:.0f} min on the reference GPU)\n    log: {logfile}")
         try:
             rc = runner(j, cmd, logfile, root)
+            if rc != 0 and graph_fallback and _graph_on():
+                reason = _graph_failure_reason(logfile)
+                if reason:
+                    _graph_fallback(root, j, logfile, rc, reason, out)
+                    rc = runner(j, cmd, logfile, root)               # the one eager retry, resumes from the segment's checkpoint
         except (KeyboardInterrupt, _Interrupted):
             _finish_log(logfile, root, j, start, t0, "interrupted", None)
             out(f"[{_now()}] INTERRUPTED during {job_label(j)} after {time.time() - t0:.0f} s.\n"
@@ -338,6 +377,199 @@ def run_queue(root: str, jobs: List[Dict[str, Any]], *, runner: Callable[[Dict[s
     return EXIT_OK
 
 
+# ------------------------------------------------------------------------------------------------ concurrent cells (plan B)
+class ProcWorker:
+    """The long-lived `python -m arbitration.rl.multitrain --serve` process: JSON lines in (jobs), JSON lines out (one 'done' per segment)."""
+
+    def __init__(self, cmd: List[str], root: str, logfile: str):
+        import queue
+        import threading
+        self.events: "queue.Queue[Dict[str, Any]]" = queue.Queue()
+        env = dict(os.environ, PYTHONUNBUFFERED="1")
+        self._err = open(logfile, "a")
+        self.p = subprocess.Popen(cmd, cwd=root, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=self._err, text=True, env=env)
+        threading.Thread(target=self._read, daemon=True).start()
+
+    def _read(self) -> None:
+        for line in self.p.stdout:
+            line = line.strip()
+            if line.startswith("{"):
+                try:
+                    self.events.put(json.loads(line))
+                except ValueError:
+                    pass
+        self.events.put({"event": "eof", "returncode": self.p.wait()})
+
+    def submit(self, jid: int, job: Dict[str, Any], logfile: str) -> None:
+        msg = dict(op="run", id=jid, cell=job["cell"], run=job["run"], g0=job["g0"], g1=job["g1"], log=logfile)
+        self.p.stdin.write(json.dumps(msg) + "\n")
+        self.p.stdin.flush()
+
+    def close(self) -> None:
+        try:
+            self.p.stdin.write(json.dumps(dict(op="quit")) + "\n")
+            self.p.stdin.flush()
+            self.p.stdin.close()
+            self.p.wait(timeout=120)
+        except Exception:                                                   # noqa: BLE001
+            self.kill()
+
+    def kill(self) -> None:
+        if self.p.poll() is None:
+            self.p.terminate()
+            try:
+                self.p.wait(timeout=60)
+            except subprocess.TimeoutExpired:
+                self.p.kill()
+                self.p.wait()
+        self._err.close()
+
+
+def run_queue_concurrent(root: str, jobs: List[Dict[str, Any]], concurrent: int, *, worker_factory: Optional[Callable[[str, int], Any]] = None,
+                         commit: bool = True, max_segments: Optional[int] = None, python: str = sys.executable, out=print,
+                         rerun_hint: str = "python3 scripts/d2_run_queue.py", push_every: int = 0, remote: str = "origin",
+                         branch: str = "direction2-freeze", pusher: Optional[Callable[[str, List[str]], Any]] = None, graph: bool = True) -> int:
+    """run_queue with up to `concurrent` segments of DIFFERENT cells in flight.  Same guarantees as run_queue (see the module doc); a worker (real:
+    ProcWorker; tests inject a fake) executes the segments.  Segment order inside a cell is the order of `jobs`; the cells are served in the order
+    of their first segment in `jobs`.  After a failure nothing new is started, the segments still running finish and are committed."""
+    from collections import OrderedDict, deque
+    since_push, pending = 0, False
+
+    def maybe_push(final: bool = False) -> None:
+        nonlocal since_push, pending
+        if push_every <= 0 or not commit:
+            return
+        if final or pending or since_push >= push_every:
+            if try_push(root, remote, branch, out, pusher):
+                since_push, pending = 0, False
+            else:
+                pending = True
+
+    logdir = os.path.join(root, RUNLOG_REL)
+    os.makedirs(logdir, exist_ok=True)
+    todo = [j for j in jobs if not is_done(root, j)]
+    out(f"[{_now()}] {len(jobs) - len(todo)}/{len(jobs)} segments already done; {len(todo)} to run, up to {concurrent} cells at a time"
+        + (f" (at most {max_segments} this time)" if max_segments else ""))
+    for j in jobs:
+        if is_done(root, j) and commit and _dirty(root, part_file(root, j)):      # finished earlier but the commit was interrupted
+            try:
+                commit_paths(root, [part_file(root, j)], f"Direction 2: {job_label(j)} (part, late commit)")
+            except RuntimeError as e:
+                return _fail(out, j, f"late commit failed: {e}", None, rerun_hint, cmd=None, python=python)
+    chains: "OrderedDict[str, deque]" = OrderedDict()
+    for j in todo:
+        chains.setdefault(j["cell"], deque()).append(j)
+    worker = None
+    active: Dict[int, Dict[str, Any]] = {}                  # id -> dict(job, logfile, start, t0)
+    busy: set = set()
+    dispatched, nid = 0, 0
+    failure: Optional[Any] = None
+    stopped_by_limit = False
+    try:
+        while True:
+            while failure is None and len(active) < concurrent and not stopped_by_limit:
+                cell = next((c for c, dq in chains.items() if dq and c not in busy), None)
+                if cell is None:
+                    break
+                if max_segments is not None and dispatched >= max_segments:
+                    stopped_by_limit = True
+                    out(f"[{_now()}] stopping after {dispatched} segment(s) started as requested (--max-segments); rerun the same command to continue")
+                    break
+                j = chains[cell].popleft()
+                if worker is None:
+                    cmd = [python, "-m", "arbitration.rl.multitrain", "--serve", "--max-lanes", str(concurrent)] + ([] if graph else ["--no-graph"])
+                    wlog = os.path.join(logdir, "concurrent_worker.log")
+                    worker = worker_factory(root, concurrent) if worker_factory else ProcWorker(cmd, root, wlog)
+                nid += 1
+                stamp = _dt.datetime.now().strftime("%Y%m%dT%H%M%S")
+                logfile = os.path.join(logdir, f"{j['cell']}__run{j['run']}__g{j['g0']:04d}-{j['g1']:04d}__{stamp}.log")
+                start = _now()
+                with open(logfile, "w") as lf:
+                    lf.write(f"# START {start}\n# CMD   (concurrent worker) {j['cell']} run {j['run']} g0 {j['g0']} g1 {j['g1']}\n# CWD   {root}\n"
+                             f"# HEAD  {_git(root, 'rev-parse', '--short', 'HEAD').stdout.strip()}\n")
+                out(f"[{start}] START {job_label(j)}  (est {j['est_mean_s'] / 60:.0f}-{j['est_p95_s'] / 60:.0f} min on the reference GPU; "
+                    f"{len(active) + 1} cell(s) running)\n    log: {logfile}")
+                active[nid] = dict(job=j, logfile=logfile, start=start, t0=time.time())
+                busy.add(cell)
+                dispatched += 1
+                worker.submit(nid, j, logfile)
+            if not active:
+                break
+            ev = worker.events.get()
+            if ev.get("event") == "eof":
+                for jid, a in list(active.items()):
+                    _finish_log(a["logfile"], root, a["job"], a["start"], a["t0"], "failed", ev.get("returncode"))
+                    if failure is None:
+                        failure = (a["job"], f"the concurrent worker process exited (code {ev.get('returncode')}) while the segment was running",
+                                   a["logfile"])
+                active.clear()
+                break
+            if ev.get("event") != "done" or ev.get("id") not in active:
+                continue
+            a = active.pop(ev["id"])
+            j = a["job"]
+            busy.discard(j["cell"])
+            elapsed = time.time() - a["t0"]
+            status = None
+            if ev.get("ok"):
+                try:
+                    status = parts.read_part(part_file(root, j)).get("status")
+                except (OSError, ValueError):
+                    status = None
+            if not ev.get("ok") or status != "done":
+                reason = (f"segment failed: {ev.get('error')}" if not ev.get("ok")
+                          else f"the segment returned but the part file is not 'done' (status={status!r})")
+                _finish_log(a["logfile"], root, j, a["start"], a["t0"], "failed", 1)
+                if failure is None:
+                    failure = (j, reason, a["logfile"])
+                else:
+                    out(f"[{_now()}] ALSO FAILED: {job_label(j)}: {reason}")
+                continue
+            sha = None
+            if commit:
+                try:
+                    sha = commit_paths(root, [part_file(root, j), ckpt_file(root, j)], f"Direction 2: {job_label(j)} (part + checkpoint)")
+                except RuntimeError as e:
+                    _finish_log(a["logfile"], root, j, a["start"], a["t0"], "commit_failed", 0)
+                    if failure is None:
+                        failure = (j, f"segment finished but {e}", a["logfile"])
+                    continue
+            _finish_log(a["logfile"], root, j, a["start"], a["t0"], "ok", 0, sha)
+            out(f"[{_now()}] DONE  {job_label(j)} in {elapsed / 60:.1f} min (exit 0)" + (f", committed {sha}" if sha else ""))
+            if sha:
+                since_push += 1
+                maybe_push()
+    except (KeyboardInterrupt, _Interrupted):
+        if worker is not None:
+            worker.kill()
+        for a in active.values():
+            _finish_log(a["logfile"], root, a["job"], a["start"], a["t0"], "interrupted", None)
+        out(f"[{_now()}] INTERRUPTED with {len(active)} segment(s) running.\n"
+            f"    Nothing is lost: rerun the same command ({rerun_hint}); each segment resumes from its last checkpoint.")
+        return EXIT_INTR
+    if worker is not None:
+        worker.close()
+    if failure is not None:
+        if since_push or pending:
+            maybe_push(final=True)
+        j, reason, logfile = failure
+        return _fail(out, j, reason, logfile, rerun_hint, cmd=None, python=python)
+    if commit:
+        for j in jobs:
+            ck = ckpt_file(root, j)
+            if os.path.exists(ck) and _dirty(root, ck):
+                try:
+                    commit_paths(root, [ck], f"Direction 2: {j['cell']} run{j['run']} checkpoint")
+                except RuntimeError as e:
+                    out(f"WARNING: could not commit {ck}: {e}")
+    if since_push or pending:
+        maybe_push(final=True)
+    if stopped_by_limit:
+        return EXIT_OK
+    out(f"[{_now()}] all {len(jobs)} segments of this selection are done")
+    return EXIT_OK
+
+
 def _finish_log(logfile: str, root: str, j: Dict[str, Any], start: str, t0: float, result: str, rc: Optional[int], sha: Optional[str] = None) -> None:
     end = _now()
     elapsed = time.time() - t0
@@ -347,6 +579,28 @@ def _finish_log(logfile: str, root: str, j: Dict[str, Any], start: str, t0: floa
                result=result, commit=sha, log=os.path.relpath(logfile, root))
     with open(os.path.join(root, RUNLOG_REL, "queue_history.jsonl"), "a") as f:
         f.write(json.dumps(rec) + "\n")
+
+
+def _graph_failure_reason(logfile: str) -> Optional[str]:
+    tail = "\n".join(_tail(logfile, 200))
+    if not is_graph_failure(tail):
+        return None
+    lines = [x for x in tail[tail.rfind("Traceback (most recent call last)"):].splitlines() if x.strip()]
+    return lines[-1].strip()[:300]
+
+
+def _graph_fallback(root: str, j: Dict[str, Any], logfile: str, rc: int, reason: str, out) -> None:
+    """Switch the rest of this runner to eager stepping and record why (log of the segment, queue_history.jsonl, graph_fallback.json)."""
+    os.environ["D2_GRAPH"] = "0"
+    msg = f"GRAPH FALLBACK at {job_label(j)}: CUDA-graph error (exit {rc}): {reason}; this segment and all later ones run eager (bitwise the same results)"
+    out(f"[{_now()}] {msg}")
+    with open(logfile, "a") as lf:
+        lf.write(f"\n# {msg}\n")
+    rec = dict(cell=j["cell"], run=j["run"], g0=j["g0"], g1=j["g1"], at=_now(), exit_code=rc, reason=reason, log=os.path.relpath(logfile, root))
+    with open(os.path.join(root, RUNLOG_REL, "queue_history.jsonl"), "a") as f:
+        f.write(json.dumps(dict(rec, result="graph_fallback")) + "\n")
+    with open(os.path.join(root, GRAPH_FALLBACK_MARK), "w") as f:
+        json.dump(rec, f, indent=1)
 
 
 def _fail(out, j, reason, logfile, rerun_hint, cmd, python) -> int:
@@ -456,9 +710,22 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     ap.add_argument("--remote", default="origin", help="git remote for the backup push (default origin)")
     ap.add_argument("--branch", default="direction2-freeze", help="the only branch that may be pushed; must be the checked-out branch, never master/main (default direction2-freeze)")
     ap.add_argument("--no-push", action="store_true", help="never push (commits stay local)")
+    ap.add_argument("--concurrent", type=int, default=1, metavar="N", help="advance the next segment of N different cells at the same time (one process, one thread + CUDA "
+                    "stream per cell; bitwise identical to running them alone; implies CUDA-graph stepping).  Default 1 = the sequential runner")
+    ap.add_argument("--graph", action="store_true", help="step with CUDA graphs (D2_GRAPH=1 for every segment): bitwise identical results, faster")
+    ap.add_argument("--graph-fallback", action="store_true", help="with --graph: if a segment fails with a CUDA-graph (capture/replay) error, run that segment and all "
+                    "later ones eager instead (bitwise the same results; any other failure still stops).  Writes runlogs/graph_fallback.json; while it exists the "
+                    "runner starts eager.  Used by scripts/d2_s1_launch.sh")
+    ap.add_argument("--no-graph", action="store_true", help="with --concurrent N>1: eager stepping in the lanes (slower; for comparison)")
     ap.add_argument("--python", default=sys.executable, help="python used for train.py (default: the one running this script)")
     ap.add_argument("--root", default=REPO, help=argparse.SUPPRESS)
     a = ap.parse_args(argv)
+    if a.graph_fallback and not a.graph:
+        print("REFUSED: --graph-fallback only makes sense together with --graph")
+        return EXIT_REFUSED
+    if a.graph_fallback and a.concurrent > 1:
+        print("REFUSED: --graph-fallback is for the sequential runner (one train.py process per segment); it cannot be combined with --concurrent")
+        return EXIT_REFUSED
     root = os.path.realpath(a.root)
     pl = _plan.load_plan(os.path.join(root, PLAN_REL), os.path.join(root, _plan.DEFAULT_FREEZE))     # sha256 must equal FREEZE.md
     try:
@@ -500,8 +767,18 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     def _term(signum, frame):
         raise KeyboardInterrupt
     signal.signal(signal.SIGTERM, _term)
+    if a.graph and a.graph_fallback and os.path.exists(os.path.join(root, GRAPH_FALLBACK_MARK)):
+        print(f"[{_now()}] {GRAPH_FALLBACK_MARK} exists (an earlier segment fell back from CUDA graphs): starting EAGER.  Delete that file to try graphs again.")
+    elif a.graph:
+        os.environ["D2_GRAPH"] = "1"                                  # inherited by every train.py segment process (arbitration.rl.graphsim.from_env)
+    if a.concurrent < 1:
+        print("REFUSED: --concurrent must be >= 1")
+        return EXIT_REFUSED
+    if a.concurrent > 1:
+        return run_queue_concurrent(root, jobs, a.concurrent, commit=not a.no_commit, max_segments=a.max_segments, python=a.python,
+                                    rerun_hint=rerun.strip(), push_every=push_every, remote=a.remote, branch=a.branch, graph=not a.no_graph)
     return run_queue(root, jobs, commit=not a.no_commit, max_segments=a.max_segments, python=a.python, rerun_hint=rerun.strip(),
-                     push_every=push_every, remote=a.remote, branch=a.branch)
+                     push_every=push_every, remote=a.remote, branch=a.branch, graph_fallback=a.graph_fallback)
 
 
 if __name__ == "__main__":
