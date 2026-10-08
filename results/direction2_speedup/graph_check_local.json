@@ -1,0 +1,24 @@
+{
+ "torch": "2.12.0+cu130",
+ "gpu": "NVIDIA GeForce RTX 5070 Ti",
+ "gens": 2,
+ "K": 32,
+ "cells": {
+  "s1_D2_s0.02": {
+   "start_gen": 36,
+   "graph_equals_eager": true,
+   "eager_s_per_gen": 44.07982695102692,
+   "graph_s_per_gen": 14.77415156364441,
+   "concurrent_equals_eager": true
+  },
+  "s1_D4_s0.02": {
+   "start_gen": 0,
+   "graph_equals_eager": true,
+   "eager_s_per_gen": 51.70449471473694,
+   "graph_s_per_gen": 15.554296612739563,
+   "concurrent_equals_eager": true
+  }
+ },
+ "ok": true,
+ "concurrent_wall_s": 50.594982862472534
+}

@@ -410,3 +410,28 @@ def test_G9_real_pilot_data_reproduced_bitwise_by_graph_stepping():
         want = {k: e[k] for k in ("G_mean_curve", "G_best_curve", "sigma_curve")}
     for k, v in want.items():
         assert rec[k] == v, k
+
+
+def test_C5_train_main_wires_graph_only_when_asked(tmp_path, monkeypatch):
+    """`train.main` (the production entry): without --graph / D2_GRAPH the simulator functions are built exactly as before (no `graph` argument at
+    all); with --graph the GraphSim goes to BOTH the training and the validation function; --graph on a non-CUDA device is an error."""
+    from conftest import make_git_root
+    got = {}
+    monkeypatch.setattr(train, "make_sim_fn", lambda *a, **k: got.__setitem__("sim", (a, k)) or (lambda th, s: None))
+    monkeypatch.setattr(train, "make_val_fn", lambda *a, **k: got.__setitem__("val", (a, k)) or (lambda th: 0.0))
+    monkeypatch.setattr(train, "train_segment", lambda cell, run, g0, g1, sim, val, **k: dict(cell=cell["name"], run_id=run, gen0=g0, gen1=g1, status="done"))
+    root = make_git_root(tmp_path, decision="cold")
+    base = ["--test-mode", "--root", root, "--plan", "results/direction2/run_plan.json", "--dev", "cpu", "--cell", "s1_D2_s0.02", "--g1", "50"]
+    monkeypatch.delenv("D2_GRAPH", raising=False)
+    train.main(base)
+    assert "graph" not in got["sim"][1] and "graph" not in got["val"][1]
+    sentinel = object()
+    monkeypatch.setattr(graphsim, "from_env", lambda dev, force=False: sentinel if force else None)
+    train.main(base + ["--graph"])
+    assert got["sim"][1]["graph"] is sentinel and got["val"][1]["graph"] is sentinel
+    monkeypatch.undo()
+    monkeypatch.setattr(train, "make_sim_fn", lambda *a, **k: (lambda th, s: None))
+    monkeypatch.setattr(train, "make_val_fn", lambda *a, **k: (lambda th: 0.0))
+    monkeypatch.setattr(train, "train_segment", lambda *a, **k: dict(status="done"))
+    with pytest.raises(RuntimeError, match="needs a CUDA device"):
+        train.main(base + ["--graph"])
