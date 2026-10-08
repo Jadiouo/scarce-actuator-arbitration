@@ -75,10 +75,11 @@ def select_run(run_results: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
 # ------------------------------------------------------------------------------------------------ simulator glue
 def make_sim_fn(mech: str, T: int, cfg: Dict[str, float], r: float, dev: str = "cuda", T_score: Optional[int] = None,
                 F: int = 25, hidden: int = 2, obs_version: str = "public", operator: Any = None,
-                knob: Any = None) -> Callable[[Any, Sequence[int]], Any]:
+                knob: Any = None, graph: Any = None) -> Callable[[Any, Sequence[int]], Any]:
     """sim_fn(theta_rows, seeds) -> U[P,S] = util_b[:,:,1] at the score snapshot (REQ-OPT-02).  obs_version is forwarded explicitly
     to every MLPPolicy and to env.simulate (REQ-OPT-12).  operator/knob (run plan, REQ-S1-10): train inside the vulnerable environment
-    (vulns.simulate_vuln, public observation only); operator=None is the plain simulator."""
+    (vulns.simulate_vuln, public observation only); operator=None is the plain simulator.  graph: a graphsim.GraphSim -> CUDA-graph stepping
+    (bitwise identical results, see docs/direction2-speedup-plan.md); None = the eager simulator."""
     from . import env, policy
 
     def sim_fn(thetas, seeds_):
@@ -87,20 +88,20 @@ def make_sim_fn(mech: str, T: int, cfg: Dict[str, float], r: float, dev: str = "
             from . import vulns
             if obs_version != "public":
                 raise ValueError("vulnerability environments are simulated with the public observation only")
-            out = vulns.simulate_vuln(operator, knob, mech, T, cfg, pols, seeds_, r=r, dev=dev, T_score=T_score)
+            out = vulns.simulate_vuln(operator, knob, mech, T, cfg, pols, seeds_, r=r, dev=dev, T_score=T_score, graph=graph)
         else:
-            out = env.simulate(mech, T, cfg, pols, seeds_, r=r, T_score=T_score, dev=dev, obs_version=obs_version)
+            out = env.simulate(mech, T, cfg, pols, seeds_, r=r, T_score=T_score, dev=dev, obs_version=obs_version, graph=graph)
         return out["snap"]["util_b"][:, :, 1].cpu().numpy()
     return sim_fn
 
 
 def make_val_fn(mech: str, T_val: int, cfg: Dict[str, float], r: float, dev: str = "cuda", F: int = 25,
                 hidden: int = 2, obs_version: str = "public", operator: Any = None,
-                knob: Any = None) -> Callable[[np.ndarray], float]:
+                knob: Any = None, graph: Any = None) -> Callable[[np.ndarray], float]:
     """G_val(theta): paired mean gain over the 32 VALIDATION seeds (REQ-OPT-06)."""
     vs = list(_seeds.splits()["val"])
     _seeds.require_split(vs, "val")
-    sim = make_sim_fn(mech, T_val, cfg, r, dev, None, F, hidden, obs_version, operator, knob)
+    sim = make_sim_fn(mech, T_val, cfg, r, dev, None, F, hidden, obs_version, operator, knob, graph=graph)
     from . import env
     L = int(cfg["L"])
     Ts = env.score_window(T_val, L) if T_val > L else T_val
@@ -300,10 +301,8 @@ def _locked_paths(a, plan_mod) -> Dict[str, str]:
     return dict(root=root, plan=want_plan, freeze=want_fr)
 
 
-def main(argv: Optional[Sequence[str]] = None) -> None:
+def make_parser():
     import argparse
-    import sys
-    argv = list(sys.argv[1:] if argv is None else argv)
     ap = argparse.ArgumentParser(description="Direction-2 training segment (submit with gpujob).  Every training parameter comes from the frozen run plan.",
                                  allow_abbrev=False)
     ap.add_argument("--cell", required=True)
@@ -316,7 +315,14 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     ap.add_argument("--root", default=None, help="only with --test-mode (a root outside the repository)")
     ap.add_argument("--test-mode", action="store_true", help="unit tests only: --root outside the repository, no freeze-commit ancestry check")
     ap.add_argument("--dev", default="cuda")
-    a = ap.parse_args(argv)
+    ap.add_argument("--graph", action="store_true", help="CUDA-graph stepping (bitwise identical results; same as D2_GRAPH=1; see docs/direction2-speedup-plan.md)")
+    return ap
+
+
+def prepare(a, graph: Any = None) -> Dict[str, Any]:
+    """Everything `main` does before training: every guard of the locked entry (plan / FREEZE / git state / start route / reuse / conditional cells),
+    then the cell's simulator functions.  `a` = the parsed arguments (make_parser()).  Returns dict(cell, run, g0, g1, sim_fn, val_fn, theta0, root).
+    graph: a graphsim.GraphSim (or None = the eager simulator)."""
     from . import env, policy
     from . import plan as _plan
     paths = _locked_paths(a, _plan)
@@ -351,9 +357,23 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         print(f"warm start ({'vulnerability ' + str(operator) if operator is not None else 'plain'} environment of cell {a.cell}): best handwritten on "
               f"train = {best['name']} (G_train {best['G_train']:+.4f})", flush=True)
         theta0 = warm_start_theta(cfg, mech, r, best["scols"], warm_T, tr, a.dev, F, hidden, operator=operator, knob=knob)
-    sim_fn = make_sim_fn(mech, T, cfg, r, a.dev, None, F, hidden, obs_version, operator, knob)
-    val_fn = make_val_fn(mech, T_val or T, cfg, r, a.dev, F, hidden, obs_version, operator, knob)
-    rec = train_segment(cell, a.run, a.g0, a.g1, sim_fn, val_fn, root=root, theta0=theta0, log=lambda s: print(s, flush=True))
+    gkw = {} if graph is None else dict(graph=graph)
+    sim_fn = make_sim_fn(mech, T, cfg, r, a.dev, None, F, hidden, obs_version, operator, knob, **gkw)
+    val_fn = make_val_fn(mech, T_val or T, cfg, r, a.dev, F, hidden, obs_version, operator, knob, **gkw)
+    return dict(cell=cell, run=a.run, g0=a.g0, g1=a.g1, sim_fn=sim_fn, val_fn=val_fn, theta0=theta0, root=root)
+
+
+def main(argv: Optional[Sequence[str]] = None) -> None:
+    import sys
+    argv = list(sys.argv[1:] if argv is None else argv)
+    a = make_parser().parse_args(argv)
+    graph = None
+    if a.graph or os.environ.get("D2_GRAPH", "0") not in ("", "0", "false", "False"):
+        from . import graphsim
+        graph = graphsim.from_env(a.dev, force=True)
+    j = prepare(a, graph)
+    rec = train_segment(j["cell"], j["run"], j["g0"], j["g1"], j["sim_fn"], j["val_fn"], root=j["root"], theta0=j["theta0"],
+                        log=lambda s: print(s, flush=True))
     print(json.dumps({k: rec[k] for k in ("cell", "run_id", "gen0", "gen1", "status", "gens_done", "wall_s", "sigma", "best")
                       if k in rec}, default=float), flush=True)
 

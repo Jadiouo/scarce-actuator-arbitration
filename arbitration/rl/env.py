@@ -196,6 +196,7 @@ class SimState:
         self.susp_seen = zero(B)
         self.force_honest_after: Optional[int] = None
         self._bank = None
+        self._feed = None            # graph stepping only (arbitration/rl/graphsim.py): per-step data supplied by the graph driver; None = eager
 
     def __deepcopy__(self, memo):
         new = self.__class__.__new__(self.__class__)
@@ -234,18 +235,33 @@ def _ensure_block(st: SimState, tt: int) -> None:
     st.blk_idx = bi
 
 
+def _row(st: SimState, name: str, s: int):
+    """The RNG row of the current step for every batch element: block[name][s][sidx] (eager), or the equivalent row the graph driver put
+    in the feed (same values, same layout: Ek[i][sidx] is the same indexing op on a K-row slice of the same block)."""
+    fd = st._feed
+    if fd is None:
+        return getattr(st, name)[s][st.sidx]
+    return getattr(fd, name)[fd.i][st.sidx]
+
+
+def _tfull(like, t):
+    """full_like(like, t) for a Python number t; for the device-side time of graph stepping (0-dim float64 tensor) the same values as an expanded view."""
+    return t.expand_as(like) if torch.is_tensor(t) else torch.full_like(like, t)
+
+
 def _next_types(st: SimState):
-    _ensure_block(st, st.t)
-    z = st.rho_c * st.z + st.sq * st.E[st.t % BLK][st.sidx]
+    if st._feed is None:
+        _ensure_block(st, st.t)
+    z = st.rho_c * st.z + st.sq * _row(st, "E", st.t % BLK)
     return z, transform(torch.special.ndtr(z))
 
 
 def _obs_state(st: SimState, z, u, version: str):
     """Whitelisted obs input for the upcoming round st.t+1 with types z,u.  Returns (state_obj, last_notice_new)."""
-    t = float(st.t + 1)
+    t = float(st.t + 1) if st._feed is None else st._feed.tt
     susp1 = st.susp[:, 1]
     changed = susp1 != st.susp_seen
-    ln = torch.where(changed, torch.full_like(st.last_notice, t), st.last_notice)
+    ln = torch.where(changed, _tfull(st.last_notice, t), st.last_notice)
     kw = dict(z=z[:, 1], u=u[:, 1], susp_minus_t=susp1 - t, since_rounds=t - ln, won_hist=st.won_hist,
               d_hist=st.d_hist, v_prev=st.v[:, 1])
     if version == "public":
@@ -292,6 +308,7 @@ def _bank_for(st: SimState, policy: Any) -> _Bank:
 @torch.no_grad()
 def _step(st: SimState, bank: _Bank, rec: Optional[Dict[str, list]] = None) -> Dict[str, Any]:
     t = st.t + 1
+    tt = t if st._feed is None else st._feed.tt          # time as a number in float64 arithmetic: Python int (eager) / device scalar (graph)
     s = (t - 1) % BLK
     dev, B, mech = st.dev, st.B, st.mech
     sidx, el = st.sidx, bank.el
@@ -310,13 +327,15 @@ def _step(st: SimState, bank: _Bank, rec: Optional[Dict[str, list]] = None) -> D
         st.susp_seen = st.susp[:, 1].clone()
         st.last_notice = ln
     d = bank.act(obs) if bank.has_mlp else None
-    if d is not None and (t == 1 or t % BLK == 0) and not bool(torch.isfinite(d).all()):
+    if d is not None and st._feed is None and (t == 1 or t % BLK == 0) and not bool(torch.isfinite(d).all()):
         # isfinite costs a device sync, so it runs on t==1 and at each RNG block boundary only; NaN/inf cannot hide
         # because it persists in the EMA / d_hist state that feeds the next observation.
         raise FloatingPointError("policy action d is not finite (NaN/inf)")
+    if d is not None and st._feed is not None and st._feed.last:
+        st._feed.bad.logical_or_(~torch.isfinite(d).all())      # graph stepping: no sync inside the graph; the driver reads the flag once per block
     st.z, st.u = z, u
     susp, cus = st.susp, st.cus
-    elig = t > susp
+    elig = tt > susp
     u1 = u[:, 1]
     zero = lambda *sh: torch.zeros(*sh, dtype=F64, device=dev)
     ar = torch.arange(B, device=dev)
@@ -362,19 +381,19 @@ def _step(st: SimState, bank: _Bank, rec: Optional[Dict[str, list]] = None) -> D
     st.pen = st.pen + ~elig
     umax = u.max(1).values
     uw = u.gather(1, idx[:, None])[:, 0]
-    Rs = st.Rn[s][sidx]
+    Rs = _row(st, "Rn", s)
     rd = torch.zeros(B, dtype=torch.bool, device=dev)
     flags, nraid = st.flags, st.nraid
     if mech == "M4":
         mask = elig & (kk[None, :] != idx[:, None])
         tg_o = torch.where(mask, Rs[:, 2:], torch.full_like(Rs[:, 2:], -1.0)).argmax(1)
-        pick_w = win & (st.Rx[s][sidx][:, 0] < st.rw)
+        pick_w = win & (_row(st, "Rx", s)[:, 0] < st.rw)
         tg = torch.where(pick_w, idx, tg_o)
         rd = win & (Rs[:, 0] < st.eps) & (pick_w | mask.any(1))
         viol = (v - u).gather(1, tg[:, None])[:, 0] > 1e-9
         fl = rd & viol
         oht = torch.nn.functional.one_hot(tg, K).bool() & fl[:, None]
-        susp = torch.where(oht, (t + st.L)[:, None].expand(B, K), susp)
+        susp = torch.where(oht, (tt + st.L)[:, None].expand(B, K), susp)
         flags = flags + oht
         nraid = nraid + rd
     win_eff = win & ~rd
@@ -394,7 +413,7 @@ def _step(st: SimState, bank: _Bank, rec: Optional[Dict[str, list]] = None) -> D
     resid = zero(B)
     has = torch.zeros(B, dtype=torch.bool, device=dev)
     if mech == "M3C":
-        o = win_eff & (st.Ua[s][sidx] < st.p_el)
+        o = win_eff & (_row(st, "Ua", s) < st.p_el)
         st.audits = st.audits + o
         st.pend_a[ar, slot] = torch.where(o, idx, -torch.ones_like(idx))
         st.pend_v[ar, slot] = v.gather(1, idx[:, None])[:, 0]
@@ -406,7 +425,7 @@ def _step(st: SimState, bank: _Bank, rec: Optional[Dict[str, list]] = None) -> D
         agc = ag.clamp(min=0)
         wv = u.gather(1, agc[:, None])[:, 0]
         pv = st.pend_v[:, cs]
-        elig_ag = (t > susp).gather(1, agc[:, None])[:, 0]
+        elig_ag = (tt > susp).gather(1, agc[:, None])[:, 0]
         ohag = torch.nn.functional.one_hot(agc, K).to(F64)
         zv = torch.special.ndtri(phi_of(pv, agc, C_MIN))
         zw = torch.special.ndtri(phi_of(wv, agc, C_MIN))
@@ -423,7 +442,7 @@ def _step(st: SimState, bank: _Bank, rec: Optional[Dict[str, list]] = None) -> D
         cus = torch.where(ohag.bool(), newS[:, None].expand(B, K), cus)
         ohe = ohag.bool() & el_[:, None]
         flags = flags + ohe
-        susp = torch.where(ohe, (t + st.L)[:, None].expand(B, K), susp)
+        susp = torch.where(ohe, (tt + st.L)[:, None].expand(B, K), susp)
         liar_flag = el_ & (agc == 1)
         st.pend_a[:, cs] = -1
     if bank.use_ad:
@@ -433,7 +452,7 @@ def _step(st: SimState, bank: _Bank, rec: Optional[Dict[str, list]] = None) -> D
         zvs = torch.special.ndtri(phi_of(sv.clamp(min=0), ones, C_MIN))
         zws = torch.special.ndtri(phi_of(u1, ones, C_MIN))
         rs_ = (zws - st.r_true * zvs) / st.sd_true
-        coin = st.Rx[s][sidx][:, 1] < (ad_c * st.p_el).clamp(max=1.0)
+        coin = _row(st, "Rx", s)[:, 1] < (ad_c * st.p_el).clamp(max=1.0)
         Sn = torch.where(hv & coin, (ssh - rs_ - st.kref).clamp(min=0), ssh)
         st.ssh = torch.where(liar_flag | (Sn > ad_h), torch.zeros_like(Sn), Sn)
         st.shv[:, cs] = -1
@@ -471,7 +490,7 @@ def _consts(mech, cfg, r):
 def simulate(mech: str, T: int, cfg: Dict[str, float], policies: Sequence[Any], seeds: Sequence[int], *, r: float,
              T_score: Optional[int] = None, dev: str = "cuda", obs_version: str = "public",
              diagnostic: bool = False, diagnostic_variant: Optional[str] = None, chunk: Optional[int] = None,
-             init_susp: Optional[Any] = None) -> Dict[str, Any]:
+             init_susp: Optional[Any] = None, graph: Any = None) -> Dict[str, Any]:
     """REQ-ENV-01/03/04/08/09/12: run T rounds for every (policy, seed).
 
     mech in {"M3C","M4"} (NAIVE = M3C with cfg["p"]=0).  cfg keys: p, tol, L, kref, eps, rw, ad_h (frontier names).
@@ -479,6 +498,7 @@ def simulate(mech: str, T: int, cfg: Dict[str, float], policies: Sequence[Any], 
     Returns dict: "final" and "snap" (snapshot at T_score) each a dict of fields
     reg_b[P,S], util_b[P,S,K], pen[P,S,K], flags[P,S,K], audits[P,S], nraid[P,S], susp[P,S,K]; "T_score": int.
     T_score=None means the direction-2 window T - L (the snapshot at t=T-L; the last L rounds are not scored).
+    graph: a graphsim.GraphSim -> CUDA-graph replays of the step loop (bitwise identical; only for plain training runs: MLP policies, no diagnostics).
     diagnostic=True adds "log" (public log, REQ-OBS-10 (a): z1,u1,v1,won1,susp1 each [P,S,T] + "consts"), "obs" [P,S,T,F]
     (b) and "private_log" (cus1, audited_last, u0, u2 at observation time, [P,S,T]).  diagnostic_variant="tail_honest"
     forces v1=u1 for t>T-2L (REQ-ENV-20; only the truncation-bias measurement may use it).  chunk = max elements per slice.
@@ -511,11 +531,17 @@ def simulate(mech: str, T: int, cfg: Dict[str, float], policies: Sequence[Any], 
         bank = _Bank(policies, torch.as_tensor(pid, device=dev), dev, F, obs_version)
         rec = {k: [] for k in ("z1", "u1", "v1", "won1", "susp1", "obs", "cus1", "audited_last", "u0", "u2")} if diagnostic else None
         snap = None
-        for t in range(1, T + 1):
-            _step(st, bank, rec)
-            if t == Ts:
-                snap = {f: getattr(st, f).clone() for f in _FIELDS}
-        parts.append((dict(final={f: getattr(st, f) for f in _FIELDS}, snap=snap, rec=rec)))
+        if (graph is not None and bank.has_mlp and not bank.has_adapter and rec is None and st.force_honest_after is None
+                and st.track_obs):
+            ident = ("env", mech, tuple(sorted(cfg.items())), float(r), obs_version, int(len(e)), int(len(uniq)), dev)
+            snap, final = graph.run(ident, dict(st=st, bank=bank), lambda: _step(st, bank, None), T, Ts, _FIELDS)
+        else:
+            for t in range(1, T + 1):
+                _step(st, bank, rec)
+                if t == Ts:
+                    snap = {f: getattr(st, f).clone() for f in _FIELDS}
+            final = {f: getattr(st, f) for f in _FIELDS}
+        parts.append((dict(final=final, snap=snap, rec=rec)))
     cat = lambda xs: torch.cat(xs, 0).reshape(P, S, *xs[0].shape[1:])
     out = dict(final={f: cat([p["final"][f] for p in parts]) for f in _FIELDS},
                snap={f: cat([p["snap"][f] for p in parts]) for f in _FIELDS}, T_score=Ts)

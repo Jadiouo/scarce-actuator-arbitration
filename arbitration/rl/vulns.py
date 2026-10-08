@@ -19,6 +19,7 @@ This module never refers to test seeds (REQ-SEED-03).
 import json
 import math
 import os
+import types
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Sequence
 
@@ -256,9 +257,10 @@ class _ExtD2(_Ext):
 
     def release(self, hook, st, t, elig, v, susp, log):
         sus = ~elig
-        inputs = {"susp1": susp[:, 1], "v1": v[:, 1], "calm1": self.calm[:, 1], "sus1": sus[:, 1].to(F64), "t": torch.full_like(susp[:, 1], float(t))}
+        tf = t if torch.is_tensor(t) else float(t)          # t: Python int (eager) or the device-side float64 time of graph stepping
+        inputs = {"susp1": susp[:, 1], "v1": v[:, 1], "calm1": self.calm[:, 1], "sus1": sus[:, 1].to(F64), "t": _env._tfull(susp[:, 1], tf)}
         calm_new = _calm_next(sus, v, self.calm)
-        new = _d2_release({"susp": susp, "calm_new": calm_new, "sus": sus, "t": float(t)}, self.knob)
+        new = _d2_release({"susp": susp, "calm_new": calm_new, "sus": sus, "t": tf}, self.knob)
         parole = new != susp
         self.calm = torch.where(parole, torch.zeros_like(calm_new), calm_new)
         if log is not None:
@@ -272,7 +274,7 @@ class _ExtD2(_Ext):
 
 def _d2_release(i, q):
     parole = i["sus"] & (i["calm_new"] >= _kcol(q, None))
-    return torch.where(parole, torch.full_like(i["susp"], i["t"]), i["susp"])
+    return torch.where(parole, _env._tfull(i["susp"], i["t"]), i["susp"])
 
 
 class _ExtD3(_Ext):
@@ -310,7 +312,8 @@ class _ExtD4(_Ext):
 
 
 def _d4_resid(i, eta):
-    use = torch.as_tensor(eta, dtype=F64, device=i["rh"].device) > 0
+    # a Python-number eta is filled on the device (as_tensor(float, device=cuda) is a host-to-device copy, which CUDA graph capture forbids); same value
+    use = (eta if torch.is_tensor(eta) else torch.full((), float(eta), dtype=F64, device=i["rh"].device)) > 0
     rh_c = torch.where(use, i["rh_a_ag"], i["rh"])
     sdh = torch.sqrt((1 - rh_c ** 2).clamp(min=1e-18))
     return torch.where(use, (i["zw"] - rh_c * i["zv"]) / sdh, i["resid"])
@@ -380,6 +383,7 @@ class _HS:
 def _vstep(st, bank, op: Optional[VulnOperator], knob: float, hs: _HS, log: Optional[Dict[str, Dict[str, list]]]) -> None:
     """One round of env._step (M3C), with the five hooks.  Everything outside the hooks is a verbatim copy of the base step."""
     t = st.t + 1
+    tt = t if st._feed is None else st._feed.tt          # time as a number in float64 arithmetic: Python int (eager) / device scalar (graph)
     s = (t - 1) % BLK
     dev, B = st.dev, st.B
     sidx, el = st.sidx, bank.el
@@ -393,7 +397,7 @@ def _vstep(st, bank, op: Optional[VulnOperator], knob: float, hs: _HS, log: Opti
     d = bank.act(obs) if bank.has_mlp else None
     st.z, st.u = z, u
     susp, cus = st.susp, st.cus
-    elig = t > susp
+    elig = tt > susp
     u1 = u[:, 1]
     zero = lambda *sh: torch.zeros(*sh, dtype=F64, device=dev)
     ar = torch.arange(B, device=dev)
@@ -456,10 +460,10 @@ def _vstep(st, bank, op: Optional[VulnOperator], knob: float, hs: _HS, log: Opti
     win = mx >= 0
     st.pen = st.pen + ~elig
     if ex is not None:
-        susp = ex.release(hook, st, t, elig, v, susp, log)
+        susp = ex.release(hook, st, tt, elig, v, susp, log)
     umax = u.max(1).values
     uw = u.gather(1, idx[:, None])[:, 0]
-    Rs = st.Rn[s][sidx]
+    Rs = _env._row(st, "Rn", s)
     rd = torch.zeros(B, dtype=torch.bool, device=dev)
     flags, nraid = st.flags, st.nraid
     win_eff = win & ~rd
@@ -482,7 +486,7 @@ def _vstep(st, bank, op: Optional[VulnOperator], knob: float, hs: _HS, log: Opti
         p_in.update(ex.p_inputs(st, idx))
     p_eff = hook("audit_prob", p_in, one)
     p_used = (p_eff if full else torch.where(idx == 1, p_eff, st.p_el)) if mutated("audit_prob") else st.p_el
-    o = win_eff & (st.Ua[s][sidx] < p_used)
+    o = win_eff & (_env._row(st, "Ua", s) < p_used)
     if ex is not None:
         ex.after_assign(st, idx, win_eff, elig)
     st.audits = st.audits + o
@@ -496,7 +500,7 @@ def _vstep(st, bank, op: Optional[VulnOperator], knob: float, hs: _HS, log: Opti
     is1 = has & (agc == 1)
     wv = u.gather(1, agc[:, None])[:, 0]
     pv = st.pend_v[:, cs]
-    elig_ag = (t > susp).gather(1, agc[:, None])[:, 0]
+    elig_ag = (tt > susp).gather(1, agc[:, None])[:, 0]
     ohag = torch.nn.functional.one_hot(agc, K).to(F64)
     zv = torch.special.ndtri(_env.phi_of(pv, agc, _env.C_MIN))
     zw = torch.special.ndtri(_env.phi_of(wv, agc, _env.C_MIN))
@@ -530,7 +534,7 @@ def _vstep(st, bank, op: Optional[VulnOperator], knob: float, hs: _HS, log: Opti
     # ---- HOOK pause_len (flags of agent 1)
     L_h = hook("pause_len", {"L": st.L, "clean_streak": hs.clean}, liar_flag)
     Lvec = torch.where(liar_flag, L_h, st.L) if mutated("pause_len") else st.L
-    susp = torch.where(ohe, (t + Lvec)[:, None].expand(B, K), susp)
+    susp = torch.where(ohe, (tt + Lvec)[:, None].expand(B, K), susp)
     hs.clean = torch.where(upd & (agc == 1), torch.where(liar_flag, torch.zeros_like(hs.clean), hs.clean + 1), hs.clean)
     st.pend_a[:, cs] = -1
     if bank.use_ad:
@@ -540,7 +544,7 @@ def _vstep(st, bank, op: Optional[VulnOperator], knob: float, hs: _HS, log: Opti
         zvs = torch.special.ndtri(_env.phi_of(sv.clamp(min=0), ones, _env.C_MIN))
         zws = torch.special.ndtri(_env.phi_of(u1, ones, _env.C_MIN))
         rs_ = (zws - st.r_true * zvs) / st.sd_true
-        coin = st.Rx[s][sidx][:, 1] < (ad_c * st.p_el).clamp(max=1.0)
+        coin = _env._row(st, "Rx", s)[:, 1] < (ad_c * st.p_el).clamp(max=1.0)
         Sn2 = torch.where(hv & coin, (ssh - rs_ - st.kref).clamp(min=0), ssh)
         st.ssh = torch.where(liar_flag | (Sn2 > ad_h), torch.zeros_like(Sn2), Sn2)
         st.shv[:, cs] = -1
@@ -565,7 +569,7 @@ def _vstep(st, bank, op: Optional[VulnOperator], knob: float, hs: _HS, log: Opti
 
 def simulate_vuln(operator: Any, knob: Any, mech: str, T: int, cfg: Dict[str, float], policies: Sequence[Any],
                   seeds: Sequence[int], *, r: float, dev: str = "cuda", hook_log: bool = False,
-                  T_score: Optional[int] = None, public_log: bool = False, warm_obs: bool = False) -> Dict[str, Any]:
+                  T_score: Optional[int] = None, public_log: bool = False, warm_obs: bool = False, graph: Any = None) -> Dict[str, Any]:
     """REQ-S1-05: simulate in the vulnerable environment; operator=None must equal env.simulate bitwise.
 
     operator: None | 'O1'..'O6' | 'D1'..'D4' | registered id | VulnOperator; knob: its size parameter (kappa; C for O3; g for O5; s/Q/s/eta for D1..D4);
@@ -574,11 +578,13 @@ def simulate_vuln(operator: Any, knob: Any, mech: str, T: int, cfg: Dict[str, fl
     warm_obs=True (warm start, REQ-OPT-07) additionally returns out['warm_obs'] = dict(obs[P,S,T,F], u1[P,S,T], v1[P,S,T]): the public observation the
     policy sees INSIDE this vulnerable environment and the report it makes (obs tracking does not change the simulation).
     Returns the env.simulate fields ('final', 'snap', 'T_score') and, when hook_log=True, out['hook_log'][hook] =
-    dict(mask=bool[P,S,T], out=[P,S,T], <inputs>=[P,S,T]) for the 5 hooks (inputs are those the hook received in this run)."""
+    dict(mask=bool[P,S,T], out=[P,S,T], <inputs>=[P,S,T]) for the 5 hooks (inputs are those the hook received in this run).
+    graph: a graphsim.GraphSim -> the step loop runs as CUDA-graph replays (bitwise identical; used only for plain training runs: MLP policies, no logs,
+    no rules; anything else runs the eager loop)."""
     op = get_operator(operator)
     has_rule = any(isinstance(p, RulePolicy) for p in policies)
     if op is None and not hook_log and not has_rule and not public_log and not warm_obs:
-        return _env.simulate(mech, T, cfg, policies, seeds, r=r, T_score=T_score, dev=dev, obs_version="public")
+        return _env.simulate(mech, T, cfg, policies, seeds, r=r, T_score=T_score, dev=dev, obs_version="public", graph=graph)
     if mech != "M3C":
         raise ValueError("vulnerability operators and hook logs are defined for the M3C audit block only")
     P, S = len(policies), len(seeds)
@@ -615,12 +621,20 @@ def simulate_vuln(operator: Any, knob: Any, mech: str, T: int, cfg: Dict[str, fl
             hs.rules.append((torch.isin(pid_t, torch.tensor(members, device=dev)), cls(tab, N, dev)))
     log = {h: {"mask": [], "out": []} for h in HOOKS} if hook_log else None
     snap = None
-    for t in range(1, T + 1):
-        _vstep(st, bank, op, knob, hs, log)
-        if t == Ts:
-            snap = {f: getattr(st, f).clone() for f in _env._FIELDS}
+    if graph is not None and bank.has_mlp and not bank.has_adapter and not hs.rules and log is None and hs.plog is None and hs.wrec is None:
+        holder = types.SimpleNamespace(knob=knob)
+        kid = "tensor" if torch.is_tensor(knob) else repr(knob)
+        ident = ("vuln", op.id if op is not None else None, id(op), kid, mech, tuple(sorted(cfg.items())), float(r), int(N), int(len(uniq)), dev)
+        snap, final = graph.run(ident, dict(st=st, bank=bank, hs=hs, holder=holder), lambda: _vstep(st, bank, op, holder.knob, hs, None), T, Ts,
+                                _env._FIELDS)
+    else:
+        for t in range(1, T + 1):
+            _vstep(st, bank, op, knob, hs, log)
+            if t == Ts:
+                snap = {f: getattr(st, f).clone() for f in _env._FIELDS}
+        final = {f: getattr(st, f) for f in _env._FIELDS}
     rs = lambda x: x.reshape(P, S, *x.shape[1:])
-    out = dict(final={f: rs(getattr(st, f)) for f in _env._FIELDS}, snap={f: rs(v) for f, v in snap.items()}, T_score=Ts)
+    out = dict(final={f: rs(final[f]) for f in _env._FIELDS}, snap={f: rs(v) for f, v in snap.items()}, T_score=Ts)
     if warm_obs:
         out["warm_obs"] = dict(obs=rs(torch.stack([x[0] for x in hs.wrec], 1)), u1=rs(torch.stack([x[1] for x in hs.wrec], 1)),
                                v1=rs(torch.stack([x[2] for x in hs.wrec], 1)))
