@@ -133,3 +133,61 @@ def test_serve_protocol_runs_segments_and_reports_failures(tmp_path):
     assert not ev[2]["ok"] and "already has a running segment" in ev[2]["error"]
     assert not ev[3]["ok"] and "boom" in ev[3]["error"]
     assert "started slow" in open(tmp_path / "slow.log").read()
+
+
+# ------------------------------------------------------------------------------------------------ orphan workers (red-team M1)
+def test_serve_eof_without_quit_abandons_running_segments_but_quit_waits(tmp_path):
+    """stdin EOF without 'quit' = the runner died: do not finish the running segments (a restarted runner redoes them); 'quit' waits for them."""
+    import io
+    release = threading.Event()
+    finished = []
+
+    def slow(msg, lane, dev, log):
+        release.wait(5)
+        finished.append(msg["cell"])
+        return dict(status="done")
+    job = json.dumps(dict(op="run", id=1, cell="slow", run=0, g0=0, g1=2))
+    orphan = []
+    rc = multitrain.serve(io.StringIO(job + "\n"), io.StringIO(), graph=False, dev="cpu", run_fn=slow, on_orphan=lambda: orphan.append(1))
+    assert orphan == [1] and rc != 0 and finished == []                      # returned at once, did not join the running segment
+    release.set()
+    import time
+    time.sleep(0.5)                                                          # the abandoned thread (only alive in this test process) ends now
+    finished.clear()
+    orphan2 = []
+    rc = multitrain.serve(io.StringIO(job + "\n" + json.dumps(dict(op="quit")) + "\n"), io.StringIO(), graph=False, dev="cpu", run_fn=slow,
+                          on_orphan=lambda: orphan2.append(1))
+    assert rc == 0 and orphan2 == [] and finished == ["slow"]                # quit: waited for the segment
+
+
+def test_worker_dies_with_its_parent_sigkill(tmp_path):
+    """The real mechanism: prctl(PR_SET_PDEATHSIG) in the worker.  Parent is SIGKILLed; the child must disappear within a few seconds."""
+    import signal
+    import subprocess
+    import sys
+    import time
+    pidf = tmp_path / "child.pid"
+    child = "import os,sys,time; sys.path.insert(0, %r); from arbitration.rl import multitrain; multitrain.die_with_parent(); open(%r,'w').write(str(os.getpid())); time.sleep(120)" % (
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), str(pidf))
+    parent = "import subprocess,sys,time; subprocess.Popen([sys.executable,'-c',%r]); time.sleep(120)" % child
+    p = subprocess.Popen([sys.executable, "-c", parent])
+    for _ in range(300):
+        if pidf.exists() and pidf.read_text():
+            break
+        time.sleep(0.1)
+    cpid = int(pidf.read_text())
+    os.kill(cpid, 0)                                                        # alive
+    p.send_signal(signal.SIGKILL)
+    p.wait()
+    for _ in range(100):
+        try:
+            os.kill(cpid, 0)
+            with open(f"/proc/{cpid}/stat") as f:
+                if f.read().split(")")[1].split()[0] == "Z":
+                    break
+        except (ProcessLookupError, FileNotFoundError):
+            break
+        time.sleep(0.1)
+    else:
+        os.kill(cpid, signal.SIGKILL)
+        pytest.fail("child survived its parent")

@@ -25,6 +25,8 @@ A failed push is logged (runlogs/push.log, queue_history.jsonl) and never stops 
 
 speed-up options (docs/direction2-speedup-plan.md; both off by default, the default behaviour is exactly the sequential runner above).
   --graph          every segment steps with CUDA graphs (same as D2_GRAPH=1 in the environment): bitwise identical results, faster.
+  --graph-fallback with --graph: a segment that fails with a CUDA-graph error is run again eager (and so are all later segments); other errors stop.
+                   scripts/d2_s1_launch.sh = the S1 command with --graph --graph-fallback.
   --concurrent N   advance the next segment of N DIFFERENT cells at the same time on the one GPU (CUDA-graph stepping unless --no-graph):
                    a long-lived worker process (python -m arbitration.rl.multitrain --serve) runs each segment in its own thread + CUDA stream;
                    every cell's results are bitwise what it would be alone.  The runner keeps: segments of one cell strictly in order, a part+checkpoint
@@ -64,6 +66,9 @@ MAX_SEG_S = 1500.0
 TRAILER = ("Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>\n"
            "Claude-Session: https://claude.ai/code/session_01Vcin4FdSJwvFyTg4u3RSiU")
 EXIT_OK, EXIT_FAIL, EXIT_REFUSED, EXIT_INTR = 0, 2, 3, 130
+GRAPH_FALLBACK_MARK = os.path.join(RUNLOG_REL, "graph_fallback.json")     # written when a segment fell back from CUDA graphs to eager; delete it to try graphs again
+_GRAPH_MARKERS = ("graphsim", "cudagraph", "cuda graph", "cudagraphs", "stream is capturing", "during capture", "streamcapture", "stream_capture",
+                  "capture_error_mode", "torch/cuda/graphs.py")
 
 
 PROTECTED_BRANCHES = ("master", "main")
@@ -248,6 +253,26 @@ def subprocess_runner(job: Dict[str, Any], cmd: List[str], logfile: str, root: s
             raise
 
 
+def is_graph_failure(log_tail: str) -> bool:
+    """True iff the LAST traceback in `log_tail` comes from the CUDA-graph machinery (arbitration/rl/graphsim.py, torch.cuda.graph capture / replay).
+    An ordinary training error (CMA-ES, out of memory outside a graph, a NaN found by the finite check, ...) is never a graph failure: the eager retry
+    would only repeat it, so such a segment still stops the queue."""
+    i = log_tail.rfind("Traceback (most recent call last)")
+    if i < 0:
+        return False
+    block = log_tail[i:]
+    lines = [x for x in block.splitlines() if x.strip()]
+    last = lines[-1] if lines else ""
+    if last.startswith("FloatingPointError") or "non-finite" in last:
+        return False
+    low = block.lower()
+    return any(m in low for m in _GRAPH_MARKERS)
+
+
+def _graph_on() -> bool:
+    return os.environ.get("D2_GRAPH", "0") not in ("", "0", "false", "False")
+
+
 def _now() -> str:
     return _dt.datetime.now().astimezone().isoformat(timespec="seconds")
 
@@ -263,8 +288,9 @@ def _tail(path: str, n: int) -> List[str]:
 def run_queue(root: str, jobs: List[Dict[str, Any]], *, runner: Callable[[Dict[str, Any], List[str], str, str], int] = subprocess_runner,
               commit: bool = True, max_segments: Optional[int] = None, python: str = sys.executable, out=print,
               rerun_hint: str = "python3 scripts/d2_run_queue.py", push_every: int = 0, remote: str = "origin", branch: str = "direction2-freeze",
-              pusher: Optional[Callable[[str, List[str]], Any]] = None) -> int:
-    """Run the not-yet-done jobs in order.  Returns the exit code (see module doc).  push_every=N>0 (needs commit=True): push after every N committed
+              pusher: Optional[Callable[[str, List[str]], Any]] = None, graph_fallback: bool = False) -> int:
+    """Run the not-yet-done jobs in order.  graph_fallback (needs D2_GRAPH on): if a segment fails with a CUDA-graph error (is_graph_failure) the segment is run
+    again, once, with eager stepping (bitwise the same results, from the same checkpoint) and so are all later segments; any other failure stops as before.  Returns the exit code (see module doc).  push_every=N>0 (needs commit=True): push after every N committed
     segments, retrying after each later segment while a push is outstanding."""
     since_push, pending = 0, False
 
@@ -303,6 +329,11 @@ def run_queue(root: str, jobs: List[Dict[str, Any]], *, runner: Callable[[Dict[s
         out(f"[{start}] START {job_label(j)}  (est {j['est_mean_s'] / 60:.0f}-{j['est_p95_s'] / 60:.0f} min on the reference GPU)\n    log: {logfile}")
         try:
             rc = runner(j, cmd, logfile, root)
+            if rc != 0 and graph_fallback and _graph_on():
+                reason = _graph_failure_reason(logfile)
+                if reason:
+                    _graph_fallback(root, j, logfile, rc, reason, out)
+                    rc = runner(j, cmd, logfile, root)               # the one eager retry, resumes from the segment's checkpoint
         except (KeyboardInterrupt, _Interrupted):
             _finish_log(logfile, root, j, start, t0, "interrupted", None)
             out(f"[{_now()}] INTERRUPTED during {job_label(j)} after {time.time() - t0:.0f} s.\n"
@@ -550,6 +581,28 @@ def _finish_log(logfile: str, root: str, j: Dict[str, Any], start: str, t0: floa
         f.write(json.dumps(rec) + "\n")
 
 
+def _graph_failure_reason(logfile: str) -> Optional[str]:
+    tail = "\n".join(_tail(logfile, 200))
+    if not is_graph_failure(tail):
+        return None
+    lines = [x for x in tail[tail.rfind("Traceback (most recent call last)"):].splitlines() if x.strip()]
+    return lines[-1].strip()[:300]
+
+
+def _graph_fallback(root: str, j: Dict[str, Any], logfile: str, rc: int, reason: str, out) -> None:
+    """Switch the rest of this runner to eager stepping and record why (log of the segment, queue_history.jsonl, graph_fallback.json)."""
+    os.environ["D2_GRAPH"] = "0"
+    msg = f"GRAPH FALLBACK at {job_label(j)}: CUDA-graph error (exit {rc}): {reason}; this segment and all later ones run eager (bitwise the same results)"
+    out(f"[{_now()}] {msg}")
+    with open(logfile, "a") as lf:
+        lf.write(f"\n# {msg}\n")
+    rec = dict(cell=j["cell"], run=j["run"], g0=j["g0"], g1=j["g1"], at=_now(), exit_code=rc, reason=reason, log=os.path.relpath(logfile, root))
+    with open(os.path.join(root, RUNLOG_REL, "queue_history.jsonl"), "a") as f:
+        f.write(json.dumps(dict(rec, result="graph_fallback")) + "\n")
+    with open(os.path.join(root, GRAPH_FALLBACK_MARK), "w") as f:
+        json.dump(rec, f, indent=1)
+
+
 def _fail(out, j, reason, logfile, rerun_hint, cmd, python) -> int:
     out(f"\n[{_now()}] STOPPED: {job_label(j)} failed.\n    reason: {reason}")
     if logfile:
@@ -660,10 +713,19 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     ap.add_argument("--concurrent", type=int, default=1, metavar="N", help="advance the next segment of N different cells at the same time (one process, one thread + CUDA "
                     "stream per cell; bitwise identical to running them alone; implies CUDA-graph stepping).  Default 1 = the sequential runner")
     ap.add_argument("--graph", action="store_true", help="step with CUDA graphs (D2_GRAPH=1 for every segment): bitwise identical results, faster")
+    ap.add_argument("--graph-fallback", action="store_true", help="with --graph: if a segment fails with a CUDA-graph (capture/replay) error, run that segment and all "
+                    "later ones eager instead (bitwise the same results; any other failure still stops).  Writes runlogs/graph_fallback.json; while it exists the "
+                    "runner starts eager.  Used by scripts/d2_s1_launch.sh")
     ap.add_argument("--no-graph", action="store_true", help="with --concurrent N>1: eager stepping in the lanes (slower; for comparison)")
     ap.add_argument("--python", default=sys.executable, help="python used for train.py (default: the one running this script)")
     ap.add_argument("--root", default=REPO, help=argparse.SUPPRESS)
     a = ap.parse_args(argv)
+    if a.graph_fallback and not a.graph:
+        print("REFUSED: --graph-fallback only makes sense together with --graph")
+        return EXIT_REFUSED
+    if a.graph_fallback and a.concurrent > 1:
+        print("REFUSED: --graph-fallback is for the sequential runner (one train.py process per segment); it cannot be combined with --concurrent")
+        return EXIT_REFUSED
     root = os.path.realpath(a.root)
     pl = _plan.load_plan(os.path.join(root, PLAN_REL), os.path.join(root, _plan.DEFAULT_FREEZE))     # sha256 must equal FREEZE.md
     try:
@@ -705,7 +767,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     def _term(signum, frame):
         raise KeyboardInterrupt
     signal.signal(signal.SIGTERM, _term)
-    if a.graph:
+    if a.graph and a.graph_fallback and os.path.exists(os.path.join(root, GRAPH_FALLBACK_MARK)):
+        print(f"[{_now()}] {GRAPH_FALLBACK_MARK} exists (an earlier segment fell back from CUDA graphs): starting EAGER.  Delete that file to try graphs again.")
+    elif a.graph:
         os.environ["D2_GRAPH"] = "1"                                  # inherited by every train.py segment process (arbitration.rl.graphsim.from_env)
     if a.concurrent < 1:
         print("REFUSED: --concurrent must be >= 1")
@@ -714,7 +778,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         return run_queue_concurrent(root, jobs, a.concurrent, commit=not a.no_commit, max_segments=a.max_segments, python=a.python,
                                     rerun_hint=rerun.strip(), push_every=push_every, remote=a.remote, branch=a.branch, graph=not a.no_graph)
     return run_queue(root, jobs, commit=not a.no_commit, max_segments=a.max_segments, python=a.python, rerun_hint=rerun.strip(),
-                     push_every=push_every, remote=a.remote, branch=a.branch)
+                     push_every=push_every, remote=a.remote, branch=a.branch, graph_fallback=a.graph_fallback)
 
 
 if __name__ == "__main__":

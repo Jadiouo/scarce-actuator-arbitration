@@ -186,6 +186,16 @@ $ echo $!        # 記下這個 PID
 自動 push 選項：`--push-every N`（每 N 段推一次，預設 1）、`--remote`（預設 origin）、`--branch`（預設 direction2-freeze）、`--no-push`（不推）。
 若目前所在分支不是 `--branch`，或 `--branch` 是 master／main，執行器會**拒絕啟動**並告訴你原因（exit code 3）；push 失敗則只記錄，不會中斷訓練，下一段完成時重試。
 
+**加速版（CUDA Graph，結果與上面逐位相同，需要先通過 `python3 scripts/d2_graph_check.py --preflight`，見 `docs/direction2-speedup-plan.md` 第 9 節）**：
+用包裝啟動，不要自己拼 `--graph`：
+
+```bash
+$ bash scripts/d2_s1_launch.sh          # = d2_run_queue.py --stage s1 --push-every 1 --remote origin --branch direction2-freeze --graph --graph-fallback
+```
+
+某段因 graph 例外失敗時，它會自動改用 eager 從該段 checkpoint 續跑（log 與 `runlogs/queue_history.jsonl` 會有 `GRAPH FALLBACK`／`graph_fallback`，並寫
+`runlogs/graph_fallback.json`；刪掉它才會再試 graph）。其他錯誤照舊失敗即停。**watchdog（`~/s1_watchdog.sh`）重啟 runner 的指令請換成 `bash scripts/d2_s1_launch.sh`**。
+
 在 docker 內跑：先照第 4 節進容器，再執行同一行指令。
 
 ---

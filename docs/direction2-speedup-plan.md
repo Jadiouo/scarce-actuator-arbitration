@@ -350,7 +350,35 @@ python3 -m pytest tests/direction2/test_d2_env.py::test_T01_parity_m3c_per_seed 
 python3 scripts/d2_graph_check.py --cell <正在跑的 cell> --cell <另一個 cell> --gens 2        # 結尾印 "ok": true，exit 0
 ```
 （4）是「中途切換」的直接驗收：checkpoint 是 eager 在學校機器上寫的，續跑的 graph 版與 eager 版必須相同。它在 `/tmp` 底下工作，不寫進 repo。
+
+**一鍵版（紅隊 H1 之後的標準作法）**：`--preflight` 把 (1)–(4) 與驗證路徑檢查一次跑完，輸出一份 PASS／FAIL 的 JSON（每步的結果、耗時、學校時間估計）：
+
+```bash
+python3 scripts/d2_graph_check.py --preflight --json-out ~/preflight.json     # 在學校；cell 預設取 repo 裡有 checkpoint 的前兩個 S1 cell
+python3 scripts/d2_graph_check.py --preflight --only 4,H1 --json-out ~/pf_41.json      # 只跑某幾步（名稱前綴：1、2、3、4、H1）
+```
+步驟：`1_cpu_tests`、`2_gpu_graph_tests`、`3_gpu_eager_tests`、`4_checkpoint_continuation_cross_val`、`H1_val_fn_real_size`。
+- 步驟 4 用 `--cross-val`：續跑的那 2 代把 `val_every` 設成「最後一代剛好驗證」，所以被比較的 part／checkpoint 內含**一次正式大小的驗證**（B=64、T_val=100000、另一張圖）與 `best` 的挑選；verdict 會記 `validated`、`val_records_new`、`best_set`，沒有真的驗證到就算失敗。它是 (4) 的超集合。
+- 步驟 H1 用 `--val-cell s1_M4rw0_anchor`（走 `env._step`，其餘 S1 cell 走 `vulns._vstep`）：以固定亂數 θ（或 checkpoint 的 mean）比較 `val_fn` 的 eager／graph 輸出，必須逐位相同。
+- 時間估計見 9.1b。總 verdict 在 JSON 的 `verdict`（PASS/FAIL）、`failed`（失敗步驟名）、`school_estimate_minutes`、`within_60_min`。
 任何一項失敗：**不要切換**，把輸出帶回來（舊程式不受影響）。
+
+### 9.1b `--preflight` 的時間估計（本機實測 × 3 ≈ RTX8000）
+
+本機（RTX 5070 Ti；量測時機器負載很高，CPU 被別的專案佔滿，所以 eager 的數字偏大、偏保守）各步驟牆鐘秒數，與乘 3 的學校估計：
+
+| 步驟 | 內容 | 本機 | 學校估計（×3） |
+|---|---|---|---|
+| 1_cpu_tests | speed／multi／run_queue／graph_check 的 CPU 測試（109 項；torch 多執行緒，CPU 時間約 1230 s，學校核心數少的話會更久） | 310 s | 15.5 分 |
+| 2_gpu_graph_tests | test_d2_speed＋test_d2_multi 的 GPU 測試（45 項） | 73 s | 3.7 分 |
+| 3_gpu_eager_tests | T01、T36、T41（eager 路徑沒被重構弄壞的最便宜三項） | 75 s | 3.8 分 |
+| 4_checkpoint_continuation_cross_val | 2 個 cell 各續跑 2 代（eager／graph／兩 cell 同時）；第一個 cell 的最後一代做正式大小驗證（eager 驗證約 180 s） | 434 s | 21.7 分 |
+| H1_val_fn_real_size | `s1_M4rw0_anchor` 的 `val_fn`，T_val=100000，eager 約 182 s、graph 約 15 s | 200 s | 10 分 |
+| 合計 | | 約 1090 s（18 分） | **約 55 分（≤ 60）** |
+
+- `--full` 另加：全部 CPU 測試（`tests/direction2 -m "not gpu"`，220 項；本機在高負載下 43 分鐘，無負載約 10+ 分鐘）與 T02／T06／T08（本機 +10～15 分，學校 +30～45 分）。學校上這會超過 60 分鐘，建議只在 runner 兩段之間、有空時跑。
+- 預設版刻意把「eager 驗證」只做兩次（一次 vulns 路徑在步驟 4 的第一個 cell，一次 env 路徑在 H1），因為它是最貴的部分。
+- 學校機若比本機慢超過 3 倍，`within_60_min` 會在 JSON 裡反映實測；單步可用 `--only` 分開跑（每步最長約 22 分鐘）。
 
 ### 9.2 切換（在兩段之間）
 
@@ -359,12 +387,22 @@ python3 scripts/d2_graph_check.py --cell <正在跑的 cell> --cell <另一個 c
 3. 把程式帶進學校的 `direction2-freeze`：`git fetch origin direction2-speedup && git merge --no-edit origin/direction2-speedup`。這個分支只動 `arbitration/rl/*.py`、`scripts/*.py`、`tests/direction2/`、`docs/direction2-speedup-plan.md`、`results/direction2_speedup/`，沒有碰 `run_plan.json`、`FREEZE.md`、`pilot_decision.json`、`vuln_suite.json`、parts／ckpt，所以不會有衝突，也不會讓 `verify_repo_state` 拒絕（HEAD 仍是 a72d3d7 的後代）。合併前先用 `git diff --stat HEAD...origin/direction2-speedup` 確認清單。
    - 注意：之後 runner 的 `git push origin direction2-freeze` 會把這些程式 commit 一併推上去。如果希望 `direction2-freeze` 只有結果，就改在新分支（例如 `direction2-run2`）上合併、並用 `--branch direction2-run2` 跑；這會讓結果分散在兩個分支，要事後合併。**由使用者決定**；FREEZE.md 的「程式合併 sha」補登（第 5 節）也由使用者決定。
 4. `python3 scripts/d2_run_queue.py --stage s1 --dry-run`：必須列出同樣的 143 段，done／todo 與切換前一致（只看狀態，不跑任何東西）。
-5. 啟動（第一階段只用 `--graph`，不並行）：
-   `tmux new -s s1 'python3 scripts/d2_run_queue.py --stage s1 --push-every 1 --remote origin --branch direction2-freeze --graph'`
-   同時把 `~/s1_watchdog.sh` 裡的同一行加上 `--graph`（或在腳本開頭 `export D2_GRAPH=1`），再恢復 crontab。
+5. 啟動（第一階段只用 `--graph`，不並行；**用包裝 `scripts/d2_s1_launch.sh`**，它等於 `d2_run_queue.py --stage s1 --push-every 1 --remote origin --branch direction2-freeze --graph --graph-fallback`）：
+   `tmux new -s s1 'bash scripts/d2_s1_launch.sh'`（要指定 venv 的 python 時：`PYTHON=$HOME/scarce-actuator-arbitration/.venv/bin/python bash scripts/d2_s1_launch.sh`；其餘參數照原樣傳給 runner，例如 `--max-segments 1`）。
+   - **watchdog 該用的重啟指令**：把 `~/s1_watchdog.sh` 裡啟動 runner 的那一行換成 `bash scripts/d2_s1_launch.sh`（在 repo 目錄下；`pgrep -af d2_run_queue` 仍然找得到，因為包裝是 `exec` 進 `scripts/d2_run_queue.py --stage s1 ...`）。**不要**再用沒有後備的 `... --graph`：graph 失敗時 watchdog 會連續重啟 3 次然後放棄。
+   - 後備行為（紅隊 H2）：某一段因 CUDA graph 例外（capture／replay，由 log 最後一個 traceback 判斷）失敗時，runner 在該段 log 與 `runlogs/queue_history.jsonl` 記一筆 `graph_fallback`、寫 `runlogs/graph_fallback.json`，然後**同一段從它的 checkpoint 起改用 eager 重跑，之後的段也都用 eager**（結果逐位相同，只是慢）。一般訓練錯誤（NaN、CMA-ES、非 graph 的 OOM…）**不會**重試，仍然失敗即停（exit 2）。只重試一次，不會無限迴圈。
+   - `runlogs/graph_fallback.json` 存在時，包裝一開始就用 eager（watchdog 重啟不會再撞同一個 graph 錯誤）；想再試 graph 就刪掉這個檔案。
+   - `--concurrent` 不能與 `--graph-fallback` 同用（會被拒絕）；第一階段不開 `--concurrent`。`--concurrent` 的 worker 在 runner 被 SIGKILL 時會自行結束（`prctl(PR_SET_PDEATHSIG)`；stdin EOF 但沒有 `quit` 也立刻結束），不再變孤兒（紅隊 M1）。
+   - 同時恢復 crontab。
 6. 第一段完成後檢查：`--status`；新 part 的 `t_step_ms` 應明顯小於之前的段（本機 eager→graph 為 2.6–3.2 倍；學校的倍數要實測）；`G_mean_curve` 的第一點接著上一段的最後一點（曲線沒有斷點，σ 連續）；`git log` 顯示該段的 commit＋push 正常。
 7. 穩定幾段之後才考慮 `--concurrent 2`（加在同一行；需要 12 GB vGPU 上約 1–2 GB 額外記憶體，增益本機 +18%）。
 
 ### 9.3 退回
 
 在任一段完成後停下 runner，拿掉 `--graph`／`--concurrent` 重啟即可：checkpoint 與 part 檔沒有任何 graph 相關內容，退回後的結果與一直用 eager 的結果相同。中途斷線、watchdog 重啟、segment 被中斷也都是從 checkpoint 續跑，和以前一樣。
+
+### 9.5 紅隊後續修補記錄（2026-10-08）
+
+- H1：`scripts/d2_graph_check.py` 新增 `--cross-val`／`--cross-val-cell`（續跑跨過驗證邊界並挑 best）、`--val-cell`（正式大小 `val_fn` eager vs graph）、`--preflight`（9.1 (1)–(4)＋H1，JSON verdict）。測試：`tests/direction2/test_d2_graph_check.py`（CPU 小尺寸，13 項）。本機 GPU 實測全部 PASS：D1（checkpoint g416）／D2（g36）續跑 2 代、第一個 cell 內含正式大小驗證，graph == eager、並行 == eager；`s1_M4rw0_anchor` 的 `val_fn` 兩邊同為 0.14500079156464982。
+- H2：`d2_run_queue.py --graph-fallback`＋`scripts/d2_s1_launch.sh`（見 9.2 第 5 點）。測試在 `test_d2_run_queue.py`（分類器、fallback、只重試一次、非 graph 錯誤仍停、marker 檔、包裝腳本）。
+- M1：`multitrain.die_with_parent()`（`prctl(PR_SET_PDEATHSIG, SIGKILL)`，`--serve` 啟動時呼叫）；`serve` 在 stdin EOF 而沒有 `quit` 時立刻結束（不再把手上的段跑完）。測試在 `test_d2_multi.py`（含真的 SIGKILL 父程序）。

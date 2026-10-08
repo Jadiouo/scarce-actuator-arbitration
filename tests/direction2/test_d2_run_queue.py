@@ -475,3 +475,114 @@ def test_concurrent_pushes_after_each_committed_segment(prepo):
 
 def test_concurrent_option_validation(repo, capsys):
     assert q.main(["--root", repo, "--no-push", "--concurrent", "0"]) in (q.EXIT_REFUSED, q.EXIT_FAIL)
+
+
+# ------------------------------------------------------------------------------------------------ --graph-fallback (red-team H2)
+TB_GRAPH = ("Traceback (most recent call last):\n  File \"/x/arbitration/rl/graphsim.py\", line 185, in _capture\n"
+            "    with torch.cuda.graph(g, capture_error_mode=self.gs.capture_mode):\nRuntimeError: CUDA error: operation not permitted when stream is capturing\n")
+TB_PLAIN = "Traceback (most recent call last):\n  File \"/x/arbitration/rl/cmaes.py\", line 99, in tell\nValueError: matrix is not positive definite\n"
+TB_NAN = ("Traceback (most recent call last):\n  File \"/x/arbitration/rl/graphsim.py\", line 300, in simulate\n"
+          "FloatingPointError: non-finite reward in graph block\n")
+
+
+@pytest.mark.parametrize("text,expect", [(TB_GRAPH, True), (TB_PLAIN, False), (TB_NAN, False), ("", False),
+                                         ("gen 3 ok\ntorch.OutOfMemoryError: CUDA out of memory\n", False),
+                                         ("Traceback (most recent call last):\n  File \"torch/cuda/graphs.py\", line 1, in __exit__\n"
+                                          "torch.AcceleratorError: CUDA error: operation failed due to a previous error during capture\n", True),
+                                         ("Traceback (most recent call last):\n  File \"torch/cuda/graphs.py\", line 1, in replay\nRuntimeError: CUDA graph replay failed\n", True)])
+def test_is_graph_failure_classifier(text, expect):
+    assert q.is_graph_failure(text) is expect
+
+
+def _graph_runner(calls, envs, fail_graph_on=1, tb=TB_GRAPH, fail_always=None, tb_eager=TB_PLAIN):
+    """A fake train.py that fails with `tb` while D2_GRAPH is on (at the fail_graph_on-th call) and behaves normally under eager."""
+    base = _fake_runner(calls)
+
+    def run(job, cmd, logfile, root):
+        envs.append(os.environ.get("D2_GRAPH"))
+        graph_on = os.environ.get("D2_GRAPH", "0") not in ("", "0")
+        gfail = graph_on and len(calls) + 1 == fail_graph_on
+        if gfail or (fail_always is not None and len(envs) == fail_always):
+            calls.append((job["cell"], job["run"], job["g0"], job["g1"]))
+            with open(logfile, "a") as f:
+                f.write("gen 1 fake\n" + (tb if gfail else tb_eager))
+            return 1
+        return base(job, cmd, logfile, root)
+    return run
+
+
+def test_graph_failure_falls_back_to_eager_for_this_and_all_later_segments(repo, monkeypatch):
+    monkeypatch.setenv("D2_GRAPH", "1")
+    jobs = q.build_jobs(PLAN, "s1")[:4]
+    calls, envs, lines = [], [], []
+    rc = q.run_queue(repo, jobs, runner=_graph_runner(calls, envs, fail_graph_on=2), out=lines.append, graph_fallback=True)
+    assert rc == q.EXIT_OK and all(q.is_done(repo, j) for j in jobs)
+    assert envs == ["1", "1", "0", "0", "0"]                                  # seg1 graph ok, seg2 graph fails, seg2 retried eager, seg3/4 eager
+    assert calls[1] == calls[2] == (jobs[1]["cell"], jobs[1]["run"], jobs[1]["g0"], jobs[1]["g1"])       # same segment, same checkpoint
+    text = "\n".join(lines)
+    assert "GRAPH FALLBACK" in text
+    hist = [json.loads(x) for x in open(os.path.join(repo, q.RUNLOG_REL, "queue_history.jsonl"))]
+    assert [h["result"] for h in hist].count("graph_fallback") == 1
+    assert "GRAPH FALLBACK" in open(os.path.join(repo, hist[1]["log"])).read()
+    mark = json.load(open(os.path.join(repo, q.GRAPH_FALLBACK_MARK)))
+    assert mark["cell"] == jobs[1]["cell"] and "stream is capturing" in mark["reason"]
+
+
+def test_graph_fallback_is_only_for_graph_errors_and_only_once(repo, monkeypatch):
+    monkeypatch.setenv("D2_GRAPH", "1")
+    jobs = q.build_jobs(PLAN, "s1")[:3]
+    calls, envs = [], []
+    rc = q.run_queue(repo, jobs, runner=_graph_runner(calls, envs, fail_graph_on=1, tb=TB_PLAIN), out=_quiet, graph_fallback=True)
+    assert rc == q.EXIT_FAIL and len(calls) == 1 and envs == ["1"]            # an ordinary training error: stop, no retry
+    assert not os.path.exists(os.path.join(repo, q.GRAPH_FALLBACK_MARK))
+    # graph error, eager retry fails too (a real error): stop after exactly one retry, no loop
+    calls, envs = [], []
+    rc = q.run_queue(repo, jobs, runner=_graph_runner(calls, envs, fail_graph_on=1, fail_always=2), out=_quiet, graph_fallback=True)
+    assert rc == q.EXIT_FAIL and len(envs) == 2 and envs == ["1", "0"]
+
+
+def test_graph_failure_without_the_option_still_stops(repo, monkeypatch):
+    monkeypatch.setenv("D2_GRAPH", "1")
+    jobs = q.build_jobs(PLAN, "s1")[:3]
+    calls, envs = [], []
+    assert q.run_queue(repo, jobs, runner=_graph_runner(calls, envs, fail_graph_on=1), out=_quiet) == q.EXIT_FAIL and len(envs) == 1
+
+
+def test_no_fallback_when_graph_is_not_on(repo, monkeypatch):
+    monkeypatch.delenv("D2_GRAPH", raising=False)
+    jobs = q.build_jobs(PLAN, "s1")[:2]
+    calls, envs = [], []
+    assert q.run_queue(repo, jobs, runner=_graph_runner(calls, envs, fail_always=1), out=_quiet, graph_fallback=True) == q.EXIT_FAIL and len(envs) == 1
+
+
+def test_main_graph_fallback_options(repo, monkeypatch, capsys):
+    monkeypatch.delenv("D2_GRAPH", raising=False)
+    assert q.main(["--root", repo, "--graph", "--graph-fallback", "--no-push", "--dry-run"]) == q.EXIT_OK          # option is accepted
+    assert q.main(["--root", repo, "--graph-fallback", "--no-push"]) == q.EXIT_REFUSED                   # needs --graph
+    assert q.main(["--root", repo, "--graph", "--graph-fallback", "--concurrent", "2", "--no-push"]) == q.EXIT_REFUSED
+    assert "graph-fallback" in capsys.readouterr().out
+
+
+def test_main_skips_graph_when_fallback_marker_exists(repo, monkeypatch):
+    monkeypatch.delenv("D2_GRAPH", raising=False)
+    os.makedirs(os.path.join(repo, q.RUNLOG_REL), exist_ok=True)
+    json.dump(dict(cell="x", reason="r"), open(os.path.join(repo, q.GRAPH_FALLBACK_MARK), "w"))
+    seen = {}
+    monkeypatch.setattr(q, "preflight", lambda *a, **k: None)
+    monkeypatch.setattr(q, "run_queue", lambda *a, **k: seen.update(env=os.environ.get("D2_GRAPH"), fb=k.get("graph_fallback")) or q.EXIT_OK)
+    assert q.main(["--root", repo, "--graph", "--graph-fallback", "--no-push", "--max-segments", "0"]) == q.EXIT_OK
+    assert seen["env"] in (None, "0")                                                                      # marker => stays eager
+    monkeypatch.delenv("D2_GRAPH", raising=False)
+    os.remove(os.path.join(repo, q.GRAPH_FALLBACK_MARK))
+    q.main(["--root", repo, "--graph", "--graph-fallback", "--no-push", "--max-segments", "0"])
+    assert seen["env"] == "1" and seen["fb"] is True
+    monkeypatch.delenv("D2_GRAPH", raising=False)
+
+
+def test_s1_launch_wrapper_uses_graph_with_fallback():
+    sh = os.path.join(ROOT, "scripts", "d2_s1_launch.sh")
+    body = open(sh).read()
+    assert "--graph" in body and "--graph-fallback" in body and "--stage s1" in body and "--concurrent" not in body
+    assert os.access(sh, os.X_OK)
+    r = subprocess.run(["bash", sh, "--dry-run"], capture_output=True, text=True, cwd=ROOT)
+    assert r.returncode == 0 and "s1_" in r.stdout

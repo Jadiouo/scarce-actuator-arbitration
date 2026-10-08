@@ -25,6 +25,20 @@ from typing import Any, Callable, Dict, List, Optional, Sequence
 from . import train
 
 
+def die_with_parent(sig: int = 9) -> bool:
+    """Linux prctl(PR_SET_PDEATHSIG): the kernel sends `sig` (SIGKILL) to this process when its parent dies, so a worker never outlives a runner that
+    was SIGKILLed / OOM-killed (the restarted runner would run the same segments a second time).  False where unavailable (not Linux)."""
+    try:
+        import ctypes
+        import ctypes.util
+        libc = ctypes.CDLL(ctypes.util.find_library("c") or "libc.so.6", use_errno=True)
+        if libc.prctl(1, sig, 0, 0, 0) != 0:                  # PR_SET_PDEATHSIG = 1
+            return False
+        return os.getppid() != 1                              # parent already gone before the call: nothing will ever signal us
+    except (OSError, AttributeError):
+        return False
+
+
 class Lane:
     """The resources one cell keeps between its segments: a CUDA stream and a GraphSim (graph cache) that was built on that stream."""
 
@@ -106,9 +120,15 @@ def run_concurrent(specs: Sequence[Dict[str, Any]], graph: bool = True, K: int =
     return out                                        # type: ignore[return-value]
 
 
+def _hard_exit() -> None:
+    os._exit(1)
+
+
 def serve(inp=None, outp=None, graph: bool = True, K: int = 32, dev: str = "cuda", max_lanes: int = 3, capture: Optional[bool] = None,
-          run_fn: Optional[Callable[..., Dict[str, Any]]] = None) -> int:
-    """The long-lived worker (see module doc).  Returns 0 after a 'quit' once every running segment has finished."""
+          run_fn: Optional[Callable[..., Dict[str, Any]]] = None, on_orphan: Optional[Callable[[], Any]] = None) -> int:
+    """The long-lived worker (see module doc).  Returns 0 after a 'quit' once every running segment has finished.  stdin EOF WITHOUT a 'quit' means the
+    runner died: `on_orphan` (default: os._exit(1)) is called at once, the running segments are abandoned (a restarted runner redoes them from their
+    checkpoints), and 1 is returned."""
     inp = inp or sys.stdin
     outp = outp or sys.stdout
     run_fn = run_fn or run_segment
@@ -125,12 +145,14 @@ def serve(inp=None, outp=None, graph: bool = True, K: int = 32, dev: str = "cuda
         for c in [c for c, t in running.items() if not t.is_alive()]:
             running.pop(c)
 
+    quit_seen = False
     for line in inp:
         line = line.strip()
         if not line:
             continue
         msg = json.loads(line)
         if msg["op"] == "quit":
+            quit_seen = True
             break
         if msg["op"] != "run":
             emit(dict(event="error", error=f"unknown op {msg['op']!r}"))
@@ -153,6 +175,9 @@ def serve(inp=None, outp=None, graph: bool = True, K: int = 32, dev: str = "cuda
         t = threading.Thread(target=work, name=f"lane-{cell}")
         running[cell] = t
         t.start()
+    if not quit_seen:
+        (on_orphan or _hard_exit)()
+        return 1
     for t in list(running.values()):
         t.join()
     return 0
@@ -168,6 +193,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     ap.add_argument("--job", action="append", default=[], metavar="CELL:RUN:G0:G1", help="without --serve: run these segments together and exit")
     a = ap.parse_args(argv)
     if a.serve:
+        die_with_parent()
         return serve(graph=not a.no_graph, K=a.K, dev=a.dev, max_lanes=a.max_lanes)
     specs = []
     for j in a.job:
