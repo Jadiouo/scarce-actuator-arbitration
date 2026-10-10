@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Main-experiment launcher for the school machine (and what ~/s1_watchdog.sh should run): CUDA-graph stepping with an automatic eager fallback.
+# Main-experiment launcher for the school machine (and what ~/main_watchdog.sh runs): CUDA-graph stepping with an automatic eager fallback.
 #   * starts scripts/d2_run_queue.py with --graph --graph-fallback (sequential: one segment at a time);
 #   * if a segment fails with a CUDA-graph error (capture / replay), the runner logs "GRAPH FALLBACK" (segment log, runlogs/queue_history.jsonl,
 #     runlogs/graph_fallback.json) and runs that segment and all later ones eager from the segment's checkpoint -- bitwise the same results;

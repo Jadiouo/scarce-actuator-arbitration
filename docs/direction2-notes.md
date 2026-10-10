@@ -744,3 +744,12 @@
   - 指標：E = G_RL^V − G_RL^off（逐 seed paired，95% CI）。另報 G_HW^off（36 個 S_HW 的最佳，同 seeds）與 D^off = G_RL^off − G_HW^off。
   - 判讀：E 的 CI 下界 > 0 才算「RL 有利用此漏洞」的證據；E ≈ 0 而 D>0 表示 detected 來自基礎優勢。D2 預期 E 恰為 0（對照組）。
   - 輸出 results/direction2/s1_diag_offknob.json，不修改 s1.json 與任何凍結檔。
+
+## 2026-10-10 主實驗在學校機器開跑（無人看顧）
+
+- 指令（tmux `main`，由 watchdog 啟動）：`PYTHON=~/scarce-actuator-arbitration/.venv/bin/python bash scripts/d2_main_launch.sh`，即 `d2_run_queue.py --stage main --push-every 1 --remote origin --branch direction2-freeze --graph --graph-fallback`（單 cell 循序，絕不加 `--concurrent`）。
+- 共 84 段；`--dry-run` 估計參考 GPU（5070 Ti）24h 平均 / 33h p95。學校機器實測第一段（g0-36）27.3 分、約 45 秒/代（GPU util 約 93%），推估總計約 35 小時（以 `--status` 為準）。無 GRAPH FALLBACK。
+- 開跑前 preflight（`d2_graph_check.py --preflight --skip-concurrent`）：單 cell graph==eager 位元相同、驗證路徑與 val_fn 通過；失敗項皆為已知/環境因素：concurrent（torch 2.6 的 Offset increment 錯誤，與 S1 相同）、一個 CPU 測試因 preflight 用系統 python 缺 numpy（launch wrapper 測試）。
+- 開跑前學校機器上另有他人的 `ztrain` GPU 程式（非本專案），等其結束後才啟動；watchdog 遇到其他 GPU 程式會自動不重啟。
+- watchdog：`~/main_watchdog.sh`（cron 每 15 分鐘 + 開機後 2 分鐘；暫停旗標 `~/MAIN_PAUSED`；計數 `~/.main_restart_count`；日誌 `~/logs/main.log`、`main_exit.log`、`main_watchdog.log`）。說明見 `~/MAIN_README.txt`。S1 的 watchdog 與 `~/crontab.s1.bak` 保留不動。
+- 第一段 commit 42b8c23 已推到 origin/direction2-freeze。
