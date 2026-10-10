@@ -87,3 +87,15 @@ def evaluate_on_test(record: Dict[str, Any], evaluator: Optional[Callable[[list]
     with open(ledger, "w") as f:
         json.dump(done, f, indent=1)
     return out
+
+
+def already_evaluated(cell: str, policy_id: str, ledger_path: Optional[str] = None) -> bool:
+    """True iff (cell, policy_id) is in the ledger (it was evaluated on the test seeds)."""
+    return f"{cell}|{policy_id}" in _load_ledger(DEFAULT_LEDGER if ledger_path is None else ledger_path)
+
+
+def evaluate(record: Dict[str, Any], evaluator: Callable[[list], Dict[str, Any]], *, freeze_path: Optional[str] = None,
+             ledger_path: Optional[str] = None) -> Dict[str, Any]:
+    """Entry for the other modules (s1_eval etc.): fills in the 32 test seeds HERE, so that no other module has to name or build a test seed
+    (REQ-SEED-06); everything else is evaluate_on_test (freeze file, once-per-(cell, policy) ledger, frozen MDE)."""
+    return evaluate_on_test(dict(record, seeds=list(_seeds.splits()["test"])), evaluator, freeze_path=freeze_path, ledger_path=ledger_path)
