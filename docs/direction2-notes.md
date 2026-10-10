@@ -732,3 +732,15 @@
 - S1 143/143 段於 2026-10-10 04:31 完成（EXIT 0，無 watchdog 重啟、無 graph fallback），全部已推上 GitHub。
 - 發現規格要求的 S1 最終評估／組裝程式不存在，依 REQ-MET-04/06/07、REQ-S1-* 補寫（b0f3b0a：arbitration/rl/s1_eval.py、scripts/d2_s1_eval.py；歧義 13 項見 docs/direction2-s1-eval-impl.md）。紅隊（docs/direction2-s1-eval-redteam.md）：無 BLOCKER，13 項歧義都不改變判讀，S1 閘門與 J 表沒有混淆。
 - **揭露（偏離「測試集只用一次」）**：實作者在煙霧測試（本機 gpujob，`--test-mode`，輸出寫在 .scratch/ 後刪除）中，已用真實 test seeds 5000–5031 與真實最終 checkpoint，完整評估過 s1_O1_s0.02、NAIVE 錨點、M4 錨點；部分數字寫進 docs/direction2-s1-eval-impl.md。未寫入正式 ledger。評估為確定性，且評估程式在此之後沒有改動。使用者於 2026-10-10 選擇「接受並公開揭露」：評估程式凍結於 b0f3b0a 的數值相關部分，正式評估照原登記的 test seeds 執行，結果文件必須引用本段。
+
+## 2026-10-10 S1 正式結果與 D2 混淆；事後診斷（執行前登記）
+
+- 正式評估完成（eb57493 val、0cd423b test、ad1ec91 assemble）：S1_pass=true（族外 s=0.02 為 3/3、s=0.01 為 3/3，兩錨點通過），族內 3/6，J7（主實驗未完成）。
+- **D2 無資訊**：s1_D2_s0.02（Q=1100）與 s1_D2_s0.01（Q=1700）的 checkpoint md5 相同，val/test 數字與 G_HW 全同。診斷（.scratch/d2_knob_diag/，CPU、seeds 0–3、T=20000）：接線無誤；RL checkpoint 與 HW dz=0.3 在 Q=1100/1700/inf 下 parole 次數都是 0（暫停期間仍報 v>EPS_REP，最大平靜連續輪數 RL 0、HW 3，L=2500）；參考策略 d2_parole 會觸發且隨 Q 改變。所以 D2 兩格的 D（≈+0.0137）量的是「基礎防守方上 RL 勝過 HW」，不是發現漏洞。
+- **閘門混淆**：REQ-S1-10 的 detected 只比 G_RL^V 與 G_HW^V。若 RL 在基礎機制上本來就勝過 HW，任何漏洞都會被判「找回」。正式閘門照登記報告為通過，但結果文件必須揭露此混淆，並把 D2 列為無資訊；不得寫成「RL 找回 3/3 族外漏洞」而不加限定。
+- **使用者決定（2026-10-10）**：進主實驗前先補一個事後診斷，明確標為事後、探索性，不改變正式閘門。登記如下（執行前寫定）：
+  - 對 10 個漏洞 cell，各取 s1.json 中選定的 checkpoint（checkpoint_gen），在 T=100000、記分到 T−L 下評估兩種環境：(a) 該 cell 的漏洞環境（原 knob）；(b) 同一 operator 的 off_knob（恆等，等於基礎 M3C）。
+  - seeds：val 2000–2031 為主、val2 3000–3031 另報（val 已用於 checkpoint 選取，故 val 結果上偏；val2 未用於選 checkpoint）。不使用 test seeds。
+  - 指標：E = G_RL^V − G_RL^off（逐 seed paired，95% CI）。另報 G_HW^off（36 個 S_HW 的最佳，同 seeds）與 D^off = G_RL^off − G_HW^off。
+  - 判讀：E 的 CI 下界 > 0 才算「RL 有利用此漏洞」的證據；E ≈ 0 而 D>0 表示 detected 來自基礎優勢。D2 預期 E 恰為 0（對照組）。
+  - 輸出 results/direction2/s1_diag_offknob.json，不修改 s1.json 與任何凍結檔。
