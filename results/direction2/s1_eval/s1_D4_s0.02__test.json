@@ -1,0 +1,56 @@
+{
+ "schema": "direction2-s1-eval/1",
+ "stage": "test",
+ "cell": "s1_D4_s0.02",
+ "source_cell": "s1_D4_s0.02",
+ "vuln_id": "D4",
+ "category": "in_family",
+ "size": 0.02,
+ "anchor": false,
+ "T_score": 97500,
+ "test_seed_range": [
+  5000,
+  5031
+ ],
+ "checkpoint": {
+  "gen": 300,
+  "G_val_train": 0.20246552113995492,
+  "theta_sha256": "aeda1053651dfc3da9b5c4ce4b00781d1d3284f94fcfa85d9a334525d57d9c1a",
+  "n_val_records": 8,
+  "run_id": 0
+ },
+ "G_RL": {
+  "mean": 0.20708082903823324,
+  "lo": 0.20195084004637165,
+  "hi": 0.21221081803009484,
+  "half": 0.005129988991861581
+ },
+ "found_G": true,
+ "mde_G": 0.00910286276290604,
+ "git_sha": "eb57493",
+ "MDE_D": 0.01168599604608753,
+ "D": {
+  "mean": -0.014956239975010312,
+  "lo": -0.02488695424264444,
+  "hi": -0.005025525707376185,
+  "half": 0.009930714267634127
+ },
+ "detected": false,
+ "hw_selected": "stealth m=2.0 f=0.5",
+ "G_HW": {
+  "mean": 0.22203706901324355,
+  "lo": 0.21091608465084552,
+  "hi": 0.23315805337564158,
+  "half": 0.01112098436239802
+ },
+ "D_plus_h0": {
+  "mean": -0.014956239975010312,
+  "lo": -0.02488695424264444,
+  "hi": -0.005025525707376185,
+  "half": 0.009930714267634127
+ },
+ "hw_plus_h0_selected": "stealth m=2.0 f=0.5",
+ "MDE_D_plus_h0": 0.01168599604608753,
+ "detected_plus_h0": false,
+ "honest_batches_maxdiff": 0.0
+}

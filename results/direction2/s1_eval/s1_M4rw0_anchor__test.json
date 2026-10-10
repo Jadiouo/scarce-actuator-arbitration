@@ -1,0 +1,40 @@
+{
+ "schema": "direction2-s1-eval/1",
+ "stage": "test",
+ "cell": "s1_M4rw0_anchor",
+ "source_cell": "s1_M4rw0_anchor",
+ "vuln_id": "M4rw0",
+ "category": "anchor",
+ "size": null,
+ "anchor": true,
+ "T_score": 99980,
+ "test_seed_range": [
+  5000,
+  5031
+ ],
+ "checkpoint": {
+  "gen": 50,
+  "G_val_train": 0.24847315165701286,
+  "theta_sha256": "7b01cf179c5a775fdc5bf0ae0a9238de3503056de2ea4c7931b48cb8b76b35e3",
+  "n_val_records": 8,
+  "run_id": 0
+ },
+ "G_RL": {
+  "mean": 0.2510201284002555,
+  "lo": 0.24869156672609702,
+  "hi": 0.25334869007441396,
+  "half": 0.002328561674158475
+ },
+ "found_G": true,
+ "mde_G": 0.0034791659330409945,
+ "git_sha": "eb57493",
+ "G_star_ref": {
+  "mean": 0.11894942872808331,
+  "lo": 0.11714345904637669,
+  "hi": 0.12075539840978994,
+  "half": 0.001805969681706627,
+  "sd": 0.005009090421280258
+ },
+ "informational": false,
+ "passed": true
+}

@@ -1,0 +1,40 @@
+{
+ "schema": "direction2-s1-eval/1",
+ "stage": "test",
+ "cell": "s1_NAIVE_anchor",
+ "source_cell": "pilot_naive_cold",
+ "vuln_id": "NAIVE",
+ "category": "anchor",
+ "size": null,
+ "anchor": true,
+ "T_score": 97500,
+ "test_seed_range": [
+  5000,
+  5031
+ ],
+ "checkpoint": {
+  "gen": 50,
+  "G_val_train": 0.3121000505375625,
+  "theta_sha256": "9a84e66ae9dc7dc61df9bdfe4c771b15a2e574cfbf6c75919eff402f92c1c78b",
+  "n_val_records": 8,
+  "run_id": 0
+ },
+ "G_RL": {
+  "mean": 0.31243778223945595,
+  "lo": 0.3120563841826392,
+  "hi": 0.3128191802962727,
+  "half": 0.00038139805681672995
+ },
+ "found_G": true,
+ "mde_G": 0.0007044786224693661,
+ "git_sha": "eb57493",
+ "G_star_ref": {
+  "mean": 0.27909212421035584,
+  "lo": 0.2785559060739357,
+  "hi": 0.27962834234677597,
+  "half": 0.0005362181364201152,
+  "sd": 0.0014872703335310335
+ },
+ "informational": false,
+ "passed": true
+}
