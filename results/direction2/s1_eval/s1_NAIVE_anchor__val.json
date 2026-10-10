@@ -1,0 +1,50 @@
+{
+ "schema": "direction2-s1-eval/1",
+ "stage": "val",
+ "cell": "s1_NAIVE_anchor",
+ "source_cell": "pilot_naive_cold",
+ "vuln_id": "NAIVE",
+ "category": "anchor",
+ "size": null,
+ "anchor": true,
+ "T": 100000,
+ "T_score": 97500,
+ "val_seeds": [
+  2000,
+  2031
+ ],
+ "checkpoint": {
+  "gen": 50,
+  "G_val_train": 0.3121000505375625,
+  "theta_sha256": "9a84e66ae9dc7dc61df9bdfe4c771b15a2e574cfbf6c75919eff402f92c1c78b",
+  "n_val_records": 8,
+  "run_id": 0
+ },
+ "G_val_recomputed": 0.3121000505375625,
+ "G_val_recompute_absdiff": 0.0,
+ "G_RL_val": {
+  "mean": 0.3121000505375625,
+  "lo": 0.3116032685454395,
+  "hi": 0.3125968325296855,
+  "half": 0.0004967819921229952
+ },
+ "mde_G": 0.0007044786224693661,
+ "git_sha": "620cdd8",
+ "G_star_ref": {
+  "mean": 0.27909212421035584,
+  "lo": 0.2785559060739357,
+  "hi": 0.27962834234677597,
+  "half": 0.0005362181364201152,
+  "sd": 0.0014872703335310335
+ },
+ "G_star_ref_strategy": "dz=2.0",
+ "G_star_ref_recheck": {
+  "mean": 0.27909212421035584,
+  "lo": 0.2785559060739357,
+  "hi": 0.27962834234677597,
+  "half": 0.0005362181364201151
+ },
+ "informational": false,
+ "mde_frozen": 0.0007044786224693661,
+ "wall_s": 243.44465351104736
+}

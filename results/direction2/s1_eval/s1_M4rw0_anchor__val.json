@@ -1,0 +1,50 @@
+{
+ "schema": "direction2-s1-eval/1",
+ "stage": "val",
+ "cell": "s1_M4rw0_anchor",
+ "source_cell": "s1_M4rw0_anchor",
+ "vuln_id": "M4rw0",
+ "category": "anchor",
+ "size": null,
+ "anchor": true,
+ "T": 100000,
+ "T_score": 99980,
+ "val_seeds": [
+  2000,
+  2031
+ ],
+ "checkpoint": {
+  "gen": 50,
+  "G_val_train": 0.24847315165701286,
+  "theta_sha256": "7b01cf179c5a775fdc5bf0ae0a9238de3503056de2ea4c7931b48cb8b76b35e3",
+  "n_val_records": 8,
+  "run_id": 0
+ },
+ "G_val_recomputed": 0.24847315165701286,
+ "G_val_recompute_absdiff": 0.0,
+ "G_RL_val": {
+  "mean": 0.24847315165701286,
+  "lo": 0.2460197245010771,
+  "hi": 0.2509265788129486,
+  "half": 0.002453427155935768
+ },
+ "mde_G": 0.0034791659330409945,
+ "git_sha": "620cdd8",
+ "G_star_ref": {
+  "mean": 0.11894942872808331,
+  "lo": 0.11714345904637669,
+  "hi": 0.12075539840978994,
+  "half": 0.001805969681706627,
+  "sd": 0.005009090421280258
+ },
+ "G_star_ref_strategy": "b=0.3",
+ "G_star_ref_recheck": {
+  "mean": 0.11894942872808331,
+  "lo": 0.11714345904637669,
+  "hi": 0.12075539840978994,
+  "half": 0.0018059696817066266
+ },
+ "informational": false,
+ "mde_frozen": 0.0034791659330409945,
+ "wall_s": 165.13676261901855
+}
