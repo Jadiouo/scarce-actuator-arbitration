@@ -57,6 +57,17 @@ def test_cache_rejects_changed_contract_and_tampered_data(tmp_path):
         diag.cached(p,con)
 
 
+def test_contract_encodes_legacy_infinity_without_changing_runtime_cfg():
+    settings=dict(cfg=env.m3c_config(.5))
+    p=policy.MLPPolicy(obs_version="public")
+    con=diag.contract("tail",settings,[p],["honest"],[2000,2001],100000)
+    assert settings["cfg"]["ad_h"]==float("inf")
+    assert con["settings"]["cfg"]["ad_h"]=={"float_sentinel":"Infinity"}
+    json.dumps(con,allow_nan=False)
+    with pytest.raises(ValueError):
+        diag.contract("tail",dict(cfg=dict(ad_h=float("nan"))),[p],["honest"],[2000],100000)
+
+
 def test_behavior_groups_use_start_of_round_eligibility_and_seed_unit():
     arrays=dict(u1=np.array([[[.2,.4,.6,.8],[.2,.4,.6,.8]]]),
                 v1=np.array([[[.3,.3,.6,.9],[.3,.3,.6,.9]]]),

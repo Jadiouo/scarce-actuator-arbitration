@@ -74,9 +74,18 @@ def pol_id(p):
 
 def contract(stage, settings, pols, names, sd, T):
     seeds.require_split(sd, "val")
-    return dict(schema="postmain-diagnostics/1", stage=stage, protocol_sha256=sha(PROTOCOL),
+    # The frozen simulator legitimately uses ad_h=+inf. Encode that sentinel
+    # only in metadata; the runtime cfg remains unchanged and snapshots must be finite.
+    def sentinel(name):
+        if name not in ("Infinity", "-Infinity"):
+            raise ValueError("NaN in diagnostic settings")
+        return {"float_sentinel": name}
+    stored_settings = json.loads(json.dumps(settings), parse_constant=sentinel)
+    con = dict(schema="postmain-diagnostics/1", stage=stage, protocol_sha256=sha(PROTOCOL),
                 diagnostic_script_sha256=sha(__file__), simulator_sha256=main_eval.code_hash(),
-                settings=settings, names=names, policies=[pol_id(p) for p in pols], seeds=list(sd), T=T)
+                settings=stored_settings, names=names, policies=[pol_id(p) for p in pols], seeds=list(sd), T=T)
+    digest(con)  # Check serializability before starting any simulation.
+    return con
 
 
 def snapshot(out):
