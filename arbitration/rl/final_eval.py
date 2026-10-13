@@ -10,6 +10,7 @@ split, the replay seeds, or anything else) raise ValueError BEFORE anything else
 """
 import json
 import os
+import tempfile
 from typing import Any, Callable, Dict, Optional
 
 import numpy as np
@@ -84,8 +85,17 @@ def evaluate_on_test(record: Dict[str, Any], evaluator: Optional[Callable[[list]
     out.update(cell=record["cell"], policy_id=record["policy_id"], seed_range=[test_seeds[0], test_seeds[-1]], n_seeds=len(test_seeds))
     done[key] = dict(seed_range=out["seed_range"], found_G=bool(out["found_G"]))
     os.makedirs(os.path.dirname(ledger) or ".", exist_ok=True)
-    with open(ledger, "w") as f:
-        json.dump(done, f, indent=1)
+    fd, temporary = tempfile.mkstemp(dir=os.path.dirname(ledger) or ".", prefix=".final-eval-", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w") as f:
+            json.dump(done, f, indent=1)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(temporary, ledger)
+    except BaseException:
+        if os.path.exists(temporary):
+            os.remove(temporary)
+        raise
     return out
 
 
