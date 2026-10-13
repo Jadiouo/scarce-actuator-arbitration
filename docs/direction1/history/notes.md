@@ -254,7 +254,7 @@ T=1e5，評估 seeds 5000–5031，ρ^τ = 0.5/0.8/0.9/0.99。G 分兩欄：非 
 - 反覆出現的弱點：策略集有限（oracle 策略主導；自適應策略實作偏弱）。這正是方向二（RL 對手）要解決的問題。
 
 ### 總結文件（2026-10-06）
-- 總結：docs/direction1-summary.md。數字對照：docs/direction1-number-audit.md，261 筆全部一致。
+- 總結：docs/direction1/results/summary.md。數字對照：docs/direction1/results/number-audit.md，261 筆全部一致。
 - 筆記更正：
   1. 無資訊邊緣灌水在 r=0.95 的 z=2.57，略高於 F3 門檻（屬邊際）。原文寫「r≥0.9 時 ≈0」不精確。F3 的判定仍以 r=0.9（z=1.2）與 r=0.99（為負）為主。
   2. QM 含 oracle 的得利，`o` 變體為 0.090–0.100；0.10–0.15 是 `u` 變體。
@@ -268,7 +268,7 @@ T=1e5，評估 seeds 5000–5031，ρ^τ = 0.5/0.8/0.9/0.99。G 分兩欄：非 
 ### 使用者決定（2026-10-06）：寫短文 → 再做方向二
 修訂後的方向一剩餘計畫（取代原階段 3、4）：
 - **4'. 實證短文**：
-  - 依 docs/direction1-paper-outline.md 撰寫 workshop 等級的短文（英文 LaTeX，標註 working draft），放在 docs/direction1-paper/。
+  - 依 docs/direction1/design/paper-outline.md 撰寫 workshop 等級的短文（英文 LaTeX，標註 working draft），放在 docs/direction1-paper/。
   - 只能使用 direction1-summary.md 與 number-audit 中有出處的數字。
   - 誠實揭露 F1–F4 與理論框架的終止。
 - **4'' 驗證**：逐數字對照，並由紅方做交付前審查，修正後重新編譯。

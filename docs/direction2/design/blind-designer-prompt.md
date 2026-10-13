@@ -10,7 +10,7 @@
   - 規格 §4（觀察與特徵表，含 k、EMA、f01–f25）
   - arbitration/rl/obs.py、arbitration/rl/policy.py
   - tests/direction2/
-  - docs/direction2-notes.md
+  - docs/direction2/history/direction2-notes.md
 
 設計者的工具紀錄由系統保存（subagent transcript）。
 
@@ -25,7 +25,7 @@
 只能讀以下檔案：
 - arbitration/gpu/frontier.py：只看 M3C（派遣時稽核＋CUSUM＋可寬恕懲罰）的實作，以及模擬的時序
 - docs/direction2-spec.md：**只讀 §8.1「漏洞套件」中關於漏洞形式與格式的段落**。不要讀 §4、§5，也不要讀其他章節
-- 嚴禁讀取：arbitration/rl/ 底下的 obs.py、policy.py；tests/ 目錄；docs/direction2-notes.md；規格的其他章節
+- 嚴禁讀取：arbitration/rl/ 底下的 obs.py、policy.py；tests/ 目錄；docs/direction2/history/direction2-notes.md；規格的其他章節
 
 每個漏洞都要寫出：
 1. 名稱。
@@ -39,6 +39,6 @@
 - 至少 2 個需要「特定時序組合」才能利用。
 - 不要設計「任何灌水都能利用」的漏洞。
 
-輸出：寫入 docs/direction2-blind-vulns.md。除此之外不要修改任何檔案，不要 commit，不需要 GPU。
+輸出：寫入 docs/direction2/archive/blind-vulns-contaminated.md。除此之外不要修改任何檔案，不要 commit，不需要 GPU。
 
 回報：繁體中文，150 字以內，列出 4 個漏洞的名稱與一句話說明。

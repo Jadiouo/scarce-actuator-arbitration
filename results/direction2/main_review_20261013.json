@@ -1,0 +1,552 @@
+{
+  "schema": "direction2-main-status-review/1",
+  "review_date": "2026-10-13",
+  "stage": "training_complete_final_test_not_performed",
+  "analysis_device": "CPU",
+  "new_policy_evaluations": 0,
+  "new_test_seed_access": false,
+  "school_commit": "e225845dd49ca29b3e4237ffffc789637ee8f0fb",
+  "github_commit": "d57dfcbb3f678403e7d3c833697eb7db1ad9697f",
+  "github_only_commits": 1,
+  "school_only_commits": 83,
+  "started": "2026-10-10T23:54:09+08:00",
+  "ended": "2026-10-11T22:29:33+08:00",
+  "elapsed_h": 22.59,
+  "expected_segments": 84,
+  "completed_segments": 84,
+  "remote_hashes_verified": 90,
+  "main_test_ledger_entries": [],
+  "runs": [
+    {
+      "cell": "main_M3C_r0.5",
+      "r": 0.5,
+      "run": 0,
+      "generations": 416,
+      "best_gen": 350,
+      "G_val": 0.0330645298358309,
+      "D_val_vs_existing_hw": 0.009451638424049495,
+      "validation_records": [
+        {
+          "gen": 50,
+          "G_val": 0.029157977210255055
+        },
+        {
+          "gen": 100,
+          "G_val": 0.028410409205274743
+        },
+        {
+          "gen": 150,
+          "G_val": 0.029300476155869934
+        },
+        {
+          "gen": 200,
+          "G_val": 0.03042605770710527
+        },
+        {
+          "gen": 250,
+          "G_val": 0.03023491790051356
+        },
+        {
+          "gen": 300,
+          "G_val": 0.03042376008229465
+        },
+        {
+          "gen": 350,
+          "G_val": 0.0330645298358309
+        },
+        {
+          "gen": 400,
+          "G_val": 0.03213527187202793
+        }
+      ],
+      "theta_sha256": "e8165c7441bc5678acee970be5cbd0013a36d173cd2c59e6e4207db728dd9b2f",
+      "action_d_bounds": [
+        -0.04717435375751082,
+        0.17681126517828014
+      ],
+      "last_sigma": 49.016803860340204,
+      "source": "results/direction2/parts/main_M3C_r0.5__run0__g0408-0416.json",
+      "checkpoint_source": "results/direction2/ckpt/main_M3C_r0.5__run0.npz",
+      "duration_s": 13641.4
+    },
+    {
+      "cell": "main_M3C_r0.5",
+      "r": 0.5,
+      "run": 1,
+      "generations": 416,
+      "best_gen": 350,
+      "G_val": 0.030591341316659786,
+      "D_val_vs_existing_hw": 0.006978449904878382,
+      "validation_records": [
+        {
+          "gen": 50,
+          "G_val": 0.028716408555455177
+        },
+        {
+          "gen": 100,
+          "G_val": 0.02882397096089143
+        },
+        {
+          "gen": 150,
+          "G_val": 0.02986500955348635
+        },
+        {
+          "gen": 200,
+          "G_val": 0.030524356399035595
+        },
+        {
+          "gen": 250,
+          "G_val": 0.03014627144867473
+        },
+        {
+          "gen": 300,
+          "G_val": 0.030410665626539688
+        },
+        {
+          "gen": 350,
+          "G_val": 0.030591341316659786
+        },
+        {
+          "gen": 400,
+          "G_val": 0.030057761585962666
+        }
+      ],
+      "theta_sha256": "f8a899c1b558aabfb52d152b24c7e887bd13a433e3689ee640b511ebd8683360",
+      "action_d_bounds": [
+        -0.025929193374956715,
+        0.1698420347769954
+      ],
+      "last_sigma": 2.097304938984906,
+      "source": "results/direction2/parts/main_M3C_r0.5__run1__g0408-0416.json",
+      "checkpoint_source": "results/direction2/ckpt/main_M3C_r0.5__run1.npz",
+      "duration_s": 12086.9
+    },
+    {
+      "cell": "main_M3C_r0.5",
+      "r": 0.5,
+      "run": 2,
+      "generations": 416,
+      "best_gen": 350,
+      "G_val": 0.031621001890349186,
+      "D_val_vs_existing_hw": 0.008008110478567781,
+      "validation_records": [
+        {
+          "gen": 50,
+          "G_val": 0.028506799247997486
+        },
+        {
+          "gen": 100,
+          "G_val": 0.02867376122654798
+        },
+        {
+          "gen": 150,
+          "G_val": 0.028921837309644382
+        },
+        {
+          "gen": 200,
+          "G_val": 0.03119409763860869
+        },
+        {
+          "gen": 250,
+          "G_val": 0.031342695570581336
+        },
+        {
+          "gen": 300,
+          "G_val": 0.030845613071994446
+        },
+        {
+          "gen": 350,
+          "G_val": 0.031621001890349186
+        },
+        {
+          "gen": 400,
+          "G_val": 0.03101803530140773
+        }
+      ],
+      "theta_sha256": "125fc04caa48bf993ee582b411603631f90d4768b561b44b53419c45ec5941f6",
+      "action_d_bounds": [
+        -0.03013323105003576,
+        0.17897556171680615
+      ],
+      "last_sigma": 3.909275814944187,
+      "source": "results/direction2/parts/main_M3C_r0.5__run2__g0408-0416.json",
+      "checkpoint_source": "results/direction2/ckpt/main_M3C_r0.5__run2.npz",
+      "duration_s": 12076.4
+    },
+    {
+      "cell": "main_M3C_r0.9",
+      "r": 0.9,
+      "run": 0,
+      "generations": 499,
+      "best_gen": 450,
+      "G_val": 0.012424668814092077,
+      "D_val_vs_existing_hw": null,
+      "validation_records": [
+        {
+          "gen": 50,
+          "G_val": 0.008858050205433237
+        },
+        {
+          "gen": 100,
+          "G_val": 0.009818686416700726
+        },
+        {
+          "gen": 150,
+          "G_val": 0.01038911065048549
+        },
+        {
+          "gen": 200,
+          "G_val": 0.009435545502966465
+        },
+        {
+          "gen": 250,
+          "G_val": 0.009527453686069016
+        },
+        {
+          "gen": 300,
+          "G_val": 0.010735907211090566
+        },
+        {
+          "gen": 350,
+          "G_val": 0.011340520280978985
+        },
+        {
+          "gen": 400,
+          "G_val": 0.011901294711052383
+        },
+        {
+          "gen": 450,
+          "G_val": 0.012424668814092077
+        }
+      ],
+      "theta_sha256": "30d42fd6f84509edcccbcac89b35e13c649d5fc7cc550a2ba6e7754a8c9f5b3d",
+      "action_d_bounds": [
+        -0.04717593070505851,
+        0.10408038941096172
+      ],
+      "last_sigma": 108.06504013385171,
+      "source": "results/direction2/parts/main_M3C_r0.9__run0__g0477-0499.json",
+      "checkpoint_source": "results/direction2/ckpt/main_M3C_r0.9__run0.npz",
+      "duration_s": 14428.1
+    },
+    {
+      "cell": "main_M3C_r0.9",
+      "r": 0.9,
+      "run": 1,
+      "generations": 499,
+      "best_gen": 400,
+      "G_val": 0.014238717604812306,
+      "D_val_vs_existing_hw": null,
+      "validation_records": [
+        {
+          "gen": 50,
+          "G_val": 0.00979256589613388
+        },
+        {
+          "gen": 100,
+          "G_val": 0.011109190228722442
+        },
+        {
+          "gen": 150,
+          "G_val": 0.01104582739811185
+        },
+        {
+          "gen": 200,
+          "G_val": 0.011751836576029824
+        },
+        {
+          "gen": 250,
+          "G_val": 0.013949582116101896
+        },
+        {
+          "gen": 300,
+          "G_val": 0.013835920090437083
+        },
+        {
+          "gen": 350,
+          "G_val": 0.014011312885043585
+        },
+        {
+          "gen": 400,
+          "G_val": 0.014238717604812306
+        },
+        {
+          "gen": 450,
+          "G_val": 0.014003922602678461
+        }
+      ],
+      "theta_sha256": "5a844807d5774e699c7d7f3a5ddd9bbf4a7fb2cd22eae59d635b324495f3d74f",
+      "action_d_bounds": [
+        -0.0740150178972676,
+        0.13854312085302195
+      ],
+      "last_sigma": 44.58319703778855,
+      "source": "results/direction2/parts/main_M3C_r0.9__run1__g0477-0499.json",
+      "checkpoint_source": "results/direction2/ckpt/main_M3C_r0.9__run1.npz",
+      "duration_s": 14446.7
+    },
+    {
+      "cell": "main_M3C_r0.9",
+      "r": 0.9,
+      "run": 2,
+      "generations": 499,
+      "best_gen": 300,
+      "G_val": 0.013347493690815906,
+      "D_val_vs_existing_hw": null,
+      "validation_records": [
+        {
+          "gen": 50,
+          "G_val": 0.008980866412916875
+        },
+        {
+          "gen": 100,
+          "G_val": 0.009253815319528557
+        },
+        {
+          "gen": 150,
+          "G_val": 0.011955635116334084
+        },
+        {
+          "gen": 200,
+          "G_val": 0.011473989032461732
+        },
+        {
+          "gen": 250,
+          "G_val": 0.013275589266632377
+        },
+        {
+          "gen": 300,
+          "G_val": 0.013347493690815906
+        },
+        {
+          "gen": 350,
+          "G_val": 0.01220803294362316
+        },
+        {
+          "gen": 400,
+          "G_val": 0.011685175514995583
+        },
+        {
+          "gen": 450,
+          "G_val": 0.01213902935800008
+        }
+      ],
+      "theta_sha256": "bc91c48acc69ae807a346acec632ee65ff206f3b7bf60d642a4c1ad313dac6ad",
+      "action_d_bounds": [
+        -0.05664782674189174,
+        0.0934600699336857
+      ],
+      "last_sigma": 46.746853404823135,
+      "source": "results/direction2/parts/main_M3C_r0.9__run2__g0477-0499.json",
+      "checkpoint_source": "results/direction2/ckpt/main_M3C_r0.9__run2.npz",
+      "duration_s": 14462.2
+    }
+  ],
+  "duplicates": [
+    {
+      "cell": "s1_D2_s0.02",
+      "equal": {
+        "best": true,
+        "records": true,
+        "curve_G": true,
+        "curve_Gbest": true,
+        "curve_sigma": true
+      }
+    },
+    {
+      "cell": "s1_D2_s0.01",
+      "equal": {
+        "best": true,
+        "records": true,
+        "curve_G": true,
+        "curve_Gbest": true,
+        "curve_sigma": true
+      }
+    }
+  ],
+  "hw_r05_validation": {
+    "source": "results/direction2/s1_diag_offknob.json",
+    "cell": "s1_D2_s0.02",
+    "json_path": "cells[cell=s1_D2_s0.02].splits.val.G_HW_off",
+    "value": 0.023612891411781405
+  },
+  "duplicate_policy_existing_offknob_diagnostic": {
+    "val": {
+      "seeds": [
+        2000,
+        2031
+      ],
+      "T_score": 97500,
+      "G_RL_V": {
+        "mean": 0.0330645298358309,
+        "lo": 0.028776677450113218,
+        "hi": 0.03735238222154858,
+        "half": 0.004287852385717682
+      },
+      "G_RL_off": {
+        "mean": 0.0330645298358309,
+        "lo": 0.028776677450113218,
+        "hi": 0.03735238222154858,
+        "half": 0.004287852385717682
+      },
+      "E": {
+        "mean": 0.0,
+        "lo": 0.0,
+        "hi": 0.0,
+        "half": 0.0
+      },
+      "G_HW_off": {
+        "name": "dz=0.3",
+        "selected_on": "same seeds as evaluated (optimistic for HW)",
+        "mean": 0.023612891411781405,
+        "lo": 0.01919757616068893,
+        "hi": 0.02802820666287388,
+        "half": 0.004415315251092478
+      },
+      "D_off": {
+        "mean": 0.009451638424049495,
+        "lo": 0.006056419585518399,
+        "hi": 0.012846857262580592,
+        "half": 0.0033952188385310963
+      },
+      "E_ci_lower_gt_0": false,
+      "sanity_vs_s1_eval_val": {
+        "s1_eval": 0.0330645298358309,
+        "absdiff": 0.0,
+        "match": true
+      }
+    },
+    "val2": {
+      "seeds": [
+        3000,
+        3031
+      ],
+      "T_score": 97500,
+      "G_RL_V": {
+        "mean": 0.033210833010305196,
+        "lo": 0.027977574213703924,
+        "hi": 0.038444091806906465,
+        "half": 0.005233258796601271
+      },
+      "G_RL_off": {
+        "mean": 0.033210833010305196,
+        "lo": 0.027977574213703924,
+        "hi": 0.038444091806906465,
+        "half": 0.005233258796601271
+      },
+      "E": {
+        "mean": 0.0,
+        "lo": 0.0,
+        "hi": 0.0,
+        "half": 0.0
+      },
+      "G_HW_off": {
+        "name": "dz=0.3",
+        "selected_on": "same seeds as evaluated (optimistic for HW)",
+        "mean": 0.020875510066599788,
+        "lo": 0.015394696680263243,
+        "hi": 0.026356323452936335,
+        "half": 0.005480813386336545
+      },
+      "D_off": {
+        "mean": 0.012335322943705405,
+        "lo": 0.007673227225893239,
+        "hi": 0.01699741866151757,
+        "half": 0.004662095717812165
+      },
+      "E_ci_lower_gt_0": false
+    }
+  },
+  "artifact_sha256": {
+    "results/direction2/ckpt/main_M3C_r0.5__run0.npz": "cee1614559eabbd91e9124e47631f4b20a36c922e9f75348ea46d0ba479716fd",
+    "results/direction2/ckpt/main_M3C_r0.5__run1.npz": "1b801eb12c4bbc41e3fd0a97411cbd4a3af77747b18b7cdac85bd822590bfae2",
+    "results/direction2/ckpt/main_M3C_r0.5__run2.npz": "72d9293434d3f1118baa0ced45992d38041b9bf610d87ef8d9b4e54ffc953f2a",
+    "results/direction2/ckpt/main_M3C_r0.9__run0.npz": "8635cddcc0dff2004097b03ac86b53a267c9d01c5179f922dbc41b527f5a466f",
+    "results/direction2/ckpt/main_M3C_r0.9__run1.npz": "65dab0cbbfb2319f49e7f417f98ae9e17f4e52c882ca688074f0655fde267cc8",
+    "results/direction2/ckpt/main_M3C_r0.9__run2.npz": "c6bef2bb5850bae3d88b0a35c9524f32d03487fb24dbe38e207421ca7304e2db",
+    "results/direction2/parts/main_M3C_r0.5__run0__g0000-0036.json": "8a83b8adb2d1367f541cc16c29866169fa832b56ef4a14cee6fa4ca26a385884",
+    "results/direction2/parts/main_M3C_r0.5__run0__g0036-0069.json": "80b9523b8a19eed44b884e4891dafb1dffc34f2350e5987a02cfeaf5c320cd18",
+    "results/direction2/parts/main_M3C_r0.5__run0__g0069-0102.json": "b7600543cf8a0ae218ff52f81372c83c70fe45ad23017577e18bb83e90318923",
+    "results/direction2/parts/main_M3C_r0.5__run0__g0102-0138.json": "f945e9a03bff217e7a12ca9b118f8304ebeb62b57050985e261e640b5e196f63",
+    "results/direction2/parts/main_M3C_r0.5__run0__g0138-0171.json": "cc1043b186cf2190c9dba8c7420ae31991d5a9e2f3366c863fa0381da1b2a199",
+    "results/direction2/parts/main_M3C_r0.5__run0__g0171-0204.json": "63ee74ef940c3d2617cca68380aca6c43c038d0ff255b11838ab40b9a35a4e30",
+    "results/direction2/parts/main_M3C_r0.5__run0__g0204-0240.json": "7b8ce878e23465bd5ef80d16e46b39109cbbda235b10b7a63ec3efe5a2b3ed98",
+    "results/direction2/parts/main_M3C_r0.5__run0__g0240-0273.json": "eef663dfc4b2e6a398989e79a35634a79ce10bd429661415ec7f868f2c4abe5c",
+    "results/direction2/parts/main_M3C_r0.5__run0__g0273-0306.json": "bfe931e0d96df87f02a13c2c7d801b780e9a17a484bdbb08a1d55b09fea3c378",
+    "results/direction2/parts/main_M3C_r0.5__run0__g0306-0342.json": "7ca02484a41fc75d888db4f2fa4b826a995d56db85cb598bd8e877e1628e9f4f",
+    "results/direction2/parts/main_M3C_r0.5__run0__g0342-0375.json": "1512dd8da4c1d80ccab43672168110cc7fe770fe9591a1ed609027ff4b6b87e3",
+    "results/direction2/parts/main_M3C_r0.5__run0__g0375-0408.json": "122aaddad6debd94176c19d8fa13da5412e63b63a9a8487b02f547adcca4422c",
+    "results/direction2/parts/main_M3C_r0.5__run0__g0408-0416.json": "85a03009a69cd5c305e3965e0cb31a4f4e8021a121ea054d0333efebd21111c9",
+    "results/direction2/parts/main_M3C_r0.5__run1__g0000-0036.json": "e59a8611b935b5c1f1ebc0d1ea4c0048587052bd24ea34ecaa642cdd35f3520f",
+    "results/direction2/parts/main_M3C_r0.5__run1__g0036-0069.json": "313f7538034f1619cf6fc43348c2ca3c3d72ee1955859ad4843a7a268494d2ce",
+    "results/direction2/parts/main_M3C_r0.5__run1__g0069-0102.json": "dfa89d351658eabce87ba87bd50b1cf56fc52302c22f3f687c70921da5e751d0",
+    "results/direction2/parts/main_M3C_r0.5__run1__g0102-0138.json": "297d09f89bc227eda9cf8d60857946f053455151d998240a4bc685aabb65e980",
+    "results/direction2/parts/main_M3C_r0.5__run1__g0138-0171.json": "4f8e7eae0b51037369dc6272f1b5be2dbe33e0d962fff579e36e18d1d063d29b",
+    "results/direction2/parts/main_M3C_r0.5__run1__g0171-0204.json": "f7724cee00f2d0be551ee398d8bde8b36eed790a80676d42409d318ee2d1c8a4",
+    "results/direction2/parts/main_M3C_r0.5__run1__g0204-0240.json": "db9b2f8da0b6801157a8c31cce71c693e30bfe8d95ff939f1787064967468f6c",
+    "results/direction2/parts/main_M3C_r0.5__run1__g0240-0273.json": "266cc821518db46d4df90042621b6922918ac2d0714b9637a7910efe02e03053",
+    "results/direction2/parts/main_M3C_r0.5__run1__g0273-0306.json": "a669642f96b64446fe894147859ed9f321f8c6df2255f053a7e3975f40e1e686",
+    "results/direction2/parts/main_M3C_r0.5__run1__g0306-0342.json": "5b0bd4f48605de0e34db74b89b6b6ed911f52d33e10c09221011f01ec4dc78c1",
+    "results/direction2/parts/main_M3C_r0.5__run1__g0342-0375.json": "bdcfb4ac63e1b98409cb1eff6a239b34718fc1a329f085bfad4751ebb62714cb",
+    "results/direction2/parts/main_M3C_r0.5__run1__g0375-0408.json": "f93df3927683604b869305f6f2272f0405e7d40235c84c55d19fd0fbc262046c",
+    "results/direction2/parts/main_M3C_r0.5__run1__g0408-0416.json": "287f8d620b16abffd02fba1700c3318d127189e951e8ccc83beaf210851f0d17",
+    "results/direction2/parts/main_M3C_r0.5__run2__g0000-0036.json": "53818a0c70b19a1f53f46ff2c3de0bde703d45c12418a0cd506d1b16a5d3694f",
+    "results/direction2/parts/main_M3C_r0.5__run2__g0036-0069.json": "39e55657a4c66724b947a1482638d551aaa5f394062291bd168b5cad318f0d67",
+    "results/direction2/parts/main_M3C_r0.5__run2__g0069-0102.json": "df26b8f32e0945aff736a8c150fdd0295dd25c07878ff42a48cce5145eda0562",
+    "results/direction2/parts/main_M3C_r0.5__run2__g0102-0138.json": "14953b2c602d7f548afb56df35c99ad07f3a8ce4988bdc8ce9e1b1778fdaf0e7",
+    "results/direction2/parts/main_M3C_r0.5__run2__g0138-0171.json": "8f3ce44b20545cd1ebc49fc376cf58316a330b6ddf0fa196cbce3b1392010f99",
+    "results/direction2/parts/main_M3C_r0.5__run2__g0171-0204.json": "a47289436f04a31af744ab148a49a425618b95a145db28417d822622a827347e",
+    "results/direction2/parts/main_M3C_r0.5__run2__g0204-0240.json": "d4558067427a94039a9527f7c0c4662c9b53066aaed36b7e6d8965dfb4e511c4",
+    "results/direction2/parts/main_M3C_r0.5__run2__g0240-0273.json": "74ea495728720ccbd87ff96d6a939be2a0eb4a66ccfcda8dc6a44220a875696b",
+    "results/direction2/parts/main_M3C_r0.5__run2__g0273-0306.json": "83e18c5e89c9b23dd9560e2afb7520b9b05252ded5890801232a8dac5ede29a1",
+    "results/direction2/parts/main_M3C_r0.5__run2__g0306-0342.json": "36332fe9815f42319c40e90161b19c329970e2134e40572c0f909b9c2d795145",
+    "results/direction2/parts/main_M3C_r0.5__run2__g0342-0375.json": "f46a614c36d3c14d27ecceec44bfa7740ae4cb177d551593b1fdf5ca6d7fbd36",
+    "results/direction2/parts/main_M3C_r0.5__run2__g0375-0408.json": "ef7cc154d37e756f67d7f7c60b716edc47351a850d0908c228372455989ef85c",
+    "results/direction2/parts/main_M3C_r0.5__run2__g0408-0416.json": "921f6223967dac790e380d11fd3c766c21cbe0563071203b5b806276d90960f1",
+    "results/direction2/parts/main_M3C_r0.9__run0__g0000-0036.json": "67252b1d9e03d83a746a78fe7dd9b445e8ee97b8ff2d67485e5bf017b4af4c1a",
+    "results/direction2/parts/main_M3C_r0.9__run0__g0036-0069.json": "0565344dc3a20f3795ab23c48df47db71f7a913de58599ba222c0bf4c575c2ed",
+    "results/direction2/parts/main_M3C_r0.9__run0__g0069-0102.json": "dfcdc682ff9da8b4989a0127209a3254425cf19c54a1c3ad1bc133b5896487a0",
+    "results/direction2/parts/main_M3C_r0.9__run0__g0102-0138.json": "c4dd01ca0043d6c93383507b0c2aa8ecbe7838181c8eb295f173690e63ed9584",
+    "results/direction2/parts/main_M3C_r0.9__run0__g0138-0171.json": "fbdbefb025a4b5204ef61b9164a3ceb500768f263f0ee0259de0e9118eb55871",
+    "results/direction2/parts/main_M3C_r0.9__run0__g0171-0204.json": "571966d90772dc3e8e052883fbd9aeb8c27efddac7e96ad09f77526a085255c0",
+    "results/direction2/parts/main_M3C_r0.9__run0__g0204-0240.json": "85bc6f7e95a51b6ec98944ae453ea3232728ceb286963e1a2a918bce11046068",
+    "results/direction2/parts/main_M3C_r0.9__run0__g0240-0273.json": "96c1bb09f30cb84bcd63ac158ca71f51b687d48d1d9e1d8eb24c30988cd780dd",
+    "results/direction2/parts/main_M3C_r0.9__run0__g0273-0306.json": "ff27d55403a3d3f2e7637282f1e5b5c09c7adad4dbed20133dd26e0f48397403",
+    "results/direction2/parts/main_M3C_r0.9__run0__g0306-0342.json": "ef91191151a864c14ef776a26de5d8834b47e003abaa681a156b49df9a9b64ee",
+    "results/direction2/parts/main_M3C_r0.9__run0__g0342-0375.json": "5a60bc3ebc84620e6c4e606fdf03c08ee134424b760d08aded971dc143a49d6a",
+    "results/direction2/parts/main_M3C_r0.9__run0__g0375-0408.json": "ffcd83f593a91d07ddcd817c4886c014b0a020caab6a4c011f606bcda6333117",
+    "results/direction2/parts/main_M3C_r0.9__run0__g0408-0444.json": "5d59d1d56c33548748bbd74ffe3adafb4a717d525463cd1ee3f9d8c022c0283e",
+    "results/direction2/parts/main_M3C_r0.9__run0__g0444-0477.json": "585d033299bcc633fc30399d1bcc178680116a2e115594a291ab37482d43ef3d",
+    "results/direction2/parts/main_M3C_r0.9__run0__g0477-0499.json": "50f7101b153e2355ab1d32c89781e3caedff244ecbd1277da27c0857f5e8e953",
+    "results/direction2/parts/main_M3C_r0.9__run1__g0000-0036.json": "3e1fdf0b495f5138f009b2d199bee77070e8e2a37642c975e7700d0588dd92f6",
+    "results/direction2/parts/main_M3C_r0.9__run1__g0036-0069.json": "005220b1eb0b375a02c3f6ffffa7db74ec5447399502c1ceee46a79975082d18",
+    "results/direction2/parts/main_M3C_r0.9__run1__g0069-0102.json": "24eff296f1031b180320724233b89463fa1828ca258afa5b7bf2f055ee335265",
+    "results/direction2/parts/main_M3C_r0.9__run1__g0102-0138.json": "62b79641255ec77b07e68a5b64d6b2c22481a0d1f933ea7e1352cc029f5e524d",
+    "results/direction2/parts/main_M3C_r0.9__run1__g0138-0171.json": "1e938081be26e987ae56090f0176f274b22dd1970706568c602296e617009880",
+    "results/direction2/parts/main_M3C_r0.9__run1__g0171-0204.json": "12c121129e8b46baa94488fc215ddbdf4bfa9c37678f0dc947083ff9423fd966",
+    "results/direction2/parts/main_M3C_r0.9__run1__g0204-0240.json": "e01c33ebbd3d3886647b6fc22dc03ee4c659d8f32b1ad38e51f483ca0cac7724",
+    "results/direction2/parts/main_M3C_r0.9__run1__g0240-0273.json": "546e63cbcecfa0fe1fda29d0b8c3619efe1b27040fcc18bd4117587114e3b29b",
+    "results/direction2/parts/main_M3C_r0.9__run1__g0273-0306.json": "f69571c69cc356303e0c14af200dfca7f9e1e6f0b644bdd4707c7c38b641333d",
+    "results/direction2/parts/main_M3C_r0.9__run1__g0306-0342.json": "4b3958edd1bd1bf608fb67b77c265efa186463ae951046e375cd51ce19b6839b",
+    "results/direction2/parts/main_M3C_r0.9__run1__g0342-0375.json": "2289831798e8af2d71f9183ff6789c49b132b7a178e51e2890a1b357237ed866",
+    "results/direction2/parts/main_M3C_r0.9__run1__g0375-0408.json": "58afcfcf95fe02c0a52a38d5f0a93b97af68e57e78786d4ab9e994293f550a09",
+    "results/direction2/parts/main_M3C_r0.9__run1__g0408-0444.json": "dc928be9e8ca595139eb16e809611ca070559c197c97d2431b1fc9313d37cddf",
+    "results/direction2/parts/main_M3C_r0.9__run1__g0444-0477.json": "24a0e10f438ab57d96b85054d83a09b1d5186f84f689a31bb33e867c66d85023",
+    "results/direction2/parts/main_M3C_r0.9__run1__g0477-0499.json": "df47359b74e14c594afb0c3ec469297dcb80232fc6464d6cb0f4e4a2b1fd3bae",
+    "results/direction2/parts/main_M3C_r0.9__run2__g0000-0036.json": "8a7b3bf2abd7b7e34fe7fe5b027d3259079f5d4e767972833d8fa412dd678dea",
+    "results/direction2/parts/main_M3C_r0.9__run2__g0036-0069.json": "348925820af5ab3f8d877f483c10ed42c88df6abcc58803cc164d879b485ae15",
+    "results/direction2/parts/main_M3C_r0.9__run2__g0069-0102.json": "307221f0be438189437e25126e199e5d63ce03f7eb0f0610b31fafdfbdad3863",
+    "results/direction2/parts/main_M3C_r0.9__run2__g0102-0138.json": "0b1b2a50bc1e889c160fc03a588da5cc420eed14bf7416fad690f756b0f7e059",
+    "results/direction2/parts/main_M3C_r0.9__run2__g0138-0171.json": "0221435bf10f3337bd254285b86600d2c00fd330682fd8f670e3a8872022989e",
+    "results/direction2/parts/main_M3C_r0.9__run2__g0171-0204.json": "51141043afe7c2def8c3cc5033ba8f41de385488d41112bc0c440608b68165d7",
+    "results/direction2/parts/main_M3C_r0.9__run2__g0204-0240.json": "d182f1be95110405e63de2169778629d36e63b0e9a9417d55e4bb348b090b534",
+    "results/direction2/parts/main_M3C_r0.9__run2__g0240-0273.json": "5e6d31d0d2c895b95399a6f466d6482d6c2281305b824b2bc58e5f1193475ed3",
+    "results/direction2/parts/main_M3C_r0.9__run2__g0273-0306.json": "c9b0f1718dd1a1413895c5108fd4b26b5dd2247c74f6cae530a424a4cea17524",
+    "results/direction2/parts/main_M3C_r0.9__run2__g0306-0342.json": "904972d31a54459a7882be46cd2dc47caa98e505de6d942f27dd6ec059d47bd3",
+    "results/direction2/parts/main_M3C_r0.9__run2__g0342-0375.json": "e0e0145e309cc1450ee23c99185dd44a17a04cc1d748ce96f6f4b8f7199fb6e6",
+    "results/direction2/parts/main_M3C_r0.9__run2__g0375-0408.json": "1bcbb3b504aeccaa94a35ed88b9a49f6715dce93dd80c16c728d2a6b30ee649d",
+    "results/direction2/parts/main_M3C_r0.9__run2__g0408-0444.json": "6bcce7da4394081fd3e89e91090542610a14dbab0fc2e3fcd561d509da1c611c",
+    "results/direction2/parts/main_M3C_r0.9__run2__g0444-0477.json": "094072557983a964aef31198d6e3e71c9468e8439bd91fec70de1d3f45d9cc14",
+    "results/direction2/parts/main_M3C_r0.9__run2__g0477-0499.json": "66058c8207091218abcd444d19f65c444df62094a95bb7c31f646755fdb703b2"
+  }
+}

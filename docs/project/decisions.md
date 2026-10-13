@@ -28,7 +28,7 @@
 
 - 2026-10-02 紅方（攻擊 B）成立：到達時稽核擋不住挑時機灌水（N=8 均衡損失 0.011，單方增益 ≫ eps）；派遣時稽核可擋住（≈0）。主張改為「稽核時機決定成敗」。補：擴大策略空間（常數／時機／距離／τ 依賴）、eps 敏感度、holdout seeds、winner's curse 量測；主數字改報絕對差，不用 VoI 比值。
 
-- 2026-10-02 白方中期檢查採納：預先登記（docs/preregistration.md）；主數字用絕對值＋CI 不用倍數；加尾部指標；策略族加共謀、反向時機、對閾值自適應；C 改為一張圖檢驗「定價＝抑制 thrash」並和策略性損失比大小；D 改為 N∈{3,4,8,16} 趨勢，2 actuators 只做 exploratory。
+- 2026-10-02 白方中期檢查採納：預先登記（docs/dispatch/preregistration.md）；主數字用絕對值＋CI 不用倍數；加尾部指標；策略族加共謀、反向時機、對閾值自適應；C 改為一張圖檢驗「定價＝抑制 thrash」並和策略性損失比大小；D 改為 N∈{3,4,8,16} 趨勢，2 actuators 只做 exploratory。
 - 推論（待驗證）：在不可改道＋fused 只用當下 claim 時，派遣時稽核＝稽核所有被採用的 claim。
 
 - 2026-10-02 B v2 中期（N=3 r=.004 shock .5 holdout）：H3 成立（audit_index 全策略損失 0.024*，依距離灌水最有效）；H4 損失 ≈0.003（disp）／≈0（disp+penalty）但 max_gain>2eps → 依預登記判為「未獲確認」，不事後改規則；split-sample 列 exploratory。懲罰誤觸發率 35–40%（限制）。網格縮減：shock 0.25/0.75 用縮減策略集（偏離預登記，需標記）；B 跳過 N=4。
@@ -41,9 +41,9 @@
 
 - 2026-10-02 demo 完成（docs/demo/）：情境③改依距離>10；所有情境改用中位數附近的代表性 seed（原 seed 12 誇大團隊差 ~18×，已撤換），並加註單次執行雜訊大。互動經 headless Chrome 驗證，console error 0。
 
-- 2026-10-02 C+D 完成。修正先前結論：λ* 調參（seeds 0–15 選、holdout 評估）後 priced 比 no-thrash 高 0.015–0.09（v2），舊「≈0」來自未調參 λ；但 priced 仍輸距離感知 index，且與 DP 決策一致率 0.51 → λ·d 是粗糙距離過濾，C 假設（最優策略的去中心化實作）被否證。D：N≥8 round-robin 勝所有資訊型啟發式；VoI 代理只有 DP 的 15–45%；fused 損失隨 N 增大（0.165→0.41）；2 actuators 無主效應。主張清單見 docs/claims.md。
+- 2026-10-02 C+D 完成。修正先前結論：λ* 調參（seeds 0–15 選、holdout 評估）後 priced 比 no-thrash 高 0.015–0.09（v2），舊「≈0」來自未調參 λ；但 priced 仍輸距離感知 index，且與 DP 決策一致率 0.51 → λ·d 是粗糙距離過濾，C 假設（最優策略的去中心化實作）被否證。D：N≥8 round-robin 勝所有資訊型啟發式；VoI 代理只有 DP 的 15–45%；fused 損失隨 N 增大（0.165→0.41）；2 actuators 無主效應。主張清單見 docs/dispatch/claims.md。
 
-- 2026-10-02 紅方總攻擊全部採納（docs/claims.md 已改寫為最終版）：H1 不主張（與門檻無法區分、service=1 被否證、估計器偏差 ~0.002）；H4 依預登記否證並撤回（N=3 CI 下界亦 >0），只主張「降約一個數量級但未消除」；max_gain 樣本內被 winner's curse 墊高需揭露；fig11 用舊數字（critical，須重畫）；各損失數字需標 cell；C7 的 0.51 一致率為假象。
+- 2026-10-02 紅方總攻擊全部採納（docs/dispatch/claims.md 已改寫為最終版）：H1 不主張（與門檻無法區分、service=1 被否證、估計器偏差 ~0.002）；H4 依預登記否證並撤回（N=3 CI 下界亦 >0），只主張「降約一個數量級但未消除」；max_gain 樣本內被 winner's curse 墊高需揭露；fig11 用舊數字（critical，須重畫）；各損失數字需標 cell；C7 的 0.51 一致率為假象。
 
 - 2026-10-02 最終紅方：小修後可交付（15 個關鍵數字皆吻合）。已改：H1 在 service=1 改為「無法區分」；預登記改稱 pre-specified internal protocol，並揭露寫於探索之後；派遣時稽核加上「已測策略族＋有限搜尋、比值偏樂觀、5/10 CI 含 0」。A–F 完成。
 

@@ -177,7 +177,7 @@ Step 0（量測，不改凍結程式）→ A（先 `_vstep`，再 `env._step`）
 | `check_run`（g0、g1 要在 G_gens 之內） | plan.py:216-222 | 不會。代數不變。 |
 | `check_reuse`／`check_conditional` | train.py:333-337 | 不會。 |
 
-**不看程式內容**：整個守門鏈沒有任何一步檢查 arbitration/rl/*.py 的雜湊。FREEZE.md 第 19、35 行登記的「程式合併 sha」本來就已因 plan.py／conftest.py 的補登而過期（第 56 行寫明「以 git 為準」）。**建議**：效能修改完成、測試通過後，在 FREEZE.md 末尾以「補登」格式附加一筆（改動內容、新合併 sha、bitwise 測試名稱、不改 RUN_PLAN_SHA256／PILOT_DECISION_SHA256），先 commit 再開跑。這是凍結語意的決定，請使用者確認；如果不想動 FREEZE.md，也可以只寫在 docs/direction2-notes.md。
+**不看程式內容**：整個守門鏈沒有任何一步檢查 arbitration/rl/*.py 的雜湊。FREEZE.md 第 19、35 行登記的「程式合併 sha」本來就已因 plan.py／conftest.py 的補登而過期（第 56 行寫明「以 git 為準」）。**建議**：效能修改完成、測試通過後，在 FREEZE.md 末尾以「補登」格式附加一筆（改動內容、新合併 sha、bitwise 測試名稱、不改 RUN_PLAN_SHA256／PILOT_DECISION_SHA256），先 commit 再開跑。這是凍結語意的決定，請使用者確認；如果不想動 FREEZE.md，也可以只寫在 docs/direction2/history/direction2-notes.md。
 
 **frozen_budget**：只出現在 `scripts/make_d2_run_plan.py:194`（產生計畫時寫入），訓練時不被讀取。內容（lam=256、T_train=20000、n_S=256、G_gens=416／499、val_every=50、T_val=100000）都不隨速度改變。`est_per_run`（t_step 與秒數）只是估計，用在 `d2_run_queue.build_jobs` 與 manifest 的 segment 切分（上限 1500 秒）。**建議保持切分不變**（143 段、#158–#300、檔名與 test_segment_order_matches_frozen_manifest 都不動）；加速後每段只是提早結束。**不要因為變快而增加 G_gens**，那會改變實驗。
 
@@ -384,7 +384,7 @@ python3 scripts/d2_graph_check.py --preflight --only 4,H1 --json-out ~/pf_41.jso
 
 1. 先暫停 watchdog：`crontab -l > ~/crontab.s1.bak`，把 s1_watchdog 兩行註解掉（否則 runner 被停下後 15 分鐘內會被它用舊參數重啟）；確認沒有 `s1_watchdog.sh` 在跑。
 2. 等 runner 印出一行 `DONE ... committed <sha>` 之後立刻停它（tmux `s1` 裡 Ctrl-C；runner 會終止 train 子程序、印 INTERRUPTED、結束）。**盡量不要在段的中間停**：中間停也不會壞（下次從上一個 checkpoint 續跑，每 50 代與每段結束時寫一次），只是白白損失那之後的進度。確認 `git status` 只剩 untracked 的 runlogs，`git log origin/direction2-freeze..HEAD` 是空的（都已 push）。
-3. 把程式帶進學校的 `direction2-freeze`：`git fetch origin direction2-speedup && git merge --no-edit origin/direction2-speedup`。這個分支只動 `arbitration/rl/*.py`、`scripts/*.py`、`tests/direction2/`、`docs/direction2-speedup-plan.md`、`results/direction2_speedup/`，沒有碰 `run_plan.json`、`FREEZE.md`、`pilot_decision.json`、`vuln_suite.json`、parts／ckpt，所以不會有衝突，也不會讓 `verify_repo_state` 拒絕（HEAD 仍是 a72d3d7 的後代）。合併前先用 `git diff --stat HEAD...origin/direction2-speedup` 確認清單。
+3. 把程式帶進學校的 `direction2-freeze`：`git fetch origin direction2-speedup && git merge --no-edit origin/direction2-speedup`。這個分支只動 `arbitration/rl/*.py`、`scripts/*.py`、`tests/direction2/`、`docs/direction2/design/speedup.md`、`results/direction2_speedup/`，沒有碰 `run_plan.json`、`FREEZE.md`、`pilot_decision.json`、`vuln_suite.json`、parts／ckpt，所以不會有衝突，也不會讓 `verify_repo_state` 拒絕（HEAD 仍是 a72d3d7 的後代）。合併前先用 `git diff --stat HEAD...origin/direction2-speedup` 確認清單。
    - 注意：之後 runner 的 `git push origin direction2-freeze` 會把這些程式 commit 一併推上去。如果希望 `direction2-freeze` 只有結果，就改在新分支（例如 `direction2-run2`）上合併、並用 `--branch direction2-run2` 跑；這會讓結果分散在兩個分支，要事後合併。**由使用者決定**；FREEZE.md 的「程式合併 sha」補登（第 5 節）也由使用者決定。
 4. `python3 scripts/d2_run_queue.py --stage s1 --dry-run`：必須列出同樣的 143 段，done／todo 與切換前一致（只看狀態，不跑任何東西）。
 5. 啟動（第一階段只用 `--graph`，不並行；**用包裝 `scripts/d2_s1_launch.sh`**，它等於 `d2_run_queue.py --stage s1 --push-every 1 --remote origin --branch direction2-freeze --graph --graph-fallback`）：

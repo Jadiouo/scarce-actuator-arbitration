@@ -1,6 +1,6 @@
 # Number audit: direction1-paper/paper.tex
 
-Every number in the paper body that comes from an experiment is substituted into `paper.tex` by a script directly from `results/*.json` (formatting: mean ± half-width, 4 decimals unless noted; pct = value×100; `R/T` for `adaaudit_2x2` R = JSON value ×1e-5). The column "consistent?" is the script check that the formatted JSON value equals the string printed in the paper. Rows marked (param) are the cell parameters printed in the table. The table rows are listed once per displayed value; the same displayed number may appear in more than one place in the text and shares one row here. a duplicate check against `docs/direction1-number-audit.md` is in the final note below.
+Every number in the paper body that comes from an experiment is substituted into `paper.tex` by a script directly from `results/*.json` (formatting: mean ± half-width, 4 decimals unless noted; pct = value×100; `R/T` for `adaaudit_2x2` R = JSON value ×1e-5). The column "consistent?" is the script check that the formatted JSON value equals the string printed in the paper. Rows marked (param) are the cell parameters printed in the table. The table rows are listed once per displayed value; the same displayed number may appear in more than one place in the text and shares one row here. a duplicate check against `docs/direction1/results/number-audit.md` is in the final note below.
 
 | # | Location in paper | Value | Source (JSON key path) | Consistent? |
 |---|---|---|---|---|
@@ -246,7 +246,7 @@ Every number in the paper body that comes from an experiment is substituted into
 
 ## Cross-check against the summary
 
-All 239 value strings above were also searched, as exact strings, in `docs/direction1-summary.md` plus `docs/direction1-number-audit.md`: 239 of 239 found (script check; "consistent" = JSON formatting matches AND the string appears there).
+All 239 value strings above were also searched, as exact strings, in `docs/direction1/results/summary.md` plus `docs/direction1/results/number-audit.md`: 239 of 239 found (script check; "consistent" = JSON formatting matches AND the string appears there).
 
 ## Design and setting numbers (not result values)
 
@@ -269,7 +269,7 @@ All 239 value strings above were also searched, as exact strings, in `docs/direc
 
 ## Notes
 
-1. `stage2b.json` has `meta.T = 20000`; `docs/direction1-summary.md` does not state T for stage-2b cells (it lists T=1e5 only for the main table). The paper states T=20000 for those cells; the summary should be checked for the same omission.
+1. `stage2b.json` has `meta.T = 20000`; `docs/direction1/results/summary.md` does not state T for stage-2b cells (it lists T=1e5 only for the main table). The paper states T=20000 for those cells; the summary should be checked for the same omission.
 2. Items deliberately NOT in the paper (no JSON source): winner-selection bias 0.573/0.522; old ~40% false-trigger rate; red-team scratchpad numbers; F4 "within 1.5x"; (the r=0.95 z=2.57 is now in the paper with a source; see the revision table below).
 3. M4 parameters differ between files: `quota.json` rw=1/3, eps=0.02; `stage2b.json` rw=1. The paper labels them separately.
 4. Figure 4 (`fig18b`) is a pre-fix stage-2 figure and carries no number from the paper.

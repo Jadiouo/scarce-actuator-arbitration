@@ -171,7 +171,7 @@ def test_OBJ06_expectation_registered_before_work():
     registry file, so the registered places are checked: docs/direction2-spec.md (REQ-OBJ-06) and the planning log docs/direction2-notes.md
     ('期望（推論）'); both must exist and state the same numbers.  (Telling the user is a process step and cannot be tested.)"""
     spec = os.path.join(ROOT, "docs", "direction2-spec.md")
-    notes = os.path.join(ROOT, "docs", "direction2-notes.md")
+    notes = os.path.join(ROOT, "docs", "direction2", "history", "direction2-notes.md")
     assert os.path.exists(spec) and os.path.exists(notes)
     spec_txt, notes_txt = open(spec, encoding="utf-8").read(), open(notes, encoding="utf-8").read()
     i = spec_txt.index("**REQ-OBJ-06")                   # the definition (the bare id also occurs in the revision log)

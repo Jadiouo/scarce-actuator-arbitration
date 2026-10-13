@@ -1,5 +1,18 @@
 # 方向二：學校 GPU 機器部署手冊
 
+2026-10-13 實際執行環境：GRID RTX8000-12Q（12 GB vGPU）、既有 `.venv`、PyTorch 2.6.0+cu126。下方 Docker 流程保留給重新部署；此次正式評估使用既有 venv。
+
+文件入口：[docs/README.md](../docs/README.md)。訓練完成後，正式 test 的規則與先前暴露揭露見[主實驗評估協定](../docs/direction2/design/main-evaluation.md)。
+
+已完成部署時，在學校的專案目錄啟動正式評估：
+
+```bash
+tmux new -s d2-final-eval
+PYTHON=.venv/bin/python bash scripts/d2_main_eval_launch.sh
+```
+
+此入口先確認 GPU 沒有其他計算程序，執行訓練 seeds 的短 GPU 驗收，再依序完成兩格 validation、test 與結果組裝。每階段保存 raw、凍結選取紀錄並備份至 `direction2-freeze`。中斷可用同一入口續接，已評估的政策不重新模擬。只讀進度用 `.venv/bin/python scripts/d2_main_eval.py status`；完成後以 `.venv/bin/python scripts/report_d2_main.py` 在 CPU 重建報告與數字稽核。正式結果入口是 `results/direction2/main.json` 與 `docs/direction2/results/main.md`。
+
 給第一次做部署的同學。照順序做，每一步都有「預期會看到什麼」；看到的和預期不同就停下來，先查最後一節「常見問題」。
 所有指令都在學校機器的終端機執行，`$` 代表提示符號，不用打。
 
@@ -54,7 +67,7 @@ $ git merge-base --is-ancestor a72d3d7 HEAD && echo "OK: 凍結點之後"
 $ nvidia-smi
 ```
 
-**預期**：看到一張表，有 GPU 名稱（目標機器是 Quadro RTX 8000）、`Driver Version`、`CUDA Version`、記憶體 48GB 左右。
+**預期**：看到一張表，有 GPU 名稱（目標機器是 Quadro RTX 8000）、`Driver Version`、`CUDA Version`、完整卡為 48 GB；學校 vGPU 配額可能只有 12 GB，以 `nvidia-smi` 實際顯示為準。
 驅動版本要 **>= 525.60**（越新越好；>= 550 最理想）。
 
 - 指令不存在或印出 `couldn't communicate with the NVIDIA driver`：驅動沒裝或沒載入，找學校機器管理員，這一步沒過不要往下做。
@@ -186,7 +199,7 @@ $ echo $!        # 記下這個 PID
 自動 push 選項：`--push-every N`（每 N 段推一次，預設 1）、`--remote`（預設 origin）、`--branch`（預設 direction2-freeze）、`--no-push`（不推）。
 若目前所在分支不是 `--branch`，或 `--branch` 是 master／main，執行器會**拒絕啟動**並告訴你原因（exit code 3）；push 失敗則只記錄，不會中斷訓練，下一段完成時重試。
 
-**加速版（CUDA Graph，結果與上面逐位相同，需要先通過 `python3 scripts/d2_graph_check.py --preflight`，見 `docs/direction2-speedup-plan.md` 第 9 節）**：
+**加速版（CUDA Graph，結果與上面逐位相同，需要先通過 `python3 scripts/d2_graph_check.py --preflight`，見 `docs/direction2/design/speedup.md` 第 9 節）**：
 用包裝啟動，不要自己拼 `--graph`：
 
 ```bash

@@ -410,7 +410,7 @@ def test_T42_vuln_registry_frozen_and_composition(tmp_path):
 def test_T43_blind_design_isolation_manifest():
     """T-43 (REQ-S1-12/13/21): designer package may hold only allowed files (no feature table, strategies() table, notes, training logs - checked by
     path and sha256); the designer prompt must not contain feature details."""
-    notes = os.path.join(ROOT, "docs", "direction2-notes.md")
+    notes = os.path.join(ROOT, "docs", "direction2", "history", "direction2-notes.md")
     h = hashlib.sha256(open(notes, "rb").read()).hexdigest()
     allowed = ["docs/direction2-vuln-format.md", "arbitration/gpu/frontier.py"]          # v1.2 (REQ-S1-12): cleaned format note + frontier M3C part only
     good = [dict(path=p, sha256="a" * 64) for p in allowed]
@@ -658,7 +658,7 @@ def test_S124_blind_material_prescan(tmp_path):
     the prompt) -> clean False and the hit names that third file (an implementation that scans only the prompt passes the prompt and misses it);
     every one of the six words is detected in a non-prompt file; (c) `files` lists every scanned file with its sha256 (the archived scan record);
     (d) extra words extend the list (e.g. a window length and a feature id); (e) all clean -> clean True and hits == []."""
-    fmt = os.path.join(ROOT, "docs", "direction2-vuln-format.md")
+    fmt = os.path.join(ROOT, "docs", "direction2", "design", "vuln-format.md")
     prm = os.path.join(_DESIGNER_ROOT, "designer_2", "prompt.txt")
     hits, _ = _scan_ref([fmt, prm], _S121_WORDS)
     assert hits == [], f"readable material for blind designers contains forbidden words: {hits}"

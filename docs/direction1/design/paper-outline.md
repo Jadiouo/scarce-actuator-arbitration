@@ -1,7 +1,7 @@
 # 實證短文大綱：延遲驗證下稽核機制的脆弱性地圖
 
 > **草案：待使用者決定是否撰寫**
-> 依據：`docs/direction1-summary.md`（下稱 S）、`direction1-notes.md`、`direction1-number-audit.md`。只列大綱，不寫正文。本文數字皆出自 S／audit（261 筆全數一致）；沒有 JSON 出處的數字不寫。
+> 依據：`docs/direction1/results/summary.md`（下稱 S）、`direction1-notes.md`、`direction1-number-audit.md`。只列大綱，不寫正文。本文數字皆出自 S／audit（261 筆全數一致）；沒有 JSON 出處的數字不寫。
 
 ## 1. 候選標題
 

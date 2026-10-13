@@ -13,6 +13,6 @@
 
 已知揭露：r=0.5 run0 的權重與完整訓練曲線等同 S1 D2 的兩種大小，且該策略在 S1 已看過 test；主實驗 run0 不能當成相對於 S1 的新獨立證據。本次照原登記跑三個 run，不改 seed、不重選較有利的候選。S1 原規則判 3/3 通過，但事後 off-knob 的漏洞利用證據只有 2/3；D2 與 O5 的 detected 混入基礎優勢。正式 J 判定與這項限制會一起報告。
 
-驗證方式：先在學校執行合成資料 CPU 測試，獨立驗算配對 CI、validation-only 選取、MDE 凍結、H0、ledger 續跑與快取拒絕；再以訓練 seeds 做短 GPU graph/eager 一致性檢查。驗收不使用正式 test seeds 或正式 checkpoint 的 test 表現。正式 test 入口及數值程式於 validation 前提交。
+驗證方式：先在學校執行合成資料 CPU 測試，獨立驗算配對 CI、validation-only 選取、MDE 凍結、H0、ledger 續跑與快取拒絕；再以訓練 seeds 做短 GPU graph/eager 一致性檢查。CPU 合成測試用假的效用函式驗證 seed 路由；驗收不在正式 test seeds 上執行真實政策或模擬器。正式 test 入口及數值程式於 validation 前提交。
 
 學校執行：`PYTHON=.venv/bin/python bash scripts/d2_main_eval_launch.sh`，放進 tmux；日誌與暫存都在專案內。每個 val/test 階段完成就提交並 push 到 direction2-freeze，不 force push；推送失敗時停在已保存的階段。

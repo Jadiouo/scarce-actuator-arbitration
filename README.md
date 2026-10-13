@@ -2,15 +2,17 @@
 
 A scarce server must be shared among agents who report their own urgency for free, and some may exaggerate: Part I studies dispatching a mobile actuator and what exact state information is worth, and Part II studies *when* to audit a claim when the truth can only be checked after a delay.
 
+**[Documentation guide](docs/README.md)** · **[Current work: learned adversarial reporting](docs/direction2/README.md)**
+
 ![Quota mechanisms versus audits (M3C, M4) versus round robin and naive trust, over four values of r = rho^tau: honest regret, maximum lying gain, and efficiency loss (direction 1, T=1e5, 32 evaluation seeds)](figures/fig20a_quota_vs_audit.png)
 
-**[Demo 1: dispatch on a ring](https://jadiouo.github.io/scarce-actuator-arbitration/demo/)** | **[Demo 2: audit timing](https://jadiouo.github.io/scarce-actuator-arbitration/demo2/)** | **[Paper 1 (draft, not peer reviewed)](docs/paper/paper.pdf)** | **[Paper 2: audit timing (draft, not peer reviewed)](docs/direction1-paper/paper.pdf)** | **[Research log](docs/decisions.md)**
+**[Demo 1: dispatch on a ring](https://jadiouo.github.io/scarce-actuator-arbitration/demo/)** | **[Demo 2: audit timing](https://jadiouo.github.io/scarce-actuator-arbitration/demo2/)** | **[Paper 1 (draft, not peer reviewed)](docs/paper/paper.pdf)** | **[Paper 2: audit timing (draft, not peer reviewed)](docs/direction1-paper/paper.pdf)** | **[Research log](docs/project/decisions.md)**
 
 Run the demos locally: `cd docs && python3 -m http.server 8000`, then open <http://localhost:8000/demo/> or <http://localhost:8000/demo2/>. Both demos are simplified illustrations with representative seeds; the numbers are in the papers.
 
 ## Part I: dispatch and the value of information
 
-One actuator serves N decaying explorers on a ring. Explorers report a noisy urgency for free, hidden shocks make health unpredictable from elapsed time, and every dispatch costs travel. The work uses exact per-step dynamic programming (N <= 3-4) and a GPU simulator. Working paper (draft, not peer reviewed): [`docs/paper/paper.pdf`](docs/paper/paper.pdf), source [`docs/paper/paper.tex`](docs/paper/paper.tex); every claim and its evidence file: [`docs/claims.md`](docs/claims.md).
+One actuator serves N decaying explorers on a ring. Explorers report a noisy urgency for free, hidden shocks make health unpredictable from elapsed time, and every dispatch costs travel. The work uses exact per-step dynamic programming (N <= 3-4) and a GPU simulator. Working paper (draft, not peer reviewed): [`docs/paper/paper.pdf`](docs/paper/paper.pdf), source [`docs/paper/paper.tex`](docs/paper/paper.tex); every claim and its evidence file: [`docs/dispatch/claims.md`](docs/dispatch/claims.md).
 
 ![Team-health loss when explorers report strategically](figures/fig11_strategic_loss_v2.png)
 
@@ -55,7 +57,7 @@ Exploratory figures (pricing, scaling) are `figures/fig14*` and `figures/fig15*`
 
 The protocol was written mid-project, after the stage-A and first stage-B exploratory results, and the H3/H4 cell choices were influenced by them. It has no external timestamp. Treat it as an analysis plan written before the final confirmatory runs, not as a strict pre-registration.
 
-H1 (VoI < 0.02): not claimed. H2 (fused loses to `learned_index`): holds. H3 (arrival audit fails): holds. H4 (dispatch audit has zero loss and max_gain <= 2 eps): refuted, withdrawn. Deviations: only 10 of 27 grid cells were run (nine at N=3, one at N=8 with r=.002, f=.5; N=4 missing); reduced strategy sets in some cells; penalty tuning in one cell; max_gain is an in-sample quantity (stored out-of-sample check only for the N=8 cell: naive in-sample gain 0.075 for `audit_disp|cal` and 0.100 for `audit_index`, out-of-sample 0.0072 and 0.0038); loss baselines differ between hypotheses (H2 against `learned_index`; H3, H4 against each mechanism's own truthful profile). Details: paper Section 8 and `docs/decisions.md`.
+H1 (VoI < 0.02): not claimed. H2 (fused loses to `learned_index`): holds. H3 (arrival audit fails): holds. H4 (dispatch audit has zero loss and max_gain <= 2 eps): refuted, withdrawn. Deviations: only 10 of 27 grid cells were run (nine at N=3, one at N=8 with r=.002, f=.5; N=4 missing); reduced strategy sets in some cells; penalty tuning in one cell; max_gain is an in-sample quantity (stored out-of-sample check only for the N=8 cell: naive in-sample gain 0.075 for `audit_disp|cal` and 0.100 for `audit_index`, out-of-sample 0.0072 and 0.0038); loss baselines differ between hypotheses (H2 against `learned_index`; H3, H4 against each mechanism's own truthful profile). Details: paper Section 8 and `docs/project/decisions.md`.
 
 ### Limitations (Part I)
 
@@ -70,7 +72,7 @@ C1, C4 and C7 are quantitative checks of known theory, not discoveries: dynamic 
 
 **In plain words.** A scarce server can serve only one of three agents per round. Agents say how urgent they are, and one of them may lie. To check a claim the server must wait, and by then the true state has drifted, so even honest agents no longer match their old claims. The question: when and how should the server check, so that lies are caught without punishing the honest? We compared believing reports, auditing on arrival, auditing at dispatch with an accumulating test, quota ("linking") mechanisms that need no verification, and low-probability raids that can hit the winner. Setting for all numbers below, unless stated: K=3, tau=1, T=100000, evaluation seeds 5000-5031 (32 each), mechanism parameters tuned on seeds 0-15. "Gain" G is the liar's mean utility minus its mean utility when honest in the same world (paired seeds), maximised over a hand-written strategy set of 45 strategies, so it is an upward-biased lower bound on what a best-responding liar could get. R/T is the honest agents' regret per round. r = rho^tau; values are +/- the second number in the JSON (about 1.96 standard errors).
 
-**Key findings** (source: [`docs/direction1-paper/`](docs/direction1-paper/paper.pdf), [`docs/direction1-summary.md`](docs/direction1-summary.md); each number is traced to a JSON key in [`docs/direction1-number-audit.md`](docs/direction1-number-audit.md)):
+**Key findings** (source: [`docs/direction1-paper/`](docs/direction1-paper/paper.pdf), [`docs/direction1/results/summary.md`](docs/direction1/results/summary.md); each number is traced to a JSON key in [`docs/direction1/results/number-audit.md`](docs/direction1/results/number-audit.md)):
 
 1. **Believing reports, or auditing on arrival, is beaten by lying.** at r=0.5, naive trust gives a maximum gain G = 0.2793 +/- 0.0004 and arrival audit (p=0.1, delta=0, suspension L=20) G = 0.2795 +/- 0.0004, independent of r. A timing liar inflates at decision time and tells the truth when the arrival audit asks.
 2. **An audit at dispatch is cheap but only robust against liars that do not know the other claims.** M3C (CUSUM, p=0.1, h=6, L=2500; r=0.9): honest R/T 0.0070 +/- 0.0016, false-punishment rate 0.0303 +/- 0.0060, uninformed max gain 0.0020 +/- 0.0011. An oracle "edge" liar who sees the others' bids still gains 0.0211 +/- 0.0033 at r=0.9 and 0.0870 +/- 0.0053 at r=0.5. It is sensitive to a wrong rho: overestimating r by 0.05 at r=0.9 punishes honest agents at rate 0.3073 +/- 0.0212.
@@ -78,7 +80,7 @@ C1, C4 and C7 are quantitative checks of known theory, not discoveries: dynamic 
 4. **Low-probability raids that can hit the winner were the most robust in this strategy set.** M4 (epsilon=0.02, L=2500, winner raided with probability 1/3): G = 0.0000 +/- 0.0000 against all 45 strategies at every r, no false punishment, honest R/T 0.0162 +/- 0.0001 (r=0.5) and 0.0162 +/- 0.0002 (r=0.99); each raid wastes one round (0.0200 +/- 0.0002 of rounds). The cost corresponds to travel in the spatial model, which has not been measured. A first version that never raided the winner left a gain of 0.1811 +/- 0.0721 at r=1.
 5. **A hoped-for universal scaling law failed.** The gain-versus-noise exponent changes with the false-punishment target (s = 1.26 [1.13, 1.39] at alpha=0.005, 2.18 [1.77, 2.63] at alpha=0.05), so the planned theorem did not hold and the contribution became the empirical map.
 
-**Honesty about the process.** The theory framework was stopped by falsification conditions (F1 to F4) written down before the results were seen. F1 and F3 held, so the framework was abandoned. Those conditions have no external timestamp, so this is not a formal pre-registration. Limits: hand-written strategy sets (oracle strategies dominate, no strategy is proven best), K=3 only, rho assumed known by M3C and QT, and the abstract model is not yet connected back to the ring simulation. Mechanisms and strategy sets are described in [`docs/direction1-summary.md`](docs/direction1-summary.md) (Chinese; the paper is in English).
+**Honesty about the process.** The theory framework was stopped by falsification conditions (F1 to F4) written down before the results were seen. F1 and F3 held, so the framework was abandoned. Those conditions have no external timestamp, so this is not a formal pre-registration. Limits: hand-written strategy sets (oracle strategies dominate, no strategy is proven best), K=3 only, rho assumed known by M3C and QT, and the abstract model is not yet connected back to the ring simulation. Mechanisms and strategy sets are described in [`docs/direction1/results/summary.md`](docs/direction1/results/summary.md) (Chinese; the paper is in English).
 
 ![Maximum lying gain versus false-punishment rate for the dispatch audit (stage 2b frontier)](figures/fig19a_frontier_G_vs_alpha.png)
 
@@ -86,18 +88,28 @@ C1, C4 and C7 are quantitative checks of known theory, not discoveries: dynamic 
 
 "Lying" here means directional misreporting: a systematic bias that benefits the reporter. It has at least four sources: robots from different owners sharing a charging station, elevator or landing pad, each tuned for its own owner's performance; learned reporting policies that discover exaggeration through reward hacking; unintentional bias, such as an over-estimating estimator or a conservative threshold, which looks the same to the dispatcher; and faulty or compromised nodes, which are related but outside our model. We do not claim real fleets behave this way; the dispatcher simply cannot tell the sources apart from the reports alone.
 
+## Learned adversarial reporting (direction 2)
+
+The formal test is complete for fixed M3C at r=0.5 (primary) and r=0.9 (exploratory), using three training runs per setting. A 55-parameter MLP observes only public information and is trained with sep-CMA-ES. Checkpoints, the main run, the handwritten baseline and MDEs were selected on validation before this main test.
+
+At r=0.5, the validation-selected run0 gains **G=0.03452** per round over honest reporting, versus **0.02087** for the selected handwritten strategy (`dz=0.3`). Their paired difference is **D=0.01366, 95% CI [0.00932, 0.01800]**, above the frozen MDE of 0.00481. All three runs have D CI lower bounds above zero (3/3), satisfying the registered J3 rule. CIs use 32 paired environment seeds; the three runs are not pooled as 96 independent observations.
+
+**Evidence limits:** S1 passes its original gate, but off-knob checks show baseline-advantage confounding and only 2/3 out-of-family exploits. Main run0 at r=0.5 also has exactly the same policy as an S1 case already evaluated on these test seeds, so it adds no independent evidence relative to S1. The result is an exploitability lower bound for this fixed mechanism, policy class and budget. It is neither an optimal best response nor a safety claim, and it does not test M4 raids.
+
+[Full results and limitations](docs/direction2/results/main.md) · [Independent number audit](docs/direction2/results/number-audit.md) · [Frozen evaluation protocol](docs/direction2/design/main-evaluation.md) · [Data](results/direction2/main.json)
+
 ## Research process
 
-- [`docs/decisions.md`](docs/decisions.md): decision log (Chinese)
-- [`docs/direction1-notes.md`](docs/direction1-notes.md): direction 1 decision notes, including the falsification conditions
-- [`docs/direction1-summary.md`](docs/direction1-summary.md): direction 1 results summary and vulnerability map
-- [`docs/direction1-number-audit.md`](docs/direction1-number-audit.md) and [`docs/direction1-paper/number_audit.md`](docs/direction1-paper/number_audit.md): every number traced to JSON
+- [`docs/project/decisions.md`](docs/project/decisions.md): decision log (Chinese)
+- [`docs/direction1/history/notes.md`](docs/direction1/history/notes.md): direction 1 decision notes, including the falsification conditions
+- [`docs/direction1/results/summary.md`](docs/direction1/results/summary.md): direction 1 results summary and vulnerability map
+- [`docs/direction1/results/number-audit.md`](docs/direction1/results/number-audit.md) and [`docs/direction1-paper/number_audit.md`](docs/direction1-paper/number_audit.md): every number traced to JSON
 - [`docs/paper/number_audit.md`](docs/paper/number_audit.md): Part I number audit
-- [`docs/claims.md`](docs/claims.md), [`docs/preregistration.md`](docs/preregistration.md) (internal protocol, no external timestamp), [`docs/literature.md`](docs/literature.md)
+- [`docs/dispatch/claims.md`](docs/dispatch/claims.md), [`docs/dispatch/preregistration.md`](docs/dispatch/preregistration.md) (internal protocol, no external timestamp), [`docs/project/literature.md`](docs/project/literature.md)
 
 ## How this project was built
 
-The research was done with AI agents. A main agent planned and reviewed the work; subagents implemented code and ran experiments; red-team agents attacked each conclusion and white-team agents checked for over-optimism. Direction 1 used the same process, with the added step that the white team wrote falsification conditions before the results were seen; the red team then found the loopholes (for example that the raid mechanism never audited the winner) and those were fixed or the claims withdrawn. The decision record is in [`docs/decisions.md`](docs/decisions.md) and [`docs/direction1-notes.md`](docs/direction1-notes.md) (Chinese). The author chose the topics and directions and made the final judgments.
+The research was done with AI agents. A main agent planned and reviewed the work; subagents implemented code and ran experiments; red-team agents attacked each conclusion and white-team agents checked for over-optimism. Direction 1 used the same process, with the added step that the white team wrote falsification conditions before the results were seen; the red team then found the loopholes (for example that the raid mechanism never audited the winner) and those were fixed or the claims withdrawn. The decision record is in [`docs/project/decisions.md`](docs/project/decisions.md) and [`docs/direction1/history/notes.md`](docs/direction1/history/notes.md) (Chinese). The author chose the topics and directions and made the final judgments.
 
 ## Reproduction
 
@@ -120,7 +132,7 @@ Part II scripts, all in [`scripts/`](scripts/): `run_adaaudit_2x2.py`, `run_adaa
 
 ## Roadmap
 
-Direction 2 (in progress): train a reinforcement-learning adversary against each deployed mechanism, to replace the hand-written strategy set and test whether the strongest claims (for example that raids leave zero gain) survive a learned best response. Not yet reported.
+Direction 2 has completed its registered M3C evaluation. The remaining research questions include independently verifying the attack mechanism and assessing other mechanisms such as M4; these are future experiments and are not established by the current results.
 
 ## Repository structure
 

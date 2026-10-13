@@ -90,4 +90,4 @@ Cell: `RES.v2_sweep.configs.v2`, N=8 (`RES.config.n`), 1500 steps (`RES.config.s
 
 ## F. Still unverifiable from JSON
 
-Strategy-family definitions (code), Sec. 2 literature statements (docs/literature.md; only abstract-level checks), the claim that no published index exists for decaying arms with travel (negative search), pre-registration dates.
+Strategy-family definitions (code), Sec. 2 literature statements (docs/project/literature.md; only abstract-level checks), the claim that no published index exists for decaying arms with travel (negative search), pre-registration dates.

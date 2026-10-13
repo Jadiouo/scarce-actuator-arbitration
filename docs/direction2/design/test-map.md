@@ -52,7 +52,7 @@ GPU 隊列被實作 agent 的量測 job（m1、m2）佔用，本次加強後的 
 - **knob 關閉值（T-36/T-37）**：O1、O2、O4、O6：κ=0；O3：C=inf；O5：g=inf。開啟值：κ=0.5、C=0.5、g=20。
 - **hook 級日誌（T-37b）**：5 個 hook：`audit_prob`（O1）、`resid`（O3）、`cusum`（O2）、`cusum_reset`（O5）、`pause_len`（O4、O6）；每個 `out["hook_log"][hook] = dict(mask, out, <輸入>)`，輸入為該 hook 在變異環境中實際收到的值（teacher forcing）；非目標 hook 的 `out` 必須逐位元等於 base 公式，目標 hook 等於算子公式。輸入鍵：`audit_prob(win_streak, p)`、`resid(resid)`、`cusum(S, resid, kref)`、`cusum_reset(S, rounds_since_win)`、`pause_len(L, clean_streak)`。
 - **S1-18 schema**：`runs[]`（漏洞：`id, kind∈{auto,designer,blind}, size, G_RL{mean,lo,hi}, D{mean,lo,hi}, MDE_D, detected`；錨點：`kind="anchor", G_RL, G_star_ref, MDE_G, passed, informational`）、`summary[]`（`size, x, n=8, p_hat, LB`，只計類內漏洞）、`figure`（檔案必須存在）。`detected` 必須等於 D 規則；`LB`＝Clopper–Pearson。
-- **OBJ-06**：規格沒有指定登記檔名，測試檢查 `docs/direction2-spec.md`（REQ-OBJ-06）與 `docs/direction2-notes.md`（「期望（推論）」）兩處存在且數字一致。
+- **OBJ-06**：規格沒有指定登記檔名，測試檢查 `docs/direction2-spec.md`（REQ-OBJ-06）與 `docs/direction2/history/direction2-notes.md`（「期望（推論）」）兩處存在且數字一致。
 
 ### 錯誤實作 → 抓到它的測試
 
@@ -206,7 +206,7 @@ GPU 隊列被實作 agent 的量測 job（m1、m2）佔用，本次加強後的 
 - **T-22**：n_S 迴圈加入 256。
 - **T-24**：參考實作的 n_S 格 (16,…,128) → (16,…,256)；隨機 sd 範圍擴到 0.05（涵蓋 256 與不可行）；「n_S=128 不足」註解改為 256。
 - **T-25**：驗證記錄世代 25/50/75/100 → 50/100/150/200（選第 100 世代）；freeze 例子改為 v1.2 值並含 `nS_coverage_disclosure`。
-- **T-43**：設計者可讀清單改為 v1.2 的 `docs/direction2-vuln-format.md` 與 `arbitration/gpu/frontier.py`；新增「spec 本身不再可讀」斷言。
+- **T-43**：設計者可讀清單改為 v1.2 的 `docs/direction2/design/vuln-format.md` 與 `arbitration/gpu/frontier.py`；新增「spec 本身不再可讀」斷言。
 - **T-58**：G 值 300 → 416／499；`segment_estimate_s` 預設每 50 世代驗證（加 3 條斷言）；update_after_part 的 300 → 416。
 - **T-61**：freeze 例子改為 n_S=256、G_gens=416（含揭露鍵）；`test_d2_gate.py` 的 `s1_description` 範例預算字串改為 v1.2 值。
 - **OBJ-06**：修正 `spec.index` 命中修訂紀錄的測試自身脆弱性（見上）。

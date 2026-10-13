@@ -184,4 +184,4 @@ S1 用不到：O4、O6、D3（`OPS` 測試表只有 None/O1/O2/O3/O5/D1/D2/D4，
 
 scratchpad 的腳本不在 repo 內，建議把 `prodcmp.py` 整理後放進 `scripts/`（例如併入 `d2_graph_check.py`），讓學校上也能跑。
 
-`git status` 結束時與開始時相同（只有原本就有的 `docs/direction2-notes.md` 修改），加上本檔 `docs/direction2-speedup-redteam.md`（未追蹤）。
+`git status` 結束時與開始時相同（只有原本就有的 `docs/direction2/history/direction2-notes.md` 修改），加上本檔 `docs/direction2/reviews/speedup.md`（未追蹤）。

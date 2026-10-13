@@ -272,7 +272,7 @@
 - 失敗狀態：除了 T-03（比對既有的 frontier 與 quota，不需新實作）之外，全部因 NotImplementedError 而失敗。
 - 既有測試：148 個仍全部通過。
 - GPU job：#0、#1，皆經 gpujob。
-- 對照表：docs/direction2-tdd-map.md。共 8 條 REQ 無法寫成測試，理由記於該檔。
+- 對照表：docs/direction2/design/test-map.md。共 8 條 REQ 無法寫成測試，理由記於該檔。
 - P-8 與 S1-10／GPU-05 措辭衝突：以 P-8 為準（不補跑），留待 spec v1.1 統一。
 - 下一步：
   - 紅方攻擊測試套件的檢測力（是否抓得到錯誤實作）。
@@ -308,7 +308,7 @@
 - **W1 後半段**（平行進行）：
   1. 紅方攻擊 env 實作。
   2. spec v1.1 定稿。
-  3. 盲設計者設計 4 個漏洞，派工單原文存於 docs/direction2-blind-designer-prompt.md。
+  3. 盲設計者設計 4 個漏洞，派工單原文存於 docs/direction2/design/blind-designer-prompt.md。
   4. 實作訓練相關模組：seeds、cmaes、train、budget、parts、gpu_rules、hw。
   5. 實作評估與漏洞相關模組：metrics、numaudit、stop、trunc、nbr、m4、vulns、s1。
 
@@ -321,17 +321,17 @@
 - 待辦：spec 的 §5.5 與 §15 依 416／499 世代修正。併入下一次 spec 小修。
 
 ### 盲設計資訊洩漏與重做（2026-10-07）
-- **第一次盲設計的成果**：docs/direction2-blind-vulns.md，含 V1 SCHED6、V2 IDLE-FORGIVE、V3 LAUNDER、V4 LOSS-SKIP。
+- **第一次盲設計的成果**：docs/direction2/archive/blind-vulns-contaminated.md，含 V1 SCHED6、V2 IDLE-FORGIVE、V3 LAUNDER、V4 LOSS-SKIP。
 - **發現洩漏**：設計者被允許讀規格 §8.1，但規格 §8 的 REQ-S1-07（B2、O5）文字本身含「公開版歷史窗 k=8、EMA 時間尺度約 100 輪」。設計者的報告中引用了 k=8，而 V2 的「連續落選 8 輪」恰好等於 k，很可能是依特徵窗設計的。
 - **原因**：commander 的流程疏失，事前沒有清理可讀的材料。
 - **決定**：
   1. 第一批 V1–V4 改列為「已知受汙染（designer_1, contaminated）」，不計入檢測統計，在最終報告中揭露。
-  2. 另產生一份清除過的格式說明 docs/direction2-vuln-format.md，以 REQ-S1-21 的禁字清單自動檢查。
+  2. 另產生一份清除過的格式說明 docs/direction2/design/vuln-format.md，以 REQ-S1-21 的禁字清單自動檢查。
   3. 派一位全新的設計者（designer_2），只能讀 frontier.py 的 M3C 部分與這份格式說明。
   4. 依 REQ-S1-21 匯出兩位設計者的 prompt 與工具紀錄，存到 results/direction2/designer_logs/。
 
 ### designer_2 完成，隔離成立（2026-10-07）
-- 漏洞清單：docs/direction2-blind-vulns-2.md
+- 漏洞清單：docs/direction2/design/blind-vulns.md
   - V1 RestedAuditDiscount
   - V2 SuspensionParole
   - V3 SlopeShrink
@@ -715,14 +715,14 @@
 
 - 學校機器（aics-st05-u06，GRID RTX8000-12Q）用系統 python3.10 重建 .venv，micromamba 已移除。setup_venv.sh 自選 torch 2.6.0+cu126（不是 Dockerfile 的 2.5.1+cu124）；S1 全部 cell 在同一環境內跑，各 cell 之間可比較。與本機 pilot 的跨版本差異只影響 pilot 與 S1 的逐位元可重現性，不影響 S1 判讀。
 - 驗收：CPU 136 passed；GPU 7 passed，bitwise 等同 frontier。學校每步 2.75–3.45 ms，S1 估約 93 h（加啟動約 4 天），main 約 46 h。
-- GPU util 在 S1 實跑時約 44%，訓練進程單執行緒 CPU 100%：瓶頸是 Python/kernel launch。加速計畫見 docs/direction2-speedup-plan.md（CUDA Graphs 可行；合併 batch 不保證 bitwise，否決）。使用者決定這次先不做加速，原速跑完。
+- GPU util 在 S1 實跑時約 44%，訓練進程單執行緒 CPU 100%：瓶頸是 Python/kernel launch。加速計畫見 docs/direction2/design/speedup.md（CUDA Graphs 可行；合併 batch 不保證 bitwise，否決）。使用者決定這次先不做加速，原速跑完。
 - 2026-10-08 00:42 在 tmux `s1` 開跑：`d2_run_queue.py --stage s1 --push-every 1 --remote origin --branch direction2-freeze`，143 段，每段完成即 commit＋push。
 - 無人看顧：SSH 斷線後 tmux 存活（已實測）；~/s1_watchdog.sh（flock、連續 3 次重啟上限）由 cron `@reboot` 與每 15 分鐘執行；cron 環境的 deploy key push 已用 env -i 實測成功。watchdog 的「重啟」路徑未實測。說明檔 ~/S1_README.txt。
 - 學校機器上看進度用 `d2_run_queue.py --stage s1 --status`（d2_s1_status.py 是給本機 gpujob 用的，會顯示 LOST）。
 
 ## 2026-10-08 S1 中途切換到 CUDA Graph 版（bitwise 等同）
 
-- 加速分支 direction2-speedup（89ef840、d090b98、a3c13d3、6f76f62）：A＝CUDA Graph 單 cell（--graph），B＝同程序多 cell 並行（--concurrent）。紅隊（docs/direction2-speedup-redteam.md）無 BLOCKER；H1（驗證路徑）與 H2（graph 失敗退回 eager：--graph-fallback、scripts/d2_s1_launch.sh）已補。
+- 加速分支 direction2-speedup（89ef840、d090b98、a3c13d3、6f76f62）：A＝CUDA Graph 單 cell（--graph），B＝同程序多 cell 並行（--concurrent）。紅隊（docs/direction2/reviews/speedup.md）無 BLOCKER；H1（驗證路徑）與 H2（graph 失敗退回 eager：--graph-fallback、scripts/d2_s1_launch.sh）已補。
 - 學校 preflight（torch 2.6.0+cu126、RTX8000）：單 cell graph 與 eager 逐位相同，含真實大小驗證路徑；**--concurrent 失敗**（多執行緒 capture："Offset increment outside graph capture"），學校不得使用。第一次切換因此照規則退回 eager，確認失敗只在 concurrent 後重做。
 - 23:35 在段界切換，merge 8b57a95 已推上 GitHub。之後的段以 `d2_s1_launch.sh`（--graph --graph-fallback，無 concurrent）執行，watchdog 同步改用此指令。前 35 段為 eager，後續為 graph；兩者逐位相同，不影響判讀。
 - 實測：GPU util 45%→94%；s1_O1 每代 72 s→29.6 s（約 2.4 倍）。S1 預估 10/10 上午約 8 點完成。
@@ -730,8 +730,8 @@
 ## 2026-10-10 S1 完成；最終評估程式與測試集提前使用的揭露
 
 - S1 143/143 段於 2026-10-10 04:31 完成（EXIT 0，無 watchdog 重啟、無 graph fallback），全部已推上 GitHub。
-- 發現規格要求的 S1 最終評估／組裝程式不存在，依 REQ-MET-04/06/07、REQ-S1-* 補寫（b0f3b0a：arbitration/rl/s1_eval.py、scripts/d2_s1_eval.py；歧義 13 項見 docs/direction2-s1-eval-impl.md）。紅隊（docs/direction2-s1-eval-redteam.md）：無 BLOCKER，13 項歧義都不改變判讀，S1 閘門與 J 表沒有混淆。
-- **揭露（偏離「測試集只用一次」）**：實作者在煙霧測試（本機 gpujob，`--test-mode`，輸出寫在 .scratch/ 後刪除）中，已用真實 test seeds 5000–5031 與真實最終 checkpoint，完整評估過 s1_O1_s0.02、NAIVE 錨點、M4 錨點；部分數字寫進 docs/direction2-s1-eval-impl.md。未寫入正式 ledger。評估為確定性，且評估程式在此之後沒有改動。使用者於 2026-10-10 選擇「接受並公開揭露」：評估程式凍結於 b0f3b0a 的數值相關部分，正式評估照原登記的 test seeds 執行，結果文件必須引用本段。
+- 發現規格要求的 S1 最終評估／組裝程式不存在，依 REQ-MET-04/06/07、REQ-S1-* 補寫（b0f3b0a：arbitration/rl/s1_eval.py、scripts/d2_s1_eval.py；歧義 13 項見 docs/direction2/design/s1-evaluation.md）。紅隊（docs/direction2/reviews/s1-evaluation.md）：無 BLOCKER，13 項歧義都不改變判讀，S1 閘門與 J 表沒有混淆。
+- **揭露（偏離「測試集只用一次」）**：實作者在煙霧測試（本機 gpujob，`--test-mode`，輸出寫在 .scratch/ 後刪除）中，已用真實 test seeds 5000–5031 與真實最終 checkpoint，完整評估過 s1_O1_s0.02、NAIVE 錨點、M4 錨點；部分數字寫進 docs/direction2/design/s1-evaluation.md。未寫入正式 ledger。評估為確定性，且評估程式在此之後沒有改動。使用者於 2026-10-10 選擇「接受並公開揭露」：評估程式凍結於 b0f3b0a 的數值相關部分，正式評估照原登記的 test seeds 執行，結果文件必須引用本段。
 
 ## 2026-10-10 S1 正式結果與 D2 混淆；事後診斷（執行前登記）
 

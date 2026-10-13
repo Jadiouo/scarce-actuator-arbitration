@@ -1,6 +1,6 @@
-# 紅隊報告：docs/direction2-s1-result.md（Direction 2 S1 結果）
+# 紅隊報告：docs/direction2/results/s1.md（Direction 2 S1 結果）
 
-審查範圍：`docs/direction2-s1-result.md`（未提交）對照 `results/direction2/s1.json`、`s1_diag_offknob.json`、`s1_eval/*.json`、`scripts/d2_s1_diag_offknob.py`（a0136d5）、`arbitration/rl/s1_eval.py`、`docs/direction2-spec.md` v1.3、notes 末節登記。僅用 CPU 讀檔與算術，未碰 test seeds、final_eval、ledger。
+審查範圍：`docs/direction2/results/s1.md`（未提交）對照 `results/direction2/s1.json`、`s1_diag_offknob.json`、`s1_eval/*.json`、`scripts/d2_s1_diag_offknob.py`（a0136d5）、`arbitration/rl/s1_eval.py`、`docs/direction2-spec.md` v1.3、notes 末節登記。僅用 CPU 讀檔與算術，未碰 test seeds、final_eval、ledger。
 
 ## 0. 先給結論
 

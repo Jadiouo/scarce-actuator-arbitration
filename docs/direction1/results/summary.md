@@ -1,13 +1,13 @@
 # 方向一結果總結：延遲驗證下稽核機制的脆弱性地圖
 
-> 定位：結案紀錄，也是之後實證短文的骨架。只整理，不新增實驗。決策過程以 `docs/direction1-notes.md` 為準；每個數字的出處列在 `docs/direction1-number-audit.md`（JSON 檔與鍵路徑）。
+> 定位：結案紀錄，也是之後實證短文的骨架。只整理，不新增實驗。決策過程以 `docs/direction1/history/notes.md` 為準；每個數字的出處列在 `docs/direction1/results/number-audit.md`（JSON 檔與鍵路徑）。
 > 記號：表中「±」是 JSON 內第二個值（半寬；stage2 設計文件定義為 1.96 個標準誤，quota 沿用同一做法，JSON 內未另標）。「—」表示該格不適用或 JSON 無對應欄位。
 
 ## 1. 問題
 
 **白話。** 一個稀缺的服務者一次只能去幫一個人。請求者自報緊急度，而且有動機誇大。要查證，服務者得親自到場，但到場時狀況已變，所以拿「當時說的」比對「後來看到的」，連誠實的人都會對不上。問題：怎麼查核，才能既抓得到說謊，又不冤枉誠實者？
 
-**正式描述。** 模型：K=3 位 agent、每輪一件物品，偏離者只有 agent 1，其餘誠實。型別在 z 空間為高斯 AR(1)，`z_(t+1)=ρ z_t+√(1−ρ²) ε`，邊際分布為 agent 0 ~ U[0.2,1]、agent 1 ~ U[0,1]、agent 2 的 cdf 為 x²（`docs/stage2_design.md`）。
+**正式描述。** 模型：K=3 位 agent、每輪一件物品，偏離者只有 agent 1，其餘誠實。型別在 z 空間為高斯 AR(1)，`z_(t+1)=ρ z_t+√(1−ρ²) ε`，邊際分布為 agent 0 ~ U[0.2,1]、agent 1 ~ U[0,1]、agent 2 的 cdf 為 x²（`docs/direction1/design/stage2.md`）。
 
 延遲驗證：t 輪提交報告 v_t 並派遣，τ=1 輪後才觀察到 w=u_(t+τ)。控制量是 **ρ^τ**，即 z 空間相關，下文記 r；誠實者的殘差 `(z_w − r z_v)/√(1−r²)` 精確服從 N(0,1)，所以誠實者被單次門檻 κ 誤判的機率是 Φ(−κ)（`stage2.checks.calibration_honest_flag_rate` 驗證）。r 的格點為 0.5, 0.8, 0.9, 0.99（`quota.meta.rhos`）。
 
@@ -110,4 +110,4 @@
 - **F4 與下界。** 四種檢定在 1.5 倍以內，但沒有推導下界；白方判斷即使做出來也很可能是已知結果。
 - **待使用者決定：** 實證短文＋作品集 (b) 之後接方向二，或直接轉向方向二或三。
 
-*數字出處規則：本文所有結果數字都由腳本自 `results/*.json` 取值並逐一登錄於 `docs/direction1-number-audit.md`；沒有 JSON 出處的數字（例如紅方的 scratchpad 結果）一律未寫入。*
+*數字出處規則：本文所有結果數字都由腳本自 `results/*.json` 取值並逐一登錄於 `docs/direction1/results/number-audit.md`；沒有 JSON 出處的數字（例如紅方的 scratchpad 結果）一律未寫入。*

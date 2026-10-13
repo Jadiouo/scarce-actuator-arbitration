@@ -1,8 +1,8 @@
 # 方向二 S1 最終評估：紅隊審查（正式 test 評估前）
 
-審查對象：分支 direction2-freeze，commit b0f3b0a（`arbitration/rl/s1_eval.py`、`scripts/d2_s1_eval.py`、`arbitration/rl/final_eval.py` 新增的 `evaluate`／`already_evaluated`、`tests/direction2/test_d2_s1_eval.py`、`docs/direction2-s1-eval-impl.md`）。依據：`docs/direction2-spec.md` v1.3、`docs/direction2-freeze.md`、`results/direction2/FREEZE.md`、`run_plan.json`、`vuln_suite.json`、`docs/direction2-notes.md`。
+審查對象：分支 direction2-freeze，commit b0f3b0a（`arbitration/rl/s1_eval.py`、`scripts/d2_s1_eval.py`、`arbitration/rl/final_eval.py` 新增的 `evaluate`／`already_evaluated`、`tests/direction2/test_d2_s1_eval.py`、`docs/direction2/design/s1-evaluation.md`）。依據：`docs/direction2-spec.md` v1.3、`docs/direction2-freeze.md`、`results/direction2/FREEZE.md`、`run_plan.json`、`vuln_suite.json`、`docs/direction2/history/direction2-notes.md`。
 
-做了什麼：逐行讀上列程式與規格條文；跑 `pytest tests/direction2/test_d2_s1_eval.py -m "not gpu"`（17 passed，用 `-p no:cacheprovider`，未寫檔）；用 `gpujob log 3` 讀實作者的煙霧測試紀錄；核對 S_HW 36 清單與凍結檔逐項相同（順序一致）、`stop.py` sha256 與 freeze.md 登記相同、`metrics.kappa()`＝2.8922015。沒有跑任何 test 評估、沒有 GPU、沒有寫 ledger；`git status` 與開始時相同（只有原本就有的 `docs/direction2-notes.md` 修改，加上本報告）。
+做了什麼：逐行讀上列程式與規格條文；跑 `pytest tests/direction2/test_d2_s1_eval.py -m "not gpu"`（17 passed，用 `-p no:cacheprovider`，未寫檔）；用 `gpujob log 3` 讀實作者的煙霧測試紀錄；核對 S_HW 36 清單與凍結檔逐項相同（順序一致）、`stop.py` sha256 與 freeze.md 登記相同、`metrics.kappa()`＝2.8922015。沒有跑任何 test 評估、沒有 GPU、沒有寫 ledger；`git status` 與開始時相同（只有原本就有的 `docs/direction2/history/direction2-notes.md` 修改，加上本報告）。
 
 ## 結論
 
@@ -22,7 +22,7 @@
   - `[s1_M4rw0_anchor] test done ... G_RL 0.25102 ... passed=True`
   - `[s1_NAIVE_anchor] test done ... G_RL 0.31244 [0.31206, 0.31282], passed=True`
 - 這三個 cell 讀的是真實檢查點（val 輸出的 ckpt gen 與 G_RL_val 與真實 run 相符），`--test-mode` 只是把 ledger 與輸出放到 `.scratch/`，所以**沒有寫入真正的 ledger**，但 test seeds 5000–5031 已被用來評估這三個最終策略。job #2（`--T 2000`，12 個 cell 全部）也在 test seeds 上跑過真實檢查點，但 horizon 不同，嚴重性較低。
-- `docs/direction2-s1-eval-impl.md:26` 把「NAIVE 錨點結果（0.3124）」寫進 commit 的文件，是 test 數字外洩進入版本庫的直接證據。
+- `docs/direction2/design/s1-evaluation.md:26` 把「NAIVE 錨點結果（0.3124）」寫進 commit 的文件，是 test 數字外洩進入版本庫的直接證據。
 - `.scratch/` 現在是空的（已清除），所以沒有殘留檔案，但紀錄在 gpujob 日誌與該 doc 裡。
 
 影響評估：
@@ -31,7 +31,7 @@
 - 不可逆，只能揭露。
 
 建議：
-1. 使用者在執行前明確決定接受（或不接受）；接受的話，在 `docs/direction2-notes.md` 與最終報告的揭露清單（REQ-STOP-06 同層級）寫明：O1_s0.02、NAIVE 錨點、M4 錨點的 test 評估在正式 ledger 之前被煙霧測試跑過一次，結果一致；其他 9 格是第一次。
+1. 使用者在執行前明確決定接受（或不接受）；接受的話，在 `docs/direction2/history/direction2-notes.md` 與最終報告的揭露清單（REQ-STOP-06 同層級）寫明：O1_s0.02、NAIVE 錨點、M4 錨點的 test 評估在正式 ledger 之前被煙霧測試跑過一次，結果一致；其他 9 格是第一次。
 2. 從現在起**凍結評估程式**：b0f3b0a（或審查後的修正 commit）之後，任何改動都會讓這三格變成「看到結果後改程式」。若 M1–M3 與 L 項需要修改，修改僅限不影響數值的部分（命令、檢查、記錄），並在 commit 訊息說明。
 3. 之後所有煙霧測試只准用 `--T` 很短且不得載入真實檢查點，或乾脆用假資料（測試檔本來就有 FakeRun）。
 
@@ -41,7 +41,7 @@
 
 ### M1　文件裡的執行命令在學校機器不能用
 
-`docs/direction2-s1-eval-impl.md:42-48` 寫 `gpujob python3 scripts/d2_s1_eval.py run ...`。學校沒有 `gpujob`；而且學校用 `.venv`（系統 python3 沒有 torch，`scripts/d2_s1_launch.sh` 也明寫 `PYTHON=<venv python>`）。三個「job」在學校必須在同一個 tmux 內**依序**跑（同時只一個 GPU 程式）。
+`docs/direction2/design/s1-evaluation.md:42-48` 寫 `gpujob python3 scripts/d2_s1_eval.py run ...`。學校沒有 `gpujob`；而且學校用 `.venv`（系統 python3 沒有 torch，`scripts/d2_s1_launch.sh` 也明寫 `PYTHON=<venv python>`）。三個「job」在學校必須在同一個 tmux 內**依序**跑（同時只一個 GPU 程式）。
 
 建議的學校命令（工作樹乾淨、已 `git pull --ff-only` 到含 b0f3b0a 的 commit 之後）：
 ```bash
@@ -64,7 +64,7 @@ $PY scripts/d2_s1_eval.py assemble
 
 ### M3　學校機器的 watchdog 可能在評估期間重啟訓練佇列
 
-`docs/direction2-notes.md`（2026-10-08 一節）：`~/s1_watchdog.sh` 由 cron `@reboot` 與每 15 分鐘執行，沒有行程就重啟 `d2_s1_launch.sh`。若佇列已完成它應該什麼都不做，但「重啟路徑未實測」。評估期間若 watchdog 啟動第二個 GPU 程式，違反「同時只一個 GPU 程式」；若它同時 `git commit/push`，也會與評估中的工作樹互相干擾。
+`docs/direction2/history/direction2-notes.md`（2026-10-08 一節）：`~/s1_watchdog.sh` 由 cron `@reboot` 與每 15 分鐘執行，沒有行程就重啟 `d2_s1_launch.sh`。若佇列已完成它應該什麼都不做，但「重啟路徑未實測」。評估期間若 watchdog 啟動第二個 GPU 程式，違反「同時只一個 GPU 程式」；若它同時 `git commit/push`，也會與評估中的工作樹互相干擾。
 
 建議：評估前 `crontab -l` 確認並暫時註解掉該列（或確認佇列 manifest 已完成時 watchdog 會直接退出），`tmux ls` 與 `nvidia-smi` 確認沒有其他程序，再開跑。
 
@@ -78,7 +78,7 @@ $PY scripts/d2_s1_eval.py assemble
 
 ### L2　REQ-HW-02(b)（含 oracle 的最佳手寫）沒有實作，且 doc §2 第 11 項沒有列入「不計算的項目」
 
-REQ-HW-02 要求另外報告 (a) `G_手寫^{+H0}`（已做）與 (b) 含 8 個 oracle 的最佳手寫（附帶、不入判定）。實作未含 (b)，`docs/direction2-s1-eval-impl.md:33` 的清單只列 R/T、α、STOP-06 揭露。僅屬文件漏列；(b) 不在 REQ-S1-18 的輸出清單內，所以可留給最終報告腳本，但要補列。
+REQ-HW-02 要求另外報告 (a) `G_手寫^{+H0}`（已做）與 (b) 含 8 個 oracle 的最佳手寫（附帶、不入判定）。實作未含 (b)，`docs/direction2/design/s1-evaluation.md:33` 的清單只列 R/T、α、STOP-06 揭露。僅屬文件漏列；(b) 不在 REQ-S1-18 的輸出清單內，所以可留給最終報告腳本，但要補列。
 
 ### L3　`test_raw` 檔沒有綁定檢查點與程式版本
 

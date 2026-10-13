@@ -1,6 +1,6 @@
 # 方向一數字稽核表
 
-對應文件：`docs/direction1-summary.md`。每列＝summary 中出現的一個結果數字。「JSON 值」為原始浮點（pair 表示 [平均, 半寬]）；「一致?」檢查 summary 顯示值是否等於 JSON 值四捨五入到所示位數（衍生值註明換算）。
+對應文件：`docs/direction1/results/summary.md`。每列＝summary 中出現的一個結果數字。「JSON 值」為原始浮點（pair 表示 [平均, 半寬]）；「一致?」檢查 summary 顯示值是否等於 JSON 值四捨五入到所示位數（衍生值註明換算）。
 
 不列入本表：設計參數與格點（r 網格、W=1000、ε 與 α 目標格點等，出處為對應 JSON 的 meta 或 param）、時間點與 seeds 範圍、章節編號、文獻年份、百分比欄位中的「0」（`false_punish_frac` 等 JSON 值確為 0.0 者，只在主表以「0」表示）。未寫入 summary 的數字：紅方 scratchpad 的邊緣灌水得利、贏家偏誤 P(v>w|贏家) 實測值、notes 中舊版約 40% 的誤觸發率，它們在 `results/*.json` 找不到出處。
 
