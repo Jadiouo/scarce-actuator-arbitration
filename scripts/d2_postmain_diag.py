@@ -63,6 +63,7 @@ def interval(x, comparisons=1):
 
 def masked(p, group):
     w, b, v, c = p.blocks()
+    w = w.copy()  # blocks() exposes views; never mutate the frozen original policy.
     w[group] = 0
     return policy.MLPPolicy.from_blocks(w, b, v, c, obs_version="public")
 
