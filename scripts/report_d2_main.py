@@ -194,6 +194,24 @@ def main():
                 "信賴區間反映給定政策下的環境 seed 變異，不涵蓋重新訓練的所有不確定性。這不是最佳回應的證明，"
                 "也不直接代表真實機器人系統。", ""]
     reg = read(data / "vuln_suite.json")
+    s1 = read(data / "s1.json")
+    run_plan = read(data / "run_plan.json")
+    budget = next(c for c in run_plan["cells"] if c["name"] == "s1_D1_s0.02")
+    in_class = next(s for s in s1["summary"] if s["scope"] == "in_class" and s["size"] == .02)
+    o5 = next(r for r in s1["runs"] if r["id"] == "O5")
+    mdes = [r["MDE_D"] for r in s1["runs"] if r.get("category") == "out_of_family"]
+    s1_desc = stop.s1_description(dict(
+        x=in_class["x"], y=s1["gate"]["y"], y_s001=s1["gate"]["y_s001"],
+        budget=f"T_train={budget['T_train']}、λ={budget['lam']}、n_S={budget['n_S']}、G_gens={budget['G_gens']}",
+        mde=f"族外六格 {min(mdes):.5f} 至 {max(mdes):.5f}",
+        blind=f"原規則 detected={o5['detected']}，D={fmt(o5['D'])}；但 off-knob 診斷沒有利用證據，屬基礎優勢混淆"))
+    assert not stop.unfilled_numbers(s1_desc)
+    summary += ["依凍結規格附上 S1 描述（原 detected 定義）：" + s1_desc, "",
+                "上述「找回」是原規則的計數；事後利用證據僅族外 2/3。D2 為偽陽性，O5 亦未證實利用，"
+                "不可把此計數當成對未知漏洞的檢測率。S1 的 O1 與 NAIVE／M4 錨點也曾在正式 S1 入口前的煙霧測試暴露 test seeds，"
+                "完整時間線保留於 [S1 報告](s1.md)。", "",
+                "固定 M3C 配置為 p=0.1、h=6、L=2500、kref=0.5。公開特徵是手工充分統計量的近似，"
+                "未涵蓋的長歷史或絕對時間模式仍可能形成漏掉的漏洞。", ""]
     disclosures = stop.disclosure_text(dict(honest_drift=reg["honest_drift_summary"], o4_max=reg["o4_max"], o6_max=reg["o6_max"]))
     assert not stop.unfilled_numbers(disclosures) and not stop.missing_disclosures(disclosures)
     summary += [disclosures, "", "所有評估在學校機器以原有 float64 模擬器執行；MLP 使用已驗證一致的 CUDA Graph，手寫策略使用 eager。"

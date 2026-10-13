@@ -1,0 +1,36 @@
+{
+  "schema": "direction2-main-delivery-check/1",
+  "date": "2026-10-13",
+  "location": "school",
+  "evaluation_code_commit": "710367eaeea7f57973bd972bf4bb0fdad6858f79",
+  "tested_commit": "fa2d78a7a121d2690abad9b77d48c21f9fdb769a",
+  "source_sha256": "5c5ac62595a7aa24e595885adb12f65bcba505eabc2932ab6643ffc39e6c1ee2",
+  "formal_exit": 0,
+  "cpu": {
+    "passed": 245,
+    "skipped": 1,
+    "deselected": 78,
+    "skip_reason": "Existing CPU golden digest test requires its original PyTorch version; school uses a different CPU math version.",
+    "duration_s": 209.53
+  },
+  "gpu_preflight": {
+    "passed": 1,
+    "description": "MLP/honest graph vs eager, training seeds only"
+  },
+  "independent_metrics_verified": 112,
+  "ledger": {
+    "prior": 32,
+    "total": 42,
+    "prior_unchanged": true
+  },
+  "environment": {
+    "torch": "2.6.0+cu126",
+    "gpu": "GRID RTX8000-12Q, 12288 MiB, 580.159.03"
+  },
+  "hashes": {
+    "results/direction2/main.json": "593722eb9ec4f5c43d0980cfa919fa5efea6c65f10cf75e416093fa1eff918d5",
+    "results/direction2/main_audit.json": "eb680af78bc364e105262e2f06fcc8c105111033c9da81e67ebe0fec368d0c05",
+    "docs/direction2-spec.md": "b0963760b23f92a7ac3438f7b6c428bdcaf6920063c3650690c338cee4eb2d2d",
+    "docs/direction2-freeze.md": "83bebaabd3aadd8ab4128e08416352a5feabf519a328abd6ffc328eb98f07f36"
+  }
+}
