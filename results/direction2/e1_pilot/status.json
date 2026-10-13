@@ -1,12 +1,12 @@
 {
   "stage": "defender",
-  "updated_unix": 1791897205.7121696,
+  "updated_unix": 1791898280.164358,
   "started_unix": 1791884268.8821096,
   "manifest_sha256": "d2ed1a1198963fb5dbba95f6a2ed697f1bd34032b9e5f646396bffdf3e98baac",
   "pool": "hw",
   "run": 1,
-  "generation": 3,
+  "generation": 4,
   "candidate": 8,
-  "candidate_seconds": 81.27528047561646,
+  "candidate_seconds": 99.48523187637329,
   "feasible": true
 }
