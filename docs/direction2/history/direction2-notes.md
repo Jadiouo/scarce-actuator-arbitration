@@ -753,3 +753,10 @@
 - 開跑前學校機器上另有他人的 `ztrain` GPU 程式（非本專案），等其結束後才啟動；watchdog 遇到其他 GPU 程式會自動不重啟。
 - watchdog：`~/main_watchdog.sh`（cron 每 15 分鐘 + 開機後 2 分鐘；暫停旗標 `~/MAIN_PAUSED`；計數 `~/.main_restart_count`；日誌 `~/logs/main.log`、`main_exit.log`、`main_watchdog.log`）。說明見 `~/MAIN_README.txt`。S1 的 watchdog 與 `~/crontab.s1.bak` 保留不動。
 - 第一段 commit 42b8c23 已推到 origin/direction2-freeze。
+
+## 2026-10-13 正式評估收尾；E1 防守 pilot 啟動
+
+- 今天補齊主實驗正式 test、配對 CI、登記複現判定與 validation 事後診斷，並完成 64 個新環境 seeds 的獨立 holdout。主要 D=0.010778，95% CI [0.007362, 0.014194]，下界高於事前 δ=0.005；結論限於固定 M3C 與固定策略比較，保留 S1 混淆等限制。
+- 整理 docs、同步學校先前累積的 83 個 commits，並確認 gpu-center 已加入 Codex skills。
+- 約 17:37 在學校啟動 E1 防守調參→攻擊再適應 pilot，17:46 查核仍在第一條防守訓練；尚無防守成效結論。實測預估 14–16 小時，未排正式 test。
+- 完整工作、驗證版本、限制與下次接手步驟見[今日工作日誌](worklog-2026-10-13.md)。
