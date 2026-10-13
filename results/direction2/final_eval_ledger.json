@@ -222,5 +222,40 @@
    5031
   ],
   "found_G": true
+ },
+ "main_M3C_r0.5|run0-g350-e8165c7441bc5678": {
+  "seed_range": [
+   5000,
+   5031
+  ],
+  "found_G": true
+ },
+ "main_M3C_r0.5|run1-g350-f8a899c1b558aabf": {
+  "seed_range": [
+   5000,
+   5031
+  ],
+  "found_G": true
+ },
+ "main_M3C_r0.5|run2-g350-125fc04caa48bf99": {
+  "seed_range": [
+   5000,
+   5031
+  ],
+  "found_G": true
+ },
+ "main_M3C_r0.5|hw-dz=0.3": {
+  "seed_range": [
+   5000,
+   5031
+  ],
+  "found_G": true
+ },
+ "main_M3C_r0.5|hw-edge_oracle em=0.2": {
+  "seed_range": [
+   5000,
+   5031
+  ],
+  "found_G": true
  }
 }
