@@ -257,5 +257,40 @@
    5031
   ],
   "found_G": true
+ },
+ "main_M3C_r0.9|run0-g450-30d42fd6f84509ed": {
+  "seed_range": [
+   5000,
+   5031
+  ],
+  "found_G": true
+ },
+ "main_M3C_r0.9|run1-g400-5a844807d5774e69": {
+  "seed_range": [
+   5000,
+   5031
+  ],
+  "found_G": true
+ },
+ "main_M3C_r0.9|run2-g300-bc91c48acc69ae80": {
+  "seed_range": [
+   5000,
+   5031
+  ],
+  "found_G": true
+ },
+ "main_M3C_r0.9|hw-dz=0.01": {
+  "seed_range": [
+   5000,
+   5031
+  ],
+  "found_G": true
+ },
+ "main_M3C_r0.9|hw-edge_oracle em=0.05": {
+  "seed_range": [
+   5000,
+   5031
+  ],
+  "found_G": true
  }
 }
