@@ -1,0 +1,337 @@
+{
+  "manifest_sha256": "d2ed1a1198963fb5dbba95f6a2ed697f1bd34032b9e5f646396bffdf3e98baac",
+  "selected": {
+    "original": {
+      "cfg": {
+        "p": 0.1,
+        "tol": 6.0,
+        "kref": 0.5,
+        "L": 2500.0
+      },
+      "source": "original",
+      "raw": "evaluations/5a0004ea3843780b99fd3257c0293df208bc12c1f10f686e543318545a4584a0.json"
+    },
+    "hw": {
+      "gen": 6,
+      "cfg": {
+        "p": 0.1,
+        "tol": 7.46648554439031,
+        "kref": 0.46177126766970383,
+        "L": 5000.0
+      },
+      "raw": "evaluations/72fc3d23256ed68a7711098df693bba42739c00234916db017f5a72929ae7c16.json",
+      "feasible": true,
+      "worst_G": 0.01748615722979101,
+      "delta_honest_regret": -0.003927786273973435,
+      "delta_honest_alpha": -0.01599660087719298,
+      "fitness": -0.01748615722979101,
+      "source": "hw_run0/gen6",
+      "all_candidates": [
+        {
+          "cfg": {
+            "p": 0.1,
+            "tol": 6.0,
+            "kref": 0.5,
+            "L": 2500.0
+          },
+          "source": "original fallback",
+          "raw": "evaluations/5a0004ea3843780b99fd3257c0293df208bc12c1f10f686e543318545a4584a0.json",
+          "feasible": true,
+          "worst_G": 0.021450709835593117,
+          "delta_honest_regret": 0.0,
+          "delta_honest_alpha": 0.0,
+          "fitness": -0.021450709835593117
+        },
+        {
+          "gen": 3,
+          "cfg": {
+            "p": 0.1,
+            "tol": 7.287202551437297,
+            "kref": 0.4910995672274407,
+            "L": 4651.0
+          },
+          "raw": "evaluations/8e24df51201c89459644c17aab4d4297adbd941ff22b0e9fcefc9fa3b992a2e4.json",
+          "feasible": true,
+          "worst_G": 0.023815341510811057,
+          "delta_honest_regret": -0.004890156281781516,
+          "delta_honest_alpha": -0.019069736842105264,
+          "fitness": -0.023815341510811057,
+          "source": "hw_run0/gen3"
+        },
+        {
+          "gen": 6,
+          "cfg": {
+            "p": 0.1,
+            "tol": 7.46648554439031,
+            "kref": 0.46177126766970383,
+            "L": 5000.0
+          },
+          "raw": "evaluations/72fc3d23256ed68a7711098df693bba42739c00234916db017f5a72929ae7c16.json",
+          "feasible": true,
+          "worst_G": 0.01748615722979101,
+          "delta_honest_regret": -0.003927786273973435,
+          "delta_honest_alpha": -0.01599660087719298,
+          "fitness": -0.01748615722979101,
+          "source": "hw_run0/gen6"
+        },
+        {
+          "gen": 9,
+          "cfg": {
+            "p": 0.1,
+            "tol": 6.7958133563855085,
+            "kref": 0.4495688590132578,
+            "L": 4554.0
+          },
+          "raw": "evaluations/89ef575cb05658dcc5417b0fd3d90073b6515a58a1bf15e095f6abc147e18020.json",
+          "feasible": false,
+          "worst_G": 0.011005908798949207,
+          "delta_honest_regret": 0.0021965829937885895,
+          "delta_honest_alpha": 0.008139583333333332,
+          "fitness": -10.098291496894294,
+          "source": "hw_run0/gen9"
+        },
+        {
+          "gen": 12,
+          "cfg": {
+            "p": 0.1,
+            "tol": 7.224654129396789,
+            "kref": 0.4589684943363154,
+            "L": 4466.0
+          },
+          "raw": "evaluations/cf333ea8738d4d672452c08853cf5901a3e1d0d897500fcef68af342b5728051.json",
+          "feasible": true,
+          "worst_G": 0.01750755489784544,
+          "delta_honest_regret": -0.0022522570923857637,
+          "delta_honest_alpha": -0.009190789473684211,
+          "fitness": -0.01750755489784544,
+          "source": "hw_run0/gen12"
+        },
+        {
+          "gen": 3,
+          "cfg": {
+            "p": 0.1,
+            "tol": 7.455272841500998,
+            "kref": 0.4861964082170024,
+            "L": 4500.0
+          },
+          "raw": "evaluations/2e9528fbb07ebc748b20704b263454d9f9bf1403c0ce3f6ead00a4375ac342b4.json",
+          "feasible": true,
+          "worst_G": 0.024831125726105283,
+          "delta_honest_regret": -0.005364995997606705,
+          "delta_honest_alpha": -0.020930811403508772,
+          "fitness": -0.024831125726105283,
+          "source": "hw_run1/gen3"
+        },
+        {
+          "gen": 6,
+          "cfg": {
+            "p": 0.1,
+            "tol": 7.503208610442253,
+            "kref": 0.44112075118274385,
+            "L": 4237.0
+          },
+          "raw": "evaluations/8dd69dfd2cf68b331e40269849527e93f383e9e78dacc3fc76d50f4d27703452.json",
+          "feasible": true,
+          "worst_G": 0.01773896383804688,
+          "delta_honest_regret": -0.00286201316405657,
+          "delta_honest_alpha": -0.011230701754385966,
+          "fitness": -0.01773896383804688,
+          "source": "hw_run1/gen6"
+        },
+        {
+          "gen": 9,
+          "cfg": {
+            "p": 0.1,
+            "tol": 7.039206533166001,
+            "kref": 0.4281763475605619,
+            "L": 4166.0
+          },
+          "raw": "evaluations/27e7ced18cbdb36633a7e3c4800aab78021ad8ae85dd8cb9901aba9fd686baae.json",
+          "feasible": false,
+          "worst_G": 0.010456779269510611,
+          "delta_honest_regret": 0.0025283045482367554,
+          "delta_honest_alpha": 0.009474232456140349,
+          "fitness": -10.264152274118377,
+          "source": "hw_run1/gen9"
+        },
+        {
+          "gen": 12,
+          "cfg": {
+            "p": 0.1,
+            "tol": 7.3709874108375075,
+            "kref": 0.4902124594165397,
+            "L": 5000.0
+          },
+          "raw": "evaluations/f9de6aba7ca870fcc1eb2a2c0a66950dfb15d9115fd6d64eff3f364d5f979079.json",
+          "feasible": true,
+          "worst_G": 0.02365428420857133,
+          "delta_honest_regret": -0.004840708072161495,
+          "delta_honest_alpha": -0.01873782894736842,
+          "fitness": -0.02365428420857133,
+          "source": "hw_run1/gen12"
+        }
+      ]
+    },
+    "pooled": {
+      "gen": 6,
+      "cfg": {
+        "p": 0.1,
+        "tol": 6.77005290146592,
+        "kref": 0.4560583957673218,
+        "L": 4479.0
+      },
+      "raw": "evaluations/061b57203f9cb18cadebcdf0f3ad5d6bf86d204d1d65d014d80d5fa31024b632.json",
+      "feasible": true,
+      "worst_G": 0.01938250689129766,
+      "delta_honest_regret": 0.0017867773907037344,
+      "delta_honest_alpha": 0.00653234649122807,
+      "fitness": -0.01938250689129766,
+      "source": "pooled_run1/gen6",
+      "all_candidates": [
+        {
+          "cfg": {
+            "p": 0.1,
+            "tol": 6.0,
+            "kref": 0.5,
+            "L": 2500.0
+          },
+          "source": "original fallback",
+          "raw": "evaluations/5a0004ea3843780b99fd3257c0293df208bc12c1f10f686e543318545a4584a0.json",
+          "feasible": true,
+          "worst_G": 0.03532272470215725,
+          "delta_honest_regret": 0.0,
+          "delta_honest_alpha": 0.0,
+          "fitness": -0.03532272470215725
+        },
+        {
+          "gen": 3,
+          "cfg": {
+            "p": 0.1,
+            "tol": 6.963141662637752,
+            "kref": 0.4719129565092311,
+            "L": 4324.0
+          },
+          "raw": "evaluations/af45dd69db570263ff12c7d4f6bb20d816c7dd4e66d9df688efe8d93e04f29e7.json",
+          "feasible": true,
+          "worst_G": 0.029446798793665206,
+          "delta_honest_regret": -0.002315025372533342,
+          "delta_honest_alpha": -0.009386184210526317,
+          "fitness": -0.029446798793665206,
+          "source": "pooled_run0/gen3"
+        },
+        {
+          "gen": 6,
+          "cfg": {
+            "p": 0.1,
+            "tol": 7.387654665885752,
+            "kref": 0.5343051982217701,
+            "L": 5000.0
+          },
+          "raw": "evaluations/d1818734298046759b76d9545440354e755b04abc957b1217dc910f71a107cce.json",
+          "feasible": true,
+          "worst_G": 0.048596986084059775,
+          "delta_honest_regret": -0.005957441416672548,
+          "delta_honest_alpha": -0.023328399122807014,
+          "fitness": -0.048596986084059775,
+          "source": "pooled_run0/gen6"
+        },
+        {
+          "gen": 9,
+          "cfg": {
+            "p": 0.1,
+            "tol": 8.0,
+            "kref": 0.4233372154413391,
+            "L": 5000.0
+          },
+          "raw": "evaluations/080434bb931d6e4f847b63bab91318dcdf0c5e0d59cff2e3ed20a48687161458.json",
+          "feasible": true,
+          "worst_G": 0.028464428342404986,
+          "delta_honest_regret": -0.0031013597140060046,
+          "delta_honest_alpha": -0.01231875,
+          "fitness": -0.028464428342404986,
+          "source": "pooled_run0/gen9"
+        },
+        {
+          "gen": 12,
+          "cfg": {
+            "p": 0.1,
+            "tol": 7.797159514793316,
+            "kref": 0.5051561856218875,
+            "L": 5000.0
+          },
+          "raw": "evaluations/8ed0e33c5edf8101573ab4e98424b25e023dff08905066e70a1361e9daf42cd4.json",
+          "feasible": true,
+          "worst_G": 0.046399812665420495,
+          "delta_honest_regret": -0.00602970310468096,
+          "delta_honest_alpha": -0.023876644736842104,
+          "fitness": -0.046399812665420495,
+          "source": "pooled_run0/gen12"
+        },
+        {
+          "gen": 3,
+          "cfg": {
+            "p": 0.1,
+            "tol": 6.775963068542127,
+            "kref": 0.47935629162581317,
+            "L": 4443.0
+          },
+          "raw": "evaluations/a760a86b0272e4646016b6884d7baeab7b46e0759baa88fd9b0852fd1d42612f.json",
+          "feasible": true,
+          "worst_G": 0.027287423832310358,
+          "delta_honest_regret": -0.0016913268752467325,
+          "delta_honest_alpha": -0.006862938596491229,
+          "fitness": -0.027287423832310358,
+          "source": "pooled_run1/gen3"
+        },
+        {
+          "gen": 6,
+          "cfg": {
+            "p": 0.1,
+            "tol": 6.77005290146592,
+            "kref": 0.4560583957673218,
+            "L": 4479.0
+          },
+          "raw": "evaluations/061b57203f9cb18cadebcdf0f3ad5d6bf86d204d1d65d014d80d5fa31024b632.json",
+          "feasible": true,
+          "worst_G": 0.01938250689129766,
+          "delta_honest_regret": 0.0017867773907037344,
+          "delta_honest_alpha": 0.00653234649122807,
+          "fitness": -0.01938250689129766,
+          "source": "pooled_run1/gen6"
+        },
+        {
+          "gen": 9,
+          "cfg": {
+            "p": 0.1,
+            "tol": 6.644898633846565,
+            "kref": 0.47720064152882397,
+            "L": 4631.0
+          },
+          "raw": "evaluations/50adaa2245ea02627f09e6fbd749ecb1f944f9324103114d593c5a831952dc6f.json",
+          "feasible": true,
+          "worst_G": 0.024060330903563416,
+          "delta_honest_regret": 7.203335870969202e-05,
+          "delta_honest_alpha": 0.0006566885964912278,
+          "fitness": -0.024060330903563416,
+          "source": "pooled_run1/gen9"
+        },
+        {
+          "gen": 12,
+          "cfg": {
+            "p": 0.1,
+            "tol": 7.364998540671159,
+            "kref": 0.4541075566861491,
+            "L": 4794.0
+          },
+          "raw": "evaluations/1e35403135c788b449962838a4188b723410bead0d9c7dca7c7f26b6dd74b1fa.json",
+          "feasible": true,
+          "worst_G": 0.027549804600218615,
+          "delta_honest_regret": -0.002651849254865858,
+          "delta_honest_alpha": -0.011032675438596491,
+          "fitness": -0.027549804600218615,
+          "source": "pooled_run1/gen12"
+        }
+      ]
+    }
+  }
+}
