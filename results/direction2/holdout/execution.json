@@ -1,0 +1,14 @@
+{
+  "schema": "holdout-execution/1",
+  "manifest_sha256": "987c9b4aa9905faa1b7f0754e6a8792b6db85fd4a0f1f814321ea6d689b6e765",
+  "exit_code": 0,
+  "preflight": {
+    "cpu_passed": 7,
+    "gpu_passed": 1
+  },
+  "log_sha256": "4ad4eb751426d9a63606edae179d1a411069c4fc2b1e43856b81afd193088d63",
+  "batch_file_sha256": {
+    "rl": "e5cb641b284e42a9134186b195e19ad1910350112cd851b455739f68bf168efc",
+    "hw": "7e403bdcbe920a93fe5416073ff82f8b6ea72a26c593a1360849960bac48bdee"
+  }
+}

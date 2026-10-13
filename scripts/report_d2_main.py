@@ -224,6 +224,9 @@ def main():
     if (report_dir / "postmain-diagnostics.md").exists():
         summary += ["", "後續已完成 [截斷偏差、特徵消融與公開行為診斷](postmain-diagnostics.md)。"
                     "這批只用 validation，屬主實驗後的探索性分析；不校正此處 test 數字，也不新增獨立複現證據。"]
+    if (report_dir / "independent-holdout.md").exists():
+        summary += ["", "另行登記的 [64-seed 獨立環境 holdout](independent-holdout.md)已完成；"
+                    "[本階段結論](conclusion.md)整合新資料確認與既有證據。此處保留原始 test 與 J3 判定。"]
     # Each CI/MDE has a deterministic JSON source path and a recomputation check.
     audit_md = ["# 方向二主實驗數字稽核", "", f"共 {len(audited)} 項 CI／MDE 從原始 snapshot 重算，全部一致。判定另以獨立條件式核對為 {expected_row}。",
                 "", "原始檔：results/direction2/main.json；以下 JSON 路徑均相對其根節點。逐 seed 原始資料位於 results/direction2/main_eval/。", "",

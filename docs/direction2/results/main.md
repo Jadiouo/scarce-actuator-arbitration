@@ -61,3 +61,5 @@
 相關：[正式評估協定](../design/main-evaluation.md)、[S1 結果](s1.md)、[凍結規格](../../direction2-spec.md)。
 
 後續已完成 [截斷偏差、特徵消融與公開行為診斷](postmain-diagnostics.md)。這批只用 validation，屬主實驗後的探索性分析；不校正此處 test 數字，也不新增獨立複現證據。
+
+另行登記的 [64-seed 獨立環境 holdout](independent-holdout.md)已完成；[本階段結論](conclusion.md)整合新資料確認與既有證據。此處保留原始 test 與 J3 判定。

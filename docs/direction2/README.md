@@ -4,6 +4,8 @@
 
 建議閱讀順序：
 
+先看[本階段結論與收尾](results/conclusion.md)：獨立環境 holdout 的確認結果、哪些問題已完成，以及下一個研究問題的邊界。[完整 holdout 結果](results/independent-holdout.md)與[執行前協定](design/independent-holdout.md)保留這次額外確認的判準與稽核。
+
 1. [正式主實驗結果](results/main.md)：六個 run 的 test、配對 95% CI、凍結 MDE 與複現判定。
 2. [主實驗後診斷](results/postmain-diagnostics.md)：截斷偏差、固定策略的特徵消融與公開報告行為；屬 validation 上的事後分析。
 3. [數字稽核](results/number-audit.md)：從原始逐 seed 效用重算；[評估協定](design/main-evaluation.md)說明事前選取和判定規則。
