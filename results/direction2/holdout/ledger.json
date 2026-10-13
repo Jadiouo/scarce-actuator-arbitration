@@ -4,5 +4,11 @@
     "contract_sha256": "176cdd0b22e250c536edd986e8d90fb6855a570a01b3cf0fc584d3d224949d8c",
     "started_unix": 1791882516.462893,
     "raw_sha256": "e5cb641b284e42a9134186b195e19ad1910350112cd851b455739f68bf168efc"
+  },
+  "hw": {
+    "status": "completed",
+    "contract_sha256": "ceda10ae8724b2b5b855eee4d07347d8d2961b8d4c80229f31c5b8c0514d7172",
+    "started_unix": 1791882566.9896383,
+    "raw_sha256": "7e403bdcbe920a93fe5416073ff82f8b6ea72a26c593a1360849960bac48bdee"
   }
 }
