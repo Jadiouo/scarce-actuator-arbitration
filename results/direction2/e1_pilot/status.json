@@ -1,14 +1,14 @@
 {
   "stage": "attacker",
-  "updated_unix": 1791931719.7828462,
+  "updated_unix": 1791931985.0434706,
   "started_unix": 1791884268.8821096,
   "manifest_sha256": "d2ed1a1198963fb5dbba95f6a2ed697f1bd34032b9e5f646396bffdf3e98baac",
   "pool": "pooled",
   "run": 1,
-  "generation": 80,
+  "generation": 100,
   "candidate": 8,
   "candidate_seconds": 81.07239818572998,
   "feasible": false,
   "defender": "pooled",
-  "generation_seconds": 48.8123779296875
+  "generation_seconds": 49.12367057800293
 }
