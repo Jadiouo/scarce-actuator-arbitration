@@ -1,0 +1,12 @@
+{
+  "schema": "e1-preflight/1",
+  "manifest_sha256": "d2ed1a1198963fb5dbba95f6a2ed697f1bd34032b9e5f646396bffdf3e98baac",
+  "short_seconds": 8.62257170677185,
+  "short_rounds": 2000,
+  "rough_defender_hours": 11.520713863770167,
+  "attack_short_seconds": 1.158355951309204,
+  "rough_attacker_train_hours": 2.316711902618408,
+  "rough_total_hours": 14.837425766388575,
+  "note": "Step-time extrapolation at production training batch sizes; includes approximate validation overhead, not a guarantee.",
+  "snapshot_finite": true
+}
