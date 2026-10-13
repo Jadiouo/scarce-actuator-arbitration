@@ -59,3 +59,5 @@
 
 資料：[main.json](../../../results/direction2/main.json)、[逐 seed 與選取紀錄](../../../results/direction2/main_eval/)、[機器可讀稽核](../../../results/direction2/main_audit.json)、[數字來源表](number-audit.md)。重建：`python3 scripts/report_d2_main.py`（CPU，不重新評估政策）。
 相關：[正式評估協定](../design/main-evaluation.md)、[S1 結果](s1.md)、[凍結規格](../../direction2-spec.md)。
+
+後續已完成 [截斷偏差、特徵消融與公開行為診斷](postmain-diagnostics.md)。這批只用 validation，屬主實驗後的探索性分析；不校正此處 test 數字，也不新增獨立複現證據。

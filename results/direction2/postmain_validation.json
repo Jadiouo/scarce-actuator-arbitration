@@ -1,0 +1,28 @@
+{
+  "schema": "postmain-validation/1",
+  "date": "2026-10-13",
+  "location": "school",
+  "exit_code": 0,
+  "preflight": {
+    "cpu_passed": 5,
+    "gpu_passed": 1
+  },
+  "independent_numeric_checks": 1748,
+  "frozen_artifacts_unchanged_from": "4b8c9cd",
+  "formal_ledger_entries": 42,
+  "source_sha256": "5c5ac62595a7aa24e595885adb12f65bcba505eabc2932ab6643ffc39e6c1ee2",
+  "diagnostic_script_sha256": "d1a7ea9cc069f3489c78d7f0ed182af3a1bea7f0eef293273ebd6a51024a626d",
+  "protocol_sha256": "22d4684b2409019fe0ec1447e2d9bd68f46f79bff04162aa6e10732db4c8f24a",
+  "raw_batches": 4,
+  "split": "validation only",
+  "attempt_notes": [
+    "Policy aliasing was caught and fixed during preflight before diagnostics.",
+    "One unsaved validation tail run was repeated after encoding the legacy infinity sentinel in metadata; simulation parameters unchanged."
+  ],
+  "raw_sha256": {
+    "results/direction2/postmain/main_M3C_r0.5__tail_raw.json": "12b59409ff5cbe94a6793aadead855ce734af759b58500375f149a6d3d63e703",
+    "results/direction2/postmain/behavior_raw.json": "c2f597e0748977c497b08e793fb4679f4163c6a5715727f74b2ad1329a2ebd95",
+    "results/direction2/postmain/main_M3C_r0.9__tail_raw.json": "6755b0c665089f018ebf9d104de55be518dc29db287be8f290af4f8bbfc8e23b",
+    "results/direction2/postmain/ablation_raw.json": "1c202b68674cb0936c7d404566cf08348be835181e7a972e3b49a3ef4ce22f5a"
+  }
+}

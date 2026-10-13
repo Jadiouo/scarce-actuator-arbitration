@@ -221,6 +221,9 @@ def main():
                 "[機器可讀稽核](../../../results/direction2/main_audit.json)、[數字來源表](number-audit.md)。"
                 "重建：`python3 scripts/report_d2_main.py`（CPU，不重新評估政策）。",
                 "相關：[正式評估協定](../design/main-evaluation.md)、[S1 結果](s1.md)、[凍結規格](../../direction2-spec.md)。"]
+    if (report_dir / "postmain-diagnostics.md").exists():
+        summary += ["", "後續已完成 [截斷偏差、特徵消融與公開行為診斷](postmain-diagnostics.md)。"
+                    "這批只用 validation，屬主實驗後的探索性分析；不校正此處 test 數字，也不新增獨立複現證據。"]
     # Each CI/MDE has a deterministic JSON source path and a recomputation check.
     audit_md = ["# 方向二主實驗數字稽核", "", f"共 {len(audited)} 項 CI／MDE 從原始 snapshot 重算，全部一致。判定另以獨立條件式核對為 {expected_row}。",
                 "", "原始檔：results/direction2/main.json；以下 JSON 路徑均相對其根節點。逐 seed 原始資料位於 results/direction2/main_eval/。", "",
