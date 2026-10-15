@@ -1,12 +1,12 @@
 {
-  "stage": "failed",
-  "updated_unix": 1792065940.3337955,
+  "stage": "defender",
+  "updated_unix": 1792066646.8363495,
   "graph_fallback_used": false,
-  "started_unix": 1792064776.4008667,
+  "started_unix": 1792065979.3424497,
   "manifest_sha256": "34fe0eb85c218d4b847e39c8ca912559b9cdf68dd5ed67ed44f03a9ff9b51c09",
   "round": 1,
-  "run": 0,
-  "generation": 12,
+  "run": 1,
+  "generation": 1,
   "candidate": 8,
   "error_type": "CalledProcessError",
   "message": "Command '['git', 'push', 'origin', 'direction2-freeze']' returned non-zero exit status 1."
