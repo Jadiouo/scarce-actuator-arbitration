@@ -20,7 +20,7 @@
 | 設計 | [測試對照表](design/test-map.md)、[S1 評估實作](design/s1-evaluation.md)、[加速計畫](design/speedup.md) |
 | 漏洞設計 | [盲設計 prompt](design/blind-designer-prompt.md)、[有效設計](design/blind-vulns.md)、[交付格式](design/vuln-format.md) |
 | 審查 | [正式主實驗驗證](reviews/main-evaluation.md)、[S1 評估實作審查](reviews/s1-evaluation.md)、[S1 結果審查](reviews/s1-results.md)、[加速審查](reviews/speedup.md) |
-| 歷史 | [10/13 工作日誌與交接](history/worklog-2026-10-13.md)、[研究與部署紀錄](history/direction2-notes.md) |
+| 歷史 | [10/15 工作日誌與交接](history/worklog-2026-10-15.md)、[10/13 工作日誌](history/worklog-2026-10-13.md)、[研究與部署紀錄](history/direction2-notes.md) |
 | 封存 | [受汙染、不計入統計的第一份盲設計](archive/blind-vulns-contaminated.md) |
 
 原始產物位於 [results/direction2/](../../results/direction2/)。正式主實驗逐 seed 原始資料和選取紀錄位於 `results/direction2/main_eval/`，`main.json` 是彙整入口。機制參數、策略權重和 test seeds 不因整理文件而改動。
