@@ -768,3 +768,13 @@
 - 實作 b1b61f7；程式紅隊無 BLOCKER，HIGH：18 h 上限無自動續跑；MEDIUM：test 路徑未在 GPU 驗證就可能燒掉 test seeds、test 中 graph fallback 會使兩邊路徑不同。修正 1c9f1c6：launcher 自動續跑、watchdog 範本（只負責 all，不跑 test）、testcheck stage（AS 前 64 seeds，graph 分塊 vs eager 逐位相同才放行 test，檢查在 ledger started 之前）、test/testcheck 禁止 fallback。實作偏離與詮釋 12 條揭露於 docs/direction2/design/e1-v2-impl-notes.md（含次要結果 5、6 未實作、訓練 fitness 用 n=16 點估計）。
 - 驗證：本機 CPU pytest 40 passed；launcher／watchdog 語法通過、無 --concurrent。
 - 下一步：學校 audit → smoke → freeze（commit manifest）→ all（watchdog）→ select 後 commit freeze_record → testcheck → test → report。
+
+## 2026-10-15 E1 v2 在學校開跑
+
+- 學校 GPU 空閒（無 compute 程式、無 tmux session、crontab 原為空，備份 `~/crontab.e1v2.bak`）；`git pull --ff-only` 到 965b9d4。
+- `audit`：7168 / 4896 / 0（新展開 seeds／既有／交集）。
+- `smoke`（tmux，log `~/logs/e1v2_smoke.log`）：pytest 40 passed；所有階段（s1,s2,sx,select）走完，status complete、`graph_fallback_used=false`、無 GRAPH_FALLBACK；攻擊者每代約 0.4–1.1 秒（smoke 規模），GPU util 約 19%。smoke 輸出已移出 repo（`~/logs/e1v2_smoke_out`）。
+- `freeze`：manifest sha256 34fe0eb8…c09，code_git_sha 965b9d4（已 push）；design_sha256 9306f5f3…551a，與 `git show 94ad969:docs/direction2/design/e1-v2.md | sha256sum` 相同。commit a76bf8a（manifest.json + seed_audit.json）已 push。
+- 正式開跑：`~/e1v2_watchdog.sh`（repo 範本原樣複製）啟動 tmux `e1v2`：`bash scripts/e1_v2_launch.sh all`（s1,s2,sx,select；不含 testcheck／test）。crontab：`@reboot sleep 120 && $HOME/e1v2_watchdog.sh`、`*/15 * * * * $HOME/e1v2_watchdog.sh`。說明檔 `~/E1V2_README.txt`。
+- 首個進度 commit：92a29f0（defender round 1 run0 generation 1）。防守每代約 12.5 分鐘（約 16:31 起跑，16:44 完成第 1 代），GPU util 約 17–25%，無 graph fallback。
+- ETA（`dry-run`）：不延長約 24.8 小時，最壞（含 sx 延長）33.6 小時。testcheck／test 待訓練完成與審查後手動執行。
