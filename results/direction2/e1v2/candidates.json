@@ -1,0 +1,42 @@
+{
+  "manifest_sha256": "34fe0eb85c218d4b847e39c8ca912559b9cdf68dd5ed67ed44f03a9ff9b51c09",
+  "r1_winners": [
+    {
+      "gen": 12,
+      "cfg": {
+        "p": 0.1,
+        "tol": 5.648329494330207,
+        "kref": 0.5316640366231022,
+        "L": 2708.0
+      },
+      "raw": "evaluations/7b23cde921451f66476ec1c97e5b4e43d0d70cd8ffff65a1bcc3ece354c33988.json",
+      "worst_G": 0.03323279890215442,
+      "feasible": true,
+      "ub_regret": 0.0013545547456181087,
+      "ub_alpha": 0.005775955921670456,
+      "mean_regret": 0.0011070203243222056,
+      "mean_alpha": 0.004791063596491227,
+      "n": 128,
+      "source": "r1_run0/gen12"
+    },
+    null
+  ],
+  "C1": {
+    "gen": 12,
+    "cfg": {
+      "p": 0.1,
+      "tol": 5.648329494330207,
+      "kref": 0.5316640366231022,
+      "L": 2708.0
+    },
+    "raw": "evaluations/7b23cde921451f66476ec1c97e5b4e43d0d70cd8ffff65a1bcc3ece354c33988.json",
+    "worst_G": 0.03323279890215442,
+    "feasible": true,
+    "ub_regret": 0.0013545547456181087,
+    "ub_alpha": 0.005775955921670456,
+    "mean_regret": 0.0011070203243222056,
+    "mean_alpha": 0.004791063596491227,
+    "n": 128,
+    "source": "r1_run0/gen12"
+  }
+}
