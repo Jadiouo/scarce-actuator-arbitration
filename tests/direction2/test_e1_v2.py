@@ -8,6 +8,8 @@ import pytest
 from arbitration.rl import policy
 from scripts import e1_v2 as e
 
+_REAL_SIM = e.sim
+
 
 # ------------------------------------------------------------------ seeds
 def test_blocks_expand_to_registered_counts_and_are_disjoint_from_existing():
@@ -333,7 +335,7 @@ def smoke_env(tmp_path, monkeypatch, fake):
 def _reset_mode():
     yield
     e.MODE.pop('out', None)
-    e.MODE.update(smoke=False, backup=False, start=None)
+    e.MODE.update(smoke=False, backup=False, start=None, strict=False, graph=False, fallback=False, device='cuda')
 
 
 def run_all(m):
@@ -436,6 +438,10 @@ def official_env(tmp_path, monkeypatch, status='go'):
 
 def test_test_stage_unlocks_only_via_freeze_and_runs_each_evaluation_once(tmp_path, monkeypatch):
     m, seen = official_env(tmp_path, monkeypatch)
+    e.MODE.update(strict=True)
+    monkeypatch.setattr(e, 'sim_eager', e.sim)
+    e.run_testcheck()
+    del seen[:]
     res = e.run_test()
     assert res['category'] == 'established' and res['attack_may_be_unsaturated'] == dict(orig=False, C1=True)
     assert sum(seen[:16]) == 1024 and set(seen) == {64}
@@ -473,3 +479,125 @@ def test_verify_freeze_requires_files_matching_hash_and_commit(tmp_path, monkeyp
         e.verify_freeze(m)                                       # tampered after registration
     with pytest.raises(ValueError):
         e.verify_freeze(dict(smoke=True, sha256='synthetic'))    # smoke never opens test
+
+
+# ------------------------------------------------------------------ testcheck, strict graph, auto-resume
+def tc_env(tmp_path, monkeypatch, eager_shift=0.0):
+    m, seen = official_env(tmp_path, monkeypatch)
+    e.MODE.update(strict=True, graph=False, device='cpu')
+    sel = e.verify_freeze(m)
+    inner = e.sim
+
+    def eager(m_, cfg, pols, sd, T):
+        r = inner(m_, cfg, pols, sd, T)
+        if eager_shift:
+            r = dict(r, snap=dict(r['snap'], util_b=(np.asarray(r['snap']['util_b'])+eager_shift).tolist()))
+        return r
+    monkeypatch.setattr(e, 'sim_eager', eager)
+    return m, seen
+
+
+def test_testcheck_uses_only_as_seeds_and_writes_passing_record(tmp_path, monkeypatch):
+    m, seen = tc_env(tmp_path, monkeypatch)
+    used = []
+    inner = e.sim
+    monkeypatch.setattr(e, 'sim', lambda m_, c, p, sd, T: (used.append(list(sd)), inner(m_, c, p, sd, T))[1])
+    rec = e.run_testcheck()
+    assert rec['passed'] and [c['name'] for c in rec['checks']] == ['orig_main', 'cand_main', 'orig_secondary', 'cand_secondary']
+    flat = {s for u in used for s in u}
+    assert flat <= set(m['seeds']['AS'][:64]) and not flat & set(m['seeds']['TEST']) and len(flat) == 64
+    assert e.read(tmp_path/'testcheck.json')['tolerance'].startswith('exact')
+
+
+def test_testcheck_fails_on_any_difference_and_test_then_refuses_before_ledger(tmp_path, monkeypatch):
+    m, seen = tc_env(tmp_path, monkeypatch, eager_shift=1e-12)
+    with pytest.raises(RuntimeError):
+        e.run_testcheck()
+    assert e.read(tmp_path/'testcheck.json')['passed'] is False
+    n = len(seen)
+    with pytest.raises(ValueError):
+        e.run_test()
+    assert not (tmp_path/'test').exists() and len(seen) == n         # no ledger, no test seed touched
+
+
+def test_test_refuses_without_or_with_stale_testcheck(tmp_path, monkeypatch):
+    m, seen = tc_env(tmp_path, monkeypatch)
+    with pytest.raises(ValueError):
+        e.run_test()                                                   # missing
+    e.run_testcheck()
+    e.run_test()                                                       # passes with a fresh record
+    assert (tmp_path/'test/ledger.json').exists()
+    for key, val in (('manifest_sha256', 'other'), ('freeze_record_sha256', 'other')):
+        t = e.read(tmp_path/'testcheck.json')
+        e.write(tmp_path/'testcheck.json', dict(t, **{key: val}))
+        with pytest.raises(ValueError):
+            e.require_testcheck(m, e.verify_freeze(m))
+        e.write(tmp_path/'testcheck.json', t)
+    e.write(tmp_path/'testcheck.json', dict(t, path=dict(t['path'], graph=True)))
+    with pytest.raises(ValueError):
+        e.require_testcheck(m, e.verify_freeze(m))                      # different execution path
+
+
+def test_graph_failure_in_strict_mode_is_fatal_and_precedes_ledger(tmp_path, monkeypatch):
+    m, seen = tc_env(tmp_path, monkeypatch)
+    e.run_testcheck()
+    e.MODE.update(device='cuda', graph=True, fallback=True)           # fallback requested but strict must ignore it
+    t = e.read(tmp_path/'testcheck.json')
+    e.write(tmp_path/'testcheck.json', dict(t, path=dict(t['path'], graph=True, device='cuda')))
+    monkeypatch.setattr(e, 'sim', _REAL_SIM)
+    monkeypatch.setattr(e.GRAPH, 'get', lambda: object())
+    monkeypatch.setattr(e.v1, 'simulate', lambda *a, **k: (_ for _ in ()).throw(RuntimeError('CUDA graph capture failed')))
+    with pytest.raises(RuntimeError, match='graph'):
+        e.run_test()
+    assert not (tmp_path/'test').exists()                              # failed before the ledger
+    assert not (tmp_path/'graph_fallback.json').exists()
+
+
+def test_non_strict_fallback_still_works_and_is_flagged(tmp_path, monkeypatch):
+    m = dict(params=e.PARAMS)
+    e.MODE.update(smoke=False, out=str(tmp_path), device='cuda', graph=True, fallback=True, strict=False)
+    calls = []
+
+    def simulate(cfg, pols, sd, T, g, dev, ex):
+        calls.append(g)
+        if g is not None:
+            raise RuntimeError('CUDA graph replay failed')
+        return 'eager'
+    monkeypatch.setattr(e.v1, 'simulate', simulate)
+    monkeypatch.setattr(e.GRAPH, 'g', object())
+    monkeypatch.setattr(e.GRAPH, 'failed', False)
+    assert e.sim(m, e.BASE_CFG, [], [1], 10) == 'eager'
+    assert e.fallback_used() and e.plan_summary.__name__
+    e.stamp('x')
+    assert e.read(tmp_path/'status.json')['graph_fallback_used'] is True
+    e.GRAPH.failed, e.GRAPH.g = False, None
+    e.MODE.update(device='cpu', graph=False)
+
+
+def test_launcher_auto_resumes_on_75_and_passes_other_codes(tmp_path):
+    import os
+    import shutil
+    import subprocess
+    root = tmp_path/'repo'
+    (root/'scripts').mkdir(parents=True)
+    src = e.ROOT/'scripts/e1_v2_launch.sh'
+    shutil.copy(src, root/'scripts/e1_v2_launch.sh')
+    (root/'bin').mkdir()
+    (root/'bin/nvidia-smi').write_text('#!/bin/sh\nexit 0\n')
+    (root/'bin/nvidia-smi').chmod(0o755)
+    (root/'tests/direction2').mkdir(parents=True)
+    (root/'tests/direction2/test_e1_v2.py').write_text('def test_ok():\n    pass\n')
+    fake = root/'fakepy'
+    fake.write_text('#!/bin/sh\n[ "$1" = "-m" ] && exit 0\nn=$(cat count 2>/dev/null || echo 0); n=$((n+1)); echo $n > count\n'
+                    '[ "$n" -lt 3 ] && exit 75\nexit ${FINAL_RC:-0}\n')
+    fake.chmod(0o755)
+    env = dict(os.environ, PATH=f'{root}/bin:'+os.environ['PATH'], PYTHON=str(fake))
+    r = subprocess.run(['bash', 'scripts/e1_v2_launch.sh', 'all'], cwd=root, env=env, capture_output=True, text=True)
+    assert r.returncode == 0 and (root/'count').read_text().strip() == '3'
+    assert (root/'results/direction2/runlogs/e1_v2_all.log').read_text().count('auto-resume') == 2
+    (root/'count').unlink()
+    r = subprocess.run(['bash', 'scripts/e1_v2_launch.sh', 'select'], cwd=root, env=dict(env, FINAL_RC='7'), capture_output=True, text=True)
+    assert r.returncode == 7                                            # other exit codes pass through unchanged
+    (root/'count').write_text('2')
+    r = subprocess.run(['bash', 'scripts/e1_v2_launch.sh', 'test'], cwd=root, env=dict(env, FINAL_RC='7'), capture_output=True, text=True)
+    assert r.returncode == 7 and (root/'count').read_text().strip() == '3'    # test: no retry, no resume

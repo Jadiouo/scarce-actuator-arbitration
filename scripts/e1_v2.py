@@ -53,7 +53,7 @@ SMOKE_PARAMS = dict(
     attacker=dict(PARAMS['attacker'], lam=8, n_at=4, gens=4, ext_gens=4, val_every=2, sat_threshold=1e-9))
 SMOKE_N = 8
 
-MODE = dict(smoke=False, device='cuda', graph=False, fallback=False, backup=False, start=None)
+MODE = dict(smoke=False, device='cuda', graph=False, fallback=False, backup=False, start=None, strict=False)  # strict: test/testcheck, no graph fallback
 
 
 class BudgetStop(Exception):
@@ -383,11 +383,16 @@ def check_budget():
         raise BudgetStop()
 
 
+def fallback_used():
+    return bool((out_dir()/'graph_fallback.json').exists())
+
+
 def stamp(stage, **kw):
     p = out_dir()/'status.json'
     old = read(p) if p.exists() else {}
-    write(p, dict(old, stage=stage, updated_unix=time.time(), **kw))
-    print(stage, json.dumps(kw), flush=True)
+    fb = fallback_used()
+    write(p, dict(old, stage=stage, updated_unix=time.time(), graph_fallback_used=fb, **kw))
+    print(stage, json.dumps(kw), 'GRAPH_FALLBACK_USED=TRUE (eager continuation, see graph_fallback.json)' if fb else '', flush=True)
 
 
 def mark_done(name):
@@ -421,7 +426,7 @@ class Graph:
         self.failed = (out_dir()/'graph_fallback.json').exists()
 
     def get(self):
-        if not MODE['graph'] or self.failed or not MODE['device'].startswith('cuda'):
+        if not MODE['graph'] or (self.failed and not MODE['strict']) or not MODE['device'].startswith('cuda'):
             return None
         if self.g is None:
             self.g = graphsim.from_env(MODE['device'], force=True)
@@ -445,12 +450,17 @@ def sim(m, cfg, pols, sd, T):
     try:
         return fn(g)
     except Exception as e:
-        if not (MODE['fallback'] and _graph_error(e)):
-            raise
+        if MODE['strict'] or not (MODE['fallback'] and _graph_error(e)):
+            raise      # test/testcheck: a graph failure is a hard error, never an eager fallback
         GRAPH.failed, GRAPH.g = True, None
         write(out_dir()/'graph_fallback.json', dict(error=type(e).__name__, message=str(e)[:500], unix=time.time()))
         print('GRAPH FALLBACK: continuing eager from the saved state', flush=True)
         return fn(None)
+
+
+def sim_eager(m, cfg, pols, sd, T):
+    """Reference path for testcheck: no graph, one call (not chunked)."""
+    return v1.simulate(cfg, pols, sd, T, None, MODE['device'], m['params']['exclude'])
 
 
 def evaluate(m, cfg, sd, stage, pols, ids, unlocked=False):
@@ -822,6 +832,84 @@ def simulate_chunked(m, cfg, pols, sd, chunk):
     return dict(T_score=int(parts[0]['T_score']), snap=snap)
 
 
+TESTCHECK_N = 64
+
+
+def test_path_id():
+    """The execution path that testcheck verifies and test must reuse unchanged."""
+    return dict(graph=bool(MODE['graph']), device=MODE['device'], chunk=None, fallback=False)
+
+
+def test_pols(sel):
+    """(name, which, policies) of every test evaluation, in the same construction as run_test."""
+    names = dict(orig=sel['astar']['orig'], cand=sel['astar'][sel['choice']['label']])
+    out = [('orig_main', 'orig', [names['orig']['theta']]), ('cand_main', 'cand', [names['cand']['theta']])]
+    th = secondary_thetas(sel)
+    out += [('orig_secondary', 'orig', [t for _, t in th]), ('cand_secondary', 'cand', [t for _, t in th])]
+    return [(n, w, [honest_pol()]+[mlp(t) for t in ts]) for n, w, ts in out]
+
+
+def run_testcheck():
+    """GPU pre-check on AS seeds (never test seeds): the test code path (simulate_chunked, graph, test chunk) must reproduce eager results exactly."""
+    m = load_manifest()
+    sel = verify_freeze(m)
+    d = out_dir()
+    if sel['status'] != 'go':
+        print('no candidate entered test: testcheck not needed', flush=True)
+        return None
+    if not MODE['strict']:
+        raise RuntimeError('testcheck must run in strict mode (no graph fallback)')
+    if MODE['device'].startswith('cuda') and not MODE['graph']:
+        raise RuntimeError('testcheck/test on cuda must use --graph (the verified path)')
+    sd = m['seeds']['AS'][:TESTCHECK_N]
+    require_seeds(sd, 'as', m)
+    chunk = m['params']['test_chunk']
+    cfgs = dict(orig=BASE_CFG, cand=sel['choice']['cfg'])
+    T = m['params']['T_val']
+    checks = []
+    for name, which, pols in test_pols(sel):
+        got = simulate_chunked(m, cfgs[which], pols, sd, chunk)
+        ref = sim_eager(m, cfgs[which], pols, sd, T)
+        diff = {}
+        for k in main_eval.SNAP_FIELDS:
+            a, b = np.asarray(got['snap'][k], float), np.asarray(ref['snap'][k], float)
+            diff[k] = dict(shape_equal=a.shape == b.shape, identical=bool(a.shape == b.shape and np.array_equal(a, b)),
+                           max_abs=float(np.max(np.abs(a-b))) if a.shape == b.shape and a.size else None,
+                           n_seeds_differ=int((a != b).reshape(a.shape[0], a.shape[1], -1).any(-1).any(0).sum()) if a.shape == b.shape and a.ndim >= 2 else None)
+        ok = int(got['T_score']) == int(ref['T_score']) and all(v['identical'] for v in diff.values())
+        checks.append(dict(name=name, n_policies=len(pols), n_seeds=len(sd), identical=ok, fields=diff))
+        print('testcheck', name, 'identical' if ok else 'MISMATCH', flush=True)
+    rec = dict(schema='e1-v2-testcheck/1', manifest_sha256=m['sha256'], freeze_record_sha256=sha(d/'freeze_record.json'),
+               path=dict(test_path_id(), chunk=chunk), seeds=[sd[0], sd[-1], len(sd)], tolerance='exact equality, no tolerance',
+               passed=all(c['identical'] for c in checks), checks=checks, graph_fallback_used=False, unix=time.time())
+    write(d/'testcheck.json', rec)
+    publish('E1 v2: testcheck')
+    if not rec['passed']:
+        raise RuntimeError('testcheck failed: the test path differs from eager; test refused')
+    return rec
+
+
+def require_testcheck(m, sel):
+    """Called before anything is written to the ledger."""
+    d = out_dir()
+    p = d/'testcheck.json'
+    if not p.exists():
+        raise ValueError('testcheck.json is missing: run the testcheck stage first')
+    t = read(p)
+    if not t.get('passed') or t['manifest_sha256'] != m['sha256'] or t['freeze_record_sha256'] != sha(d/'freeze_record.json'):
+        raise ValueError('testcheck.json failed or does not match the current manifest/freeze_record')
+    if t['path'] != dict(test_path_id(), chunk=m['params']['test_chunk']):
+        raise ValueError('test execution path differs from the one testcheck verified')
+    if MODE['device'].startswith('cuda') and not MODE['graph']:
+        raise ValueError('test on cuda must use --graph (the verified path)')
+    if MODE['graph'] and MODE['device'].startswith('cuda'):
+        # the graph must capture for every test evaluation shape before the ledger is touched (AS seeds only)
+        sd = m['seeds']['AS'][:m['params']['test_chunk']]
+        cfgs = dict(orig=BASE_CFG, cand=sel['choice']['cfg'])
+        for name, which, pols in test_pols(sel):
+            sim(m, cfgs[which], pols, sd, m['params']['T_val'])
+
+
 def compute_result(m, sel, raw_o, raw_c):
     a, b = v1.metrics(raw_o), v1.metrics(raw_c)
     if raw_o['contract']['seeds'] != raw_c['contract']['seeds'] or raw_o['T_score'] != raw_c['T_score']:
@@ -832,7 +920,7 @@ def compute_result(m, sel, raw_o, raw_c):
                candidate=sel['choice']['label'], cfg=sel['choice']['cfg'], a_star={k: sel['astar'][k]['name'] for k in ('orig', sel['choice']['label'])},
                G_orig_mean=float(a['gains'][0].mean()), G_cand_mean=float(b['gains'][0].mean()),
                attack_may_be_unsaturated={k: v['attack_may_be_unsaturated'] for k, v in sel['saturation']['final'].items()},
-               L_at_upper_bound=sel['choice']['L_at_upper_bound'])
+               L_at_upper_bound=sel['choice']['L_at_upper_bound'], graph_fallback_used=fallback_used())
     return out
 
 
@@ -841,10 +929,11 @@ def run_test():
     sel = verify_freeze(m)
     d = out_dir()
     if sel['status'] != 'go':
-        res = dict(schema='e1-v2-result/1', manifest_sha256=m['sha256'], category='not_tested', text=sel['wording'], test_seeds_used=False)
+        res = dict(schema='e1-v2-result/1', manifest_sha256=m['sha256'], category='not_tested', text=sel['wording'], test_seeds_used=False, graph_fallback_used=fallback_used())
         write(d/'result.json', res)
         publish('E1 v2: no candidate entered test')
         return res
+    require_testcheck(m, sel)            # before the ledger and before test seeds are touched
     sd = m['seeds']['TEST']
     require_seeds(sd, 'test', m, unlocked=True)
     if len(sd) != m['params']['n_test']:
@@ -908,12 +997,12 @@ def plan_summary(m):
                         'select: transfer eval, a*, C*, freeze', 'test: once'],
                 attacker_gens=a['gens'], extension_gens=a['ext_gens'], defender_gens=p['defender']['gens'],
                 estimated_hours_without_extension=None if m['smoke'] else 24.8, estimated_hours_worst_case=None if m['smoke'] else 33.6,
-                stages_done=sorted(stages_done()), test_opens_only_after='select + committed freeze_record.json')
+                stages_done=sorted(stages_done()), graph_fallback_used=fallback_used(), test_opens_only_after='select + committed freeze_record.json')
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, allow_abbrev=False)
-    ap.add_argument('cmd', choices=['audit', 'freeze', 'run', 'test', 'status', 'dry-run', 'report'])
+    ap.add_argument('cmd', choices=['audit', 'freeze', 'run', 'test', 'testcheck', 'status', 'dry-run', 'report'])
     ap.add_argument('--stage', choices=['s1', 's2', 'sx', 'select', 'all'], default='all')
     ap.add_argument('--smoke', action='store_true')
     ap.add_argument('--backup', action='store_true')
@@ -922,7 +1011,10 @@ def main(argv=None):
     ap.add_argument('--device', default='cuda')
     a = ap.parse_args(argv)
     os.chdir(ROOT)
-    MODE.update(smoke=a.smoke, device=a.device, graph=a.graph, fallback=a.graph_fallback, backup=a.backup)
+    strict = a.cmd in ('test', 'testcheck')
+    MODE.update(smoke=a.smoke, device=a.device, graph=a.graph, fallback=a.graph_fallback and not strict, backup=a.backup, strict=strict)
+    if strict and a.smoke:
+        sys.exit('test/testcheck never run in smoke mode')
     GRAPH.failed = (out_dir()/'graph_fallback.json').exists()
     (ROOT/'.scratch').mkdir(exist_ok=True)
     if a.cmd == 'audit':
@@ -954,7 +1046,9 @@ def main(argv=None):
         MODE['start'] = time.time()
         try:
             m = load_manifest(clean=not a.smoke)
-            if a.cmd == 'test':
+            if a.cmd == 'testcheck':
+                run_testcheck()
+            elif a.cmd == 'test':
                 run_test()
             else:
                 stamp('running', started_unix=time.time(), manifest_sha256=m['sha256'])
