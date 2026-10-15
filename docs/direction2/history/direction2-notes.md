@@ -760,3 +760,11 @@
 - 整理 docs、同步學校先前累積的 83 個 commits，並確認 gpu-center 已加入 Codex skills。
 - 約 17:37 在學校啟動 E1 防守調參→攻擊再適應 pilot，17:46 查核仍在第一條防守訓練；尚無防守成效結論。實測預估 14–16 小時，未排正式 test。
 - 完整工作、驗證版本、限制與下次接手步驟見[今日工作日誌](worklog-2026-10-13.md)。
+
+## 2026-10-15 E1 v2：重新設計、實作與審查（開跑前）
+
+- 使用者看完 E1 pilot 紅隊結果後，選擇重新設計 E1（不停在 pilot）。
+- 設計 docs/direction2/design/e1-v2.md：初稿 02bf269；紅隊抓到 BLOCKER（新 seeds 加 generator offset 後撞到 pilot 61000000 系列）與 HIGH（選模 0.8 邊際使 v1 pooled 幾乎必被刷掉；288 test seeds 檢定力懸崖；誠實檢定力原文算錯）。修正版 94ad969：seeds 改 72000000 起（指揮官以 python 驗證展開後 7168 個互斥、與既有 4896 個無交集）、選模與 test 同用 1.0 倍上限、test 1024 seeds、飽和規則、決策樹、登記時的風險估計（「效果不足」或「無可行候選」是可能結果）。使用者同意開跑（約 30 h，最壞 40 h，學校 GPU；gpu-center status：學校空閒，Kaggle 單次 12 h 不適合）。
+- 實作 b1b61f7；程式紅隊無 BLOCKER，HIGH：18 h 上限無自動續跑；MEDIUM：test 路徑未在 GPU 驗證就可能燒掉 test seeds、test 中 graph fallback 會使兩邊路徑不同。修正 1c9f1c6：launcher 自動續跑、watchdog 範本（只負責 all，不跑 test）、testcheck stage（AS 前 64 seeds，graph 分塊 vs eager 逐位相同才放行 test，檢查在 ledger started 之前）、test/testcheck 禁止 fallback。實作偏離與詮釋 12 條揭露於 docs/direction2/design/e1-v2-impl-notes.md（含次要結果 5、6 未實作、訓練 fitness 用 n=16 點估計）。
+- 驗證：本機 CPU pytest 40 passed；launcher／watchdog 語法通過、無 --concurrent。
+- 下一步：學校 audit → smoke → freeze（commit manifest）→ all（watchdog）→ select 後 commit freeze_record → testcheck → test → report。
