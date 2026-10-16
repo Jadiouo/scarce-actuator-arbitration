@@ -79,5 +79,88 @@
       ],
       "extend": false
     }
+  },
+  "final": {
+    "orig": {
+      "gmax": 240,
+      "chains": [
+        {
+          "gmax": 240,
+          "prev_best": 0.03646720854981316,
+          "last_best": 0.03607349343616706,
+          "gain": -0.000393715114,
+          "saturated": true
+        },
+        {
+          "gmax": 240,
+          "prev_best": 0.035126373129851035,
+          "last_best": 0.03417372030926824,
+          "gain": -0.000952652821,
+          "saturated": true
+        },
+        {
+          "gmax": 240,
+          "prev_best": 0.035354285195768956,
+          "last_best": 0.0346845436099984,
+          "gain": -0.000669741586,
+          "saturated": true
+        }
+      ],
+      "attack_may_be_unsaturated": false
+    },
+    "C1": {
+      "gmax": 240,
+      "chains": [
+        {
+          "gmax": 240,
+          "prev_best": 0.03453561933942559,
+          "last_best": 0.034075444979978865,
+          "gain": -0.000460174359,
+          "saturated": true
+        },
+        {
+          "gmax": 240,
+          "prev_best": 0.033470965452523,
+          "last_best": 0.03338888477808952,
+          "gain": -8.2080674e-05,
+          "saturated": true
+        },
+        {
+          "gmax": 240,
+          "prev_best": 0.03343345359294997,
+          "last_best": 0.033017862314587074,
+          "gain": -0.000415591278,
+          "saturated": true
+        }
+      ],
+      "attack_may_be_unsaturated": false
+    },
+    "C2": {
+      "gmax": 240,
+      "chains": [
+        {
+          "gmax": 240,
+          "prev_best": 0.033795251262825884,
+          "last_best": 0.03368399247648266,
+          "gain": -0.000111258786,
+          "saturated": true
+        },
+        {
+          "gmax": 240,
+          "prev_best": 0.031937250326557795,
+          "last_best": 0.03136045255119083,
+          "gain": -0.000576797775,
+          "saturated": true
+        },
+        {
+          "gmax": 240,
+          "prev_best": 0.032508936439915315,
+          "last_best": 0.03240371792941883,
+          "gain": -0.00010521851,
+          "saturated": true
+        }
+      ],
+      "attack_may_be_unsaturated": false
+    }
   }
 }
