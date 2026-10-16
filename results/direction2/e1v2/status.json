@@ -1,17 +1,17 @@
 {
   "stage": "attacker",
-  "updated_unix": 1792157558.838417,
+  "updated_unix": 1792158103.266023,
   "graph_fallback_used": false,
   "started_unix": 1792116464.5139508,
   "manifest_sha256": "34fe0eb85c218d4b847e39c8ca912559b9cdf68dd5ed67ed44f03a9ff9b51c09",
   "round": 2,
   "run": 0,
-  "generation": 80,
+  "generation": 120,
   "candidate": 8,
   "error_type": "CalledProcessError",
   "message": "Command '['git', 'push', 'origin', 'direction2-freeze']' returned non-zero exit status 1.",
   "defender": "C2",
-  "generation_seconds": 59.91117715835571,
+  "generation_seconds": 59.50893831253052,
   "stages_done": [
     "s1"
   ]
