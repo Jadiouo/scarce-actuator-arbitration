@@ -1,0 +1,49 @@
+{
+  "category": "insufficient_effect",
+  "sub": "a",
+  "text": "\u6548\u679c\u4e0d\u8db3\uff1a\u6392\u9664\u9054\u5230 0.005 \u7684\u964d\u5e45\u3002",
+  "H": true,
+  "E": false,
+  "n": 1024,
+  "mean_D": 0.004236307563918891,
+  "LB": 0.0038832735058095774,
+  "UB_D": 0.004589341622028204,
+  "LB_gt_0": true,
+  "honest": {
+    "n": 1024,
+    "mean_regret": 0.0011725596780583717,
+    "mean_alpha": 0.004627727521929824,
+    "ub_regret": 0.0012830367038176075,
+    "ub_alpha": 0.005031929218524588,
+    "feasible": true,
+    "t": 1.6463444953385555
+  },
+  "delta": 0.005,
+  "honest_excess": {
+    "regret": -0.0007169632961823926,
+    "alpha": -0.004968070781475412
+  },
+  "schema": "e1-v2-result/1",
+  "manifest_sha256": "34fe0eb85c218d4b847e39c8ca912559b9cdf68dd5ed67ed44f03a9ff9b51c09",
+  "selection_frozen_sha256": "92c971be5adcc6cbc439f8b934d68ad6c545a42cc4c8de4f1bf9a691fa3670d7",
+  "candidate": "C2",
+  "cfg": {
+    "p": 0.1,
+    "tol": 6.175461735115074,
+    "kref": 0.4663589529547838,
+    "L": 2412.0
+  },
+  "a_star": {
+    "orig": "orig_adapt0",
+    "C2": "orig_adapt0"
+  },
+  "G_orig_mean": 0.034755030351009276,
+  "G_cand_mean": 0.030518722787090388,
+  "attack_may_be_unsaturated": {
+    "orig": false,
+    "C1": false,
+    "C2": false
+  },
+  "L_at_upper_bound": false,
+  "graph_fallback_used": false
+}
