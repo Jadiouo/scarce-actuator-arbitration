@@ -778,3 +778,24 @@
 - 正式開跑：`~/e1v2_watchdog.sh`（repo 範本原樣複製）啟動 tmux `e1v2`：`bash scripts/e1_v2_launch.sh all`（s1,s2,sx,select；不含 testcheck／test）。crontab：`@reboot sleep 120 && $HOME/e1v2_watchdog.sh`、`*/15 * * * * $HOME/e1v2_watchdog.sh`。說明檔 `~/E1V2_README.txt`。
 - 首個進度 commit：92a29f0（defender round 1 run0 generation 1）。防守每代約 12.5 分鐘（約 16:31 起跑，16:44 完成第 1 代），GPU util 約 17–25%，無 graph fallback。
 - ETA（`dry-run`）：不延長約 24.8 小時，最壞（含 sx 延長）33.6 小時。testcheck／test 待訓練完成與審查後手動執行。
+
+## 2026-10-16 E1 v2 推送衝突事故
+
+- 10/15 指揮官從本機推送 9bd9c4d、9978186（commit 時間 16:44、16:51）到 direction2-freeze，學校的進度 push 從此被拒（non-fast-forward），程式在每個 publish 點中止，由 watchdog 重啟續跑。第一輪防守 10/15 23:31 完成後，卡在「round 1 candidate C1」約 10 小時無進度。
+- watchdog 的「連續 3 次無進度即停」沒有生效：它以新 commit 判斷進度，而每次重啟都會產生新 commit。教訓已寫進 gpu-center skill（`platforms/school.md`）：實驗跑的期間不要從別處推同一分支；watchdog 應以程式自記的進度（stage/generation）判斷。
+- 修復：學校 touch `~/E1V2_PAUSED` → merge origin（e53dbc4）→ push → 10:04 刪暫停旗標、watchdog 重啟；10:07 推送成功（bc933b1）。未改程式、設定、seeds，manifest 雜湊不變。
+- 之後 status.json 一直殘留當時的 CalledProcessError 欄位（舊訊息，非新錯誤）。
+- 自訂規則：E1 v2 跑的期間不從本機推送；筆記本機 commit，實驗結束後再推。
+
+## 2026-10-19 E1 v2 選模、testcheck、test 與結果
+
+- `all` 於 10/17 約 00:03 完成（stages s1、s2、sx、select），graph_fallback_used=false。九條攻擊鏈依 §4 全部飽和（增益皆負），未延長。
+- 選模：C2（r2_run0/gen4；tol 6.175、κ_ref 0.4664、L 2412，未貼邊）。DS 誠實 UB：regret 0.0017、alpha 0.00685（可行）。AS 上 G(a*)：orig 0.03647、C1 0.03471、C2 0.03384，改善 0.00263（>0，status go；低於 δ，test 預期「效果不足」）。三個防守的 a* 都是 orig_adapt0（原設定鏈 run0 g=60）。
+- 使用者決定：照登記跑 test（指揮官建議；理由：登記流程如此，且可得到有定論的結果）。
+- test 前驗證（sonnet，乾淨上下文，從原始檔重算）：transfer matrix、a*、改善、DS 可行性、C1/C2 選取、飽和、freeze_record 雜湊、manifest 程式雜湊全部一致；無違規或 bug 證據。修正指揮官一處說法：orig_adapt0 不是起點，真正等於起點的是 orig_adapt1、orig_adapt2、C2_adapt1。
+- 移除學校 e1v2 cron（備份為空，故 `crontab -r`）。testcheck（b3383be）：graph vs eager 四項逐位相同。test 一次執行完畢（749f000…647cb35），ledger 四筆各一次 completed。
+- **主判定：效果不足 (a)「排除達到 0.005 的降幅」**。n=1024，D=0.004236，LB 0.003883，UB_D 0.004589；誠實 regret +0.001173（UB 0.001283）、alpha +0.004628（UB 0.005032），H 真、E 假。
+- report 驗證：學校原環境 `scripts/e1_v2.py report` → `matches result.json: True`。本機（numpy 2.4.6，學校 2.2.6）重算只差 honest.t 最後一位（1.6463444953385558 vs …555），屬數值套件版本差異。
+- 結果文件 docs/direction2/results/e1-v2.md（sonnet 撰寫）。紅方第 1 輪：無 BLOCKER；HIGH 5 條（AS 與 test 降幅差異的推論與自身 σ_D 矛盾、「最強已知攻擊者」只在 AS 成立而 test 上順序翻轉、12 條目實為 9 個不同參數、飽和≠優化有效、v1/v2 對照的因果措辭與區間口徑不同）、MEDIUM 5 條、LOW 3 條。指揮官判斷全部成立（第 8 條「重算一致」改以本進度檔為證據），已交回修正。
+- 紅方修正後（sonnet 重算）：AS 配對 D=0.002631（SD 0.007313，SE 0.000646），test D=0.004236（SE 0.000214），差 2.36 個組合 SE；test 上各取最強攻擊者相比的描述性降幅 0.003681；C2 殘餘 G 0.030519 [0.029745, 0.031292]。寫手更正指揮官：9bd9c4d、9978186 的 commit 時間是 10/15 16:44、16:51，不是晚上（已改上段）。
+- 閉門會議（第 2 輪，交付前）：未發現數字錯誤，主判定未越出登記範圍。必改 3 條（§8「沒有看到同時滿足的設定」過度推論→改為只就兩個已評估點陳述；開頭補尺度 12% 與 G 白話定義；warm-start 偏差也代表 D 可能高估）全部採納；建議採納縮寫表、manifest 自雜湊說明、「指揮官」改寫、12 條目非獨立證據；不採納「AS/test 差異表移至附錄」，理由：該表回答審查者最可能追問的問題。此段已審兩輪，修正後不再開審，由指揮官檢查修改處後交付。

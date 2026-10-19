@@ -8,6 +8,8 @@
 
 後續 E1 另批探索性訓練：[防守調參與攻擊再適應規劃](design/e1-pilot.md)、[checkpoint 與進度目錄](../../results/direction2/e1_pilot/)。目前狀態以該目錄的 `status.json` 為準；既有結論報告保留 holdout 收尾當時的研究狀態。
 
+E1 v2（預先登記的防守修補確認）：[結果](results/e1-v2.md) · [設計](design/e1-v2.md) · [實作說明](design/e1-v2-impl-notes.md) · [原始結果](../../results/direction2/e1v2/)。
+
 1. [正式主實驗結果](results/main.md)：六個 run 的 test、配對 95% CI、凍結 MDE 與複現判定。
 2. [主實驗後診斷](results/postmain-diagnostics.md)：截斷偏差、固定策略的特徵消融與公開報告行為；屬 validation 上的事後分析。
 3. [數字稽核](results/number-audit.md)：從原始逐 seed 效用重算；[評估協定](design/main-evaluation.md)說明事前選取和判定規則。
@@ -20,7 +22,7 @@
 | 設計 | [測試對照表](design/test-map.md)、[S1 評估實作](design/s1-evaluation.md)、[加速計畫](design/speedup.md) |
 | 漏洞設計 | [盲設計 prompt](design/blind-designer-prompt.md)、[有效設計](design/blind-vulns.md)、[交付格式](design/vuln-format.md) |
 | 審查 | [正式主實驗驗證](reviews/main-evaluation.md)、[S1 評估實作審查](reviews/s1-evaluation.md)、[S1 結果審查](reviews/s1-results.md)、[加速審查](reviews/speedup.md) |
-| 歷史 | [10/15 工作日誌與交接](history/worklog-2026-10-15.md)、[10/13 工作日誌](history/worklog-2026-10-13.md)、[研究與部署紀錄](history/direction2-notes.md) |
+| 歷史 | [10/16–10/19 工作日誌](history/worklog-2026-10-19.md)、[10/15 工作日誌與交接](history/worklog-2026-10-15.md)、[10/13 工作日誌](history/worklog-2026-10-13.md)、[研究與部署紀錄](history/direction2-notes.md) |
 | 封存 | [受汙染、不計入統計的第一份盲設計](archive/blind-vulns-contaminated.md) |
 
 原始產物位於 [results/direction2/](../../results/direction2/)。正式主實驗逐 seed 原始資料和選取紀錄位於 `results/direction2/main_eval/`，`main.json` 是彙整入口。機制參數、策略權重和 test seeds 不因整理文件而改動。
