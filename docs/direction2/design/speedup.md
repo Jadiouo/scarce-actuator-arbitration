@@ -320,12 +320,12 @@ Step 0（量測，不改凍結程式）→ A（先 `_vstep`，再 `env._step`）
 3. 同程序並行依賴 `capture_error_mode="thread_local"` 與建圖鎖；多 lane 同時建圖的失敗模式（`operation not permitted when stream is capturing`）已觀察到並修掉，但不同驅動／vGPU 的行為沒有驗證。
 4. `isfinite` 檢查的時機在 graph 模式晚一個 block（結果不受影響）。
 5. FREEZE.md 沒有改。「程式合併 sha」的補登（第 5 節）要由使用者決定；這個分支沒有碰任何凍結檔。
-6. eager 的速度數字是在 CPU 被其他專案佔滿的環境下量的（倍數偏高）；學校機器的實際倍數要看它自己的 GPU 時間（RTX8000 的 fp64 與頻寬都比 5070 Ti 低，graph 後的 GPU 時間可能更接近 eager 的 CPU 時間，倍數可能比本機低，約 1.5–2.5 倍是合理猜測，**這是推論，不是量到的**）。
+6. eager 的速度數字是在 CPU 負載高的環境下量的（倍數偏高）；學校機器的實際倍數要看它自己的 GPU 時間（RTX8000 的 fp64 與頻寬都比 5070 Ti 低，graph 後的 GPU 時間可能更接近 eager 的 CPU 時間，倍數可能比本機低，約 1.5–2.5 倍是合理猜測，**這是推論，不是量到的**）。
 7. 目前沒有做 A0（預先配置 `ar/kk`、批次 gather 等）：graph 之後 GPU 已 99% 忙，剩下的要靠減少 kernel 數，每一項都要重新證明 bitwise。
 
 ## 9. 學校機器切換步驟（草案，需要使用者決定後才執行）
 
-背景：學校機器（aics-st05-u06，RTX8000-12Q，torch 2.6.0+cu126）正在 tmux `s1` 裡跑
+背景：學校機器（RTX8000-12Q，torch 2.6.0+cu126）正在 tmux `s1` 裡跑
 `d2_run_queue.py --stage s1 --push-every 1 --remote origin --branch direction2-freeze`，每段 commit＋push；`~/s1_watchdog.sh`（cron `@reboot`＋每 15 分鐘）會在 runner 死掉時重啟它。
 分支 `direction2-speedup` 目前只在本機（沒有 push）；要由使用者 push 成**另一個分支名**（runner 只會 push `direction2-freeze`，不會碰它），或用 `git bundle` 帶過去。
 

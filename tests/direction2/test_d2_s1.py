@@ -602,8 +602,8 @@ def test_S123_designer_source_and_status():
     assert "隔離成立" in iso
     calls2 = [json.loads(x) for x in open(os.path.join(d2, "tool_calls.jsonl"), encoding="utf-8") if x.strip()]
     assert calls2 and {c["tool"] for c in calls2} <= {"Read", "Write", "SubagentHandback"}, "designer_2 may not use Bash/Grep/Glob"
-    def _rel(fp):        # the recorded paths are absolute on the machine that made the log (/home/lex/...); keep the part inside the repository
-        return fp.split("scarce-actuator-arbitration/", 1)[1] if "scarce-actuator-arbitration/" in fp else os.path.relpath(fp, ROOT)
+    def _rel(fp):        # the recorded paths are absolute on the machine that made the log (an absolute path on the machine that made the log); keep the part inside the repository
+        return fp.split("<repo>/", 1)[1] if "<repo>/" in fp else (fp.split("scarce-actuator-arbitration/", 1)[1] if "scarce-actuator-arbitration/" in fp else os.path.relpath(fp, ROOT))
     reads = sorted(_rel(c["args"]["file_path"]) for c in calls2 if c["tool"] == "Read")
     allowed = ["arbitration/gpu/frontier.py", "docs/direction2-vuln-format.md"]
     assert reads == allowed, f"designer_2 Read set {reads}"

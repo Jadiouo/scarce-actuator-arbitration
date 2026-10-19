@@ -3,8 +3,8 @@
 你不會知道紅隊工具看得到哪些資訊，也不會知道它的策略結構，這是刻意安排的。請不要嘗試去查。
 
 你只准讀以下兩個檔案，除此之外一律不准讀取：
-- /home/lex/Documents/scarce-actuator-arbitration/arbitration/gpu/frontier.py：只看 M3C（派遣時稽核＋CUSUM＋可寬恕的懲罰）的實作與模擬時序。
-- /home/lex/Documents/scarce-actuator-arbitration/docs/direction2-vuln-format.md：漏洞的格式要求，全文都可以讀。
+- <repo>/arbitration/gpu/frontier.py：只看 M3C（派遣時稽核＋CUSUM＋可寬恕的懲罰）的實作與模擬時序。
+- <repo>/docs/direction2-vuln-format.md：漏洞的格式要求，全文都可以讀。
 
 尤其不准讀：docs/ 底下的任何其他檔案（包括 direction2-spec.md、direction2-notes.md、direction2-blind-vulns.md）、arbitration/rl/ 整個目錄、tests/、results/、scripts/。
 
@@ -21,6 +21,6 @@
 - 不要設計「任何灌水都能利用」的漏洞。
 - 只依你從 frontier.py 讀到的機制內容來設計，不要對紅隊工具的觀察能力做任何假設或猜測。
 
-輸出：寫入 /home/lex/Documents/scarce-actuator-arbitration/docs/direction2-blind-vulns-2.md。除此之外不要修改任何檔案，不要 commit，不需要 GPU。
+輸出：寫入 <repo>/docs/direction2-blind-vulns-2.md。除此之外不要修改任何檔案，不要 commit，不需要 GPU。
 
 回報：用繁體中文，150 字以內，列出 4 個漏洞的名稱，每個附一句說明。

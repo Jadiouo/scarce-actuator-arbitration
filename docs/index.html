@@ -3,29 +3,65 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Scarce Actuator Arbitration</title>
-<meta name="description" content="When to audit a free claim: dispatching a scarce mobile actuator under strategic urgency reports.">
+<title>Scarce Actuator Arbitration: a research portfolio</title>
+<meta name="description" content="What happens when a scarce shared resource can be claimed for free, and when can a check catch a lie? A four-part study including negative results.">
+<link rel="alternate" hreflang="zh-Hant" href="zh/">
 <style>
-:root{--bg:#f6f7f9;--panel:#fff;--fg:#1b2330;--muted:#5d6878;--line:#d9dee6;--accent:#2563eb;--accent-fg:#fff}
-@media (prefers-color-scheme:dark){:root{--bg:#0e1218;--panel:#171d27;--fg:#e7ebf1;--muted:#9aa5b5;--line:#2b3442;--accent:#6ea2ff;--accent-fg:#0e1218}}
+:root{--bg:#f6f7f9;--panel:#fff;--fg:#1b2330;--muted:#556071;--line:#d9dee6;--accent:#1f5fbf;--accent-fg:#fff;--warn:#9a4b00;--warnbg:#fff4e5;--ok:#17603a}
+@media (prefers-color-scheme:dark){:root{--bg:#0e1218;--panel:#171d27;--fg:#e7ebf1;--muted:#a3aebe;--line:#2b3442;--accent:#7fadff;--accent-fg:#0e1218;--warn:#ffb86b;--warnbg:#2a2014;--ok:#6fd3a0}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:760px;margin:0 auto;padding:40px 16px}
-h1{font-size:clamp(1.6rem,4vw,2.2rem);line-height:1.15;margin:0 0 12px;letter-spacing:-.01em}
-p{color:var(--muted);margin:0 0 14px}
-.links{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0}
-.links a{display:inline-block;padding:10px 16px;min-height:44px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--fg);text-decoration:none}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 system-ui,-apple-system,"Segoe UI","Noto Sans TC","PingFang TC",Roboto,sans-serif}
+main{max-width:820px;margin:0 auto;padding:32px 16px 72px}
+h1{font-size:clamp(1.7rem,5vw,2.4rem);line-height:1.15;margin:8px 0 14px;letter-spacing:-.01em}
+h2{font-size:1.45rem;margin:2.6em 0 .5em;padding-top:.4em;border-top:1px solid var(--line);line-height:1.25}
+h3{font-size:1.1rem;margin:1.6em 0 .3em}
+p,li{margin:0 0 .8em}
+ul{padding-left:1.2em}
+a{color:var(--accent)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.92rem;color:var(--muted)}
+.lead{font-size:1.15rem;color:var(--fg)}
+.byline{color:var(--muted);font-size:.95rem}
+.links{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0}
+.links a{display:inline-block;padding:9px 15px;min-height:44px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--fg);text-decoration:none;line-height:1.5}
 .links a.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
 .links a:hover{border-color:var(--accent)}
-a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-small{color:var(--muted)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:16px 0}
+.card h4{margin:0 0 .4em;font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.card ul{margin:0}
+.nope{border-left:4px solid var(--warn);background:var(--warnbg);border-radius:6px;padding:10px 16px;margin:16px 0}
+.nope h4{margin:0 0 .3em;font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;color:var(--warn)}
+.nope ul{margin:0}
+.qa{display:grid;grid-template-columns:7.5em 1fr;gap:4px 14px;margin:.4em 0}
+.qa b{color:var(--muted);font-weight:600;font-size:.9rem}
+.qa div{margin:0}
+@media(max-width:560px){.qa{grid-template-columns:1fr}.qa b{margin-top:.5em}}
+figure{margin:20px 0}
+figure img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:8px;background:#fff}
+figcaption{font-size:.9rem;color:var(--muted);margin-top:6px}
+.status{display:inline-block;font-size:.8rem;border:1px solid var(--line);border-radius:99px;padding:1px 10px;color:var(--muted);margin-left:6px;vertical-align:middle}
+code{font-size:.88em;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:0 4px;word-break:break-word}
+table{border-collapse:collapse;width:100%;font-size:.93rem}
+td,th{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+.tablewrap{overflow-x:auto}
+blockquote{margin:1em 0;padding:2px 0 2px 16px;border-left:3px solid var(--accent);color:var(--fg)}
+footer{margin-top:3em;color:var(--muted);font-size:.9rem}
+
+details.nope summary{cursor:pointer;font-weight:600;color:var(--fg);list-style-position:outside;margin-left:1.1em}
+details.nope summary::marker{color:var(--warn)}
+details.nope[open] summary{margin-bottom:.6em}
+.howto{border-color:var(--accent)}
+.howto li{margin-bottom:.35em}
 </style>
 </head>
 <body>
 <main>
-<h1>When to audit a free claim</h1>
-<p>One actuator serves several decaying explorers on a ring. Explorers report a noisy urgency for free, hidden shocks make health hard to predict, and every dispatch costs travel. This project measures what exact state information is worth and what happens when explorers report strategically, including when a dispatcher should check claims against the truth.</p>
-<p>Two demos let you watch the mechanisms play out: dispatch under reported urgency (Demo 1) and when to audit a claim (Demo 2). The papers are working drafts and have not been peer reviewed.</p>
+<div class="top"><span>Research portfolio, Oct 2026</span><a href="zh/" hreflang="zh-Hant" lang="zh-Hant">繁體中文版</a></div>
+
+<h1>When a scarce resource can be claimed for free, can a check catch the lie?</h1>
+<p class="lead">One shared helper, several agents that report their own urgency at no cost, and some of them exaggerate. I studied what exact information is worth, when auditing helps, and whether a <em>learned</em> liar can out-gain a handwritten one. The short version: exact information is worth a little (about 0.02 on a 0 to 1 scale of average robot health), far less than trusting free reports costs; arrival and dispatch audits are beatable by handwritten liars, while random raids (surprise checks that can even hit the winner) held up against the 45 strategies tried; a learned liar found a measurable extra gain in one fixed mechanism; and my attempt to patch the audit against it <strong>did not work well enough</strong>.</p>
+<p class="byline">Hao-Ting (Lex) Ho, 2026. Abstract simulation study; papers are working drafts, not peer reviewed.</p>
 <div class="links">
 <a class="primary" href="demo/">Demo 1: dispatch and information</a>
 <a class="primary" href="demo2/">Demo 2: audit timing</a>
@@ -33,7 +69,183 @@ small{color:var(--muted)}
 <a href="direction1-paper/paper.pdf">Paper 2: audit timing (draft, not peer reviewed)</a>
 <a href="https://github.com/Jadiouo/scarce-actuator-arbitration">GitHub repository</a>
 </div>
-<small>Hao-Ting (Lex) Ho, 2026</small>
+
+<div class="card">
+<h4>The 2-minute story</h4>
+<ul>
+<li><strong>Part I.</strong> In an 8-robot model, always serving the most urgent robot first (even using its true urgency) lost to simple taking-turns at every load tested, because it ignores travel. Trusting free reports costs far more than exact knowledge is worth.</li>
+<li><strong>Direction 1.</strong> Auditing a claim when the helper arrives is beaten by lying. Auditing at dispatch is cheap but only robust against liars who cannot see others' bids. A planned general theory was falsified and dropped.</li>
+<li><strong>Direction 2.</strong> A small neural net trained to lie beat the best handwritten liar against a fixed audit, and a second, independent check on 64 fresh seeds, with a threshold fixed after the first test but before the holdout ran, found the advantage again.</li>
+<li><strong>E1.</strong> Retuning the audit against that attacker reduced its gain by 0.0042, short of the 0.005 I had committed to in advance. Verdict: insufficient effect.</li>
+</ul>
+</div>
+
+<div class="card howto">
+<h4>How to read this page</h4>
+<ul>
+<li><strong>Team health</strong>: average health of the robots, from 0 (dead) to 1 (fully healthy). <strong>Round-robin</strong>: simply taking turns.</li>
+<li><strong>r</strong>: in Part I, the load (how fast robots decay); in Directions 1 and 2, how slowly the truth drifts between a claim and a check (closer to 1 = slower drift).</li>
+<li><strong>G</strong>: a liar's average gain over being honest. <strong>D</strong>: the learned liar's G minus the best handwritten liar's G.</li>
+<li><strong>Regret</strong>: how much worse off honest agents are per round. <strong>Ineligible share</strong>: share of rounds an agent is suspended after being flagged.</li>
+<li><strong>M3C</strong>: the fixed audit used in Directions 1 and 2. It checks claims at dispatch, accumulates evidence across rounds, suspends a suspect for a while, then forgives. Its three tunable knobs are what E1 retunes.</li>
+<li><strong>Holdout</strong>: an independent re-test on fresh random seeds. <strong>95% vs 90% interval</strong>: a 95% two-sided interval is the usual confidence interval; a 90% two-sided interval is what you get from two one-sided 95% bounds. I label which one every time.</li>
+</ul>
+</div>
+
+<h2 id="why">Why this problem</h2>
+<!-- src: .scratch/portfolio/motivation.md (English paragraph, user-approved 2026-10-19) -->
+<p>I came to this problem from building multi-robot exploration systems in which a team shares one actuator that only one robot can use at a time. Each robot reports a private, unverifiable urgency, and asking for help costs nothing. Everyone writes "serve the most urgent", but I could not justify that rule when urgency can be claimed for free. So I built a small abstract simulation to check it. The first surprise: in an 8-robot model, always serving the most urgent robot first — even using its true urgency — lost to simply taking turns at every load tested, because it ignores how far the helper has to travel. That left me asking what happens when reports are strategic, when auditing helps, and whether a learned liar can beat a handwritten one. I had spent about three years building systems and had done no theory; this project was how I learned to ask and test these questions carefully. This repository is the abstract study that grew from those questions; it does not claim real fleets behave this way.</p>
+<p>Why would a machine misreport at all? "Lying" here means a systematic bias that benefits the reporter. It can come from robots of different owners sharing a charging station or elevator, from learned reporting policies that discover exaggeration, or from honest-but-biased estimators that look identical to the dispatcher. <!-- src: facts.md sec 1; README.md:89 --></p>
+
+<h2 id="journey">The journey</h2>
+<p>Four stages, each ending with what held up and what did not. Every interval names its seeds and its level (95% or 90%). All results are simulations in simplified models.</p>
+
+<h3 id="part1">Part I. Dispatch and the value of information <span class="status">final</span></h3>
+<div class="qa">
+<b>Question</b><div>One roaming helper must restore several fading robots (health decays, partly through hidden shocks). Robots report urgency for free and every trip costs travel time. What is exact knowledge worth, and what does believing free reports cost?</div>
+<b>What I did</b><div>Exact dynamic programming for small teams as a benchmark, a GPU simulator, and a reporting game solved by approximate best response over finite families of exaggeration strategies, plus audit mechanisms.</div>
+<b>What I found</b><div>Exact knowledge of true health is worth little. Believing free reports is costly. An audit on arrival is bypassed; an audit at dispatch loses less, though not zero and with a caveat on how much less (see limits). My first-version claim that "information is worthless" came mostly from ignoring travel distance.</div>
+</div>
+<figure>
+<img src="figures/portfolio/fig7_v2_load_sweep.png" alt="Left: team mean health versus load for 15 dispatch policies with 8 robots; all fall as load rises. Right: each policy's paired difference to blind round-robin with 95% intervals; the myopic urgency-first policy using true urgency sits below zero at every load, while distance-aware policies are near or above zero." width="1200" height="488" loading="lazy">
+<figcaption>Eight robots, v2 model (the claims.md C1 cell). Right panel: difference to blind round-robin (taking turns), 95% intervals over seeds; below zero means worse than taking turns. The urgency-first policy ("Greedy on true urgency", blue) is below zero at every load. Source: <code>figures/fig7_v2_load_sweep.png</code>, data <code>results.json</code> key <code>v2_sweep</code>, status "main (C1)" in <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/figures/README.md">figures/README.md</a>.</figcaption>
+</figure>
+<div class="card">
+<h4>Key numbers (32 seeds, 95% t-intervals)</h4>
+<ul>
+<li>Value of exact information, 3 robots, shock share 0.5: <strong>0.019 [0.017, 0.021]</strong> team health <!-- src: facts.md sec2 item3; claims.md:18 (VoI_step 0.0188 [0.0170,0.0206], r=.004) --></li>
+<li>Loss from believing reports (the "fused index" dispatcher, which acts on self-reports): <strong>0.247 [0.223, 0.272]</strong> with 3 robots; <strong>0.40 [0.36, 0.44]</strong> with 8 <!-- src: facts.md sec2; README.md:24 --></li>
+<li>Arrival audit loss (checking only when the helper arrives): 0.024 [0.010, 0.038] (3 robots). Dispatch audit loss: 0.0027 [0.0001, 0.0052], about 1/9 of that (optimistic: the best-response search did not converge, convergence 0.25 with 3 robots and 0.00 with 8, and the interval contains 0 in 5 of 10 cells) <!-- src: facts.md sec2 item3 (C5,C6); number_audit.md:40 --></li>
+<li>With 8 robots, urgency-first dispatch loses to round-robin at every load tested <!-- src: claims.md:10-12 --></li>
+</ul>
+</div>
+<details class="nope">
+<summary>What did not work and limits: my own hypothesis that the dispatch audit has zero loss was refuted; only 10 of 27 planned cells were run.</summary>
+<ul>
+<li>My own pre-stated hypothesis that the dispatch audit has zero loss was refuted and withdrawn. I also do not claim that information is worth under 0.02: the result is statistically indistinguishable from that threshold. <!-- src: claims.md:23-26,53-62 --></li>
+<li>The dispatch-audit loss and its ratio to the arrival audit are optimistic: a non-converged search may miss profitable lies. <!-- src: number_audit.md:46; claims.md:55-59 --></li>
+<li>Several findings (distance-aware rules, cheap-talk collapse, pricing) are quantitative checks of known theory, not new phenomena.</li>
+<li>Only 10 of 27 planned cells were run; exact benchmarks only for 3-4 robots; finite strategy sets; the protocol was written mid-project, so it is not a strict pre-registration. <!-- src: README.md:58,64 --></li>
+</ul>
+</details>
+<p>Deeper: <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/dispatch/claims.md">claims and evidence</a> · <a href="paper/paper.pdf">paper</a> · <a href="demo/">Demo 1</a></p>
+
+<h3 id="dir1">Direction 1. When to audit <span class="status">closed</span></h3>
+<div class="qa">
+<b>Question</b><div>A scarce server serves one of three agents per round and one may lie. Checking a claim requires waiting, and meanwhile the truth drifts, so even honest agents mismatch. When and how should the server check without punishing honest agents?</div>
+<b>What I did</b><div>Compared believing reports, round-robin, auditing on arrival, auditing at dispatch with an accumulating statistical test, quota mechanisms, and low-probability random raids that can also hit the winner, against a hand-written set of 45 lying strategies.</div>
+<b>What I found</b><div>Arrival audits and naive trust are equally beaten. Dispatch audits are cheap but only robust against liars who cannot see others' bids. Raids (random spot-checks that can also hit the winner) were the most robust in this strategy set.</div>
+</div>
+<div class="card">
+<h4>Key numbers (3 agents, 100,000 rounds, 32 evaluation seeds; ± is about 1.96 standard errors)</h4>
+<ul>
+<li>Liar's maximum gain G at r=0.5: arrival audit <strong>0.2795 ± 0.0004</strong>, naive trust 0.2793 ± 0.0004 <!-- src: summary.md:56,48 --></li>
+<li>Dispatch audit, liar who sees others' bids ("oracle edge"): <strong>0.0211 ± 0.0033</strong> at r=0.9; 0.0870 ± 0.0053 at r=0.5 <!-- src: summary.md:60,62 --></li>
+<li>Raids: G = <strong>0.0000 ± 0.0000</strong> against all 45 strategies, at an honest regret of 0.0162 ± 0.0001 per round <!-- src: summary.md:64-67 --></li>
+</ul>
+</div>
+<details class="nope">
+<summary>What did not work and limits: the planned general theory failed; "G = 0" for raids only means no gain was found among 45 handwritten strategies.</summary>
+<ul>
+<li>The planned universal scaling law and theorem <strong>failed</strong>: the exponent was 1.26 [1.13, 1.39] at one false-punishment target and 2.18 [1.77, 2.63] at another. The falsification conditions I wrote before the runs stopped the theory programme; the contribution became an empirical map. No theorem was proven. <!-- src: summary.md:38; README.md:81-83 --></li>
+<li>An earlier claim that the dispatch audit deters lying was withdrawn after a red-team added the oracle-edge liar. A first raid design that never audited the winner left a gain of 0.1811 ± 0.0721 at r=1. <!-- src: summary.md:34,36 --></li>
+<li>G = 0 for raids is a floor (the maximum includes honest play), so it means "no gain found within 45 hand-written strategies", not "no gain possible". Three agents only; the raid cost is not yet measured as travel; one of the four falsification conditions I wrote in advance could not be decided; not a formal pre-registration. <!-- src: summary.md:91,101; direction1-paper abstract --></li>
+</ul>
+</details>
+<p>Deeper: <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction1/results/summary.md">results summary</a> · <a href="direction1-paper/paper.pdf">paper</a> · <a href="demo2/">Demo 2</a></p>
+
+<h3 id="dir2">Direction 2. A learned liar against a handwritten one <span class="status">closed</span></h3>
+<div class="qa">
+<b>Question</b><div>Hand-written liars limit how much robustness a test can show. Against the fixed dispatch audit, can a small neural net trained to lie find extra private gain beyond the best handwritten liar?</div>
+<b>What I did</b><div>Registered the spec and froze it before training. A 55-parameter network sees only public information and is trained by evolution strategies. Checkpoints and baselines were chosen on validation, then tested once (run 0's policy had already been evaluated on the same test seeds during the earlier S1 stage (a calibration stage that planted known exploits to check detection power), which is why the holdout was added). I then ran a second, independent 64-seed holdout (fresh seeds); its threshold of 0.005 was fixed after the first test but before the holdout ran.</div>
+<b>What I found</b><div>Yes, in this fixed mechanism. The learned liar's advantage D over the best handwritten liar was positive in all three training runs, in both tests.</div>
+</div>
+<figure>
+<img src="figures/portfolio/direction2-e1-summary.png" alt="Three panels. A: advantage D of the learned liar over the best handwritten liar for three training runs in the main test and three in the holdout; all 95% intervals are above zero and the holdout intervals are above the 0.005 threshold, which applies to the holdout only. B: E1 reduction of the attacker's gain, v1 exploratory pilot about 0.0086 versus v2 preregistered 0.0042 with a narrow 90% interval (0.00388 to 0.00459) below the 0.005 target. C: honest cost upper bounds as a fraction of the limit, within limit in v2 but above limit for the v1 pilot." width="1300" height="460">
+<figcaption>Summary of Direction 2 (panel A) and E1 (panels B, C). Intervals: panel A 95% two-sided; panel B v1 95% two-sided, v2 90% two-sided (two one-sided 95% bounds). The 0.005 line in A is the holdout threshold, registered after the main test, so it is drawn only beside the holdout runs. In C the v1 bar is the upper end of a 95% two-sided interval and the v2 bar is a one-sided 95% upper bound, so the two are not directly comparable. Drawn from the raw result files by <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/scripts/portfolio_figures.py"><code>scripts/portfolio_figures.py</code></a>; vector version: <a href="figures/portfolio/direction2-e1-summary.svg">SVG</a>.</figcaption>
+</figure>
+<div class="card">
+<h4>Key numbers (95% two-sided, paired t-intervals; main = 32 seeds, holdout = 64 seeds)</h4>
+<ul>
+<li>Main test, run 0: learned gain 0.03452 vs handwritten 0.02087; D = <strong>+0.01366 [+0.00932, +0.01800]</strong>; 3 of 3 runs have a lower bound above 0 <!-- src: results/direction2/main.json cells[r=0.5].runs[0].D; main.md:3,7,11-13 --></li>
+<li>Independent holdout, run 0: D = <strong>+0.010778 [+0.007362, +0.014194]</strong>, above the 0.005 threshold (registered after the main test, before the holdout); runs 1 and 2: +0.009158 and +0.010068 <!-- src: results/direction2/holdout/result.json runs[0].D; conclusion.md:5-7 --></li>
+<li>Honest regret per round: 0.00686 with no liar vs 0.01957 with the learned liar. Run 0, r=0.5, mean; no significance test on the regret difference. The attack does not improve system efficiency. <!-- src: main.md:33,36,44 --></li>
+</ul>
+</div>
+<details class="nope">
+<summary>What did not work and limits: a lower bound for one fixed mechanism, not a safety verdict or an optimal attack; the first test was not independent for run 0.</summary>
+<ul>
+<li>The original test added no independent evidence for run 0 (the same policy had been evaluated on those seeds in a calibration step). That is why the holdout exists; the threshold was registered after I saw the main test but before the holdout ran. <!-- src: main.md:46; independent-holdout.md --></li>
+<li>The calibration of detection power was weakened: exploitation evidence for only 2 of 3 out-of-family vulnerabilities, not 3 of 3. <!-- src: conclusion.md:28 --></li>
+<li>This is a <strong>lower bound on exploitability</strong> for one fixed mechanism, one policy class and one budget. It is not an optimal attack, not a safety verdict, and does not cover the raid mechanism or other handwritten strategies. Intervals reflect seed variation, not retraining uncertainty. The holdout interval was wider than planned (half-width 0.003416 vs 0.002352). <!-- src: main.md:48; independent-holdout.md --></li>
+</ul>
+</details>
+<p>Deeper: <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/results/conclusion.md">conclusion</a> · <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/results/independent-holdout.md">holdout</a> · <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/results/main.md">main test</a></p>
+
+<h3 id="e1">E1. Can the defender patch it? <span class="status">final, preregistered, negative</span></h3>
+<div class="qa">
+<b>Question</b><div>If the defender retunes the audit's three knobs against the learned attacker, can the attacker's gain fall by at least 0.005 without hurting honest agents by more than 0.002 regret or 0.01 ineligibility?</div>
+<b>What I did</b><div>An exploratory pilot (v1), then a preregistered v2 with disjoint train, select and test seeds. The chosen setting was frozen before the test. 1,024 fresh test seeds were used once, with a ledger.</div>
+<b>What I found</b><div>The honest cost stayed within limits, but the gain reduction was too small. Pre-committed label: <strong>insufficient effect</strong>.</div>
+</div>
+<div class="card">
+<h4>Key numbers (v2 test, 1,024 seeds; interval is 90% two-sided, i.e. two one-sided 95% bounds)</h4>
+<ul>
+<li>Attacker gain: 0.034755 originally, 0.030519 after the patch. Reduction <strong>0.004236 [0.003883, 0.004589]</strong>, about 12%; the interval excludes 0.005 <!-- src: results/direction2/e1v2/result.json mean_D, LB, UB_D, G_orig_mean, G_cand_mean; e1-v2.md:3,5 --></li>
+<li>Honest cost, point estimate (95% upper bound, limit): regret +0.001173 (0.001283, 0.002); ineligible share +0.004628 (0.005032, 0.01). Within limits, and positive, so not free. <!-- src: e1-v2.md:78-81; e1v2/result.json honest --></li>
+<li>The exploratory v1 pilot reported a reduction of 0.0086 [0.0047, 0.0125] (95%), but its honest-cost upper bounds exceeded the limits (0.0033 and 0.0118). <!-- src: e1-pilot.md:54,63-66 --></li>
+</ul>
+</div>
+<details class="nope">
+<summary>What did not work and limits: the pilot's promising result did not survive preregistration; this is not a "patch works" claim.</summary>
+<ul>
+<li>The "promising" v1 pilot did <strong>not</strong> survive preregistration; v1 selected and evaluated on the same 32 seeds, and the v2 estimate is about half of it. They are different quantities and are not merged. <!-- src: e1-pilot.md:61-66; e1-v2.md:137 --></li>
+<li>Not a "patch works" claim, not an equilibrium (only two defender-attacker rounds), and the attacker is the strongest of 12 entries (9 distinct attackers) on a selection set, all derived from the original mechanism. The attacker may be weaker against the patched audit, so the true reduction could be smaller. Residual gain is 0.030519, far from zero. <!-- src: e1-v2.md:175-192 --></li>
+<li>Unexplained: the selection-set reduction (0.002631) differed from the test (0.004236) by about 2.4 standard errors. Planted-exploit detection power was not re-checked for the changed audit. Secondary results (all 12 entries, 9 distinct attackers: 0.0033 to 0.0043) did not override the verdict. <!-- src: e1-v2.md:131,158 --></li>
+</ul>
+</details>
+<p>Deeper: <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/results/e1-v2.md">E1 v2 results</a> · <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/results/e1-pilot.md">v1 pilot</a></p>
+
+<h2 id="built">What I built</h2>
+<ul>
+<li>An exact dynamic-programming benchmark for small teams, and a float64 GPU simulator that reproduces the CPU reference seed by seed (maximum difference about 1e-15 in the stored checks). <!-- src: paper.tex:58 --></li>
+<li>For Direction 2, a CUDA-Graph-accelerated environment whose results were checked bit for bit against the plain (eager) version before test seeds were read. <!-- src: e1-v2.md:212 --></li>
+<li>A 55-parameter neural policy trained with an evolution strategy (sep-CMA-ES), and a frozen evaluation protocol with a ledger so each test seed set is used once. <!-- src: direction2/README.md; e1-v2.md:213 --></li>
+<li>A pytest suite under <code>tests/</code>, plus a number audit that traces each reported number to a JSON key.</li>
+</ul>
+<p>Reproduce (from the repository README and Makefile): <code>make quick</code> (tiny CPU smoke run), <code>make replot</code> (all Part I figures from stored JSON), <code>make test</code>, and <code>cd docs &amp;&amp; python3 -m http.server 8000</code> to run the demos locally.</p>
+
+<h2 id="learned">What I learned</h2>
+<ul>
+<li><strong>Write the failure condition first.</strong> Conditions written before the runs let me stop a failing theory (Direction 1) and report a negative patch result (E1) at its pre-committed threshold instead of tuning the story.</li>
+<li><strong>Attack your own conclusions.</strong> Red-team review withdrew a claim that the dispatch audit deters lying and found a raid design that never checked the winner. Exact benchmarks showed my first "information is worthless" result was mostly an artifact of ignoring distance.</li>
+<li><strong>Keep evidence that was already seen separate from fresh evidence.</strong> When the first test turned out not to be independent, I added a holdout with a registered threshold rather than moving the goalposts. Test seeds for E1 were used once.</li>
+<li><strong>Report the interval and its level.</strong> The same effect appears with different numbers in different tests (D = 0.01366, 0.010778); each is shown with its role.</li>
+</ul>
+
+<h2 id="limits">Honest limits and open questions</h2>
+<ul>
+<li>Everything is an abstract simulation with a few agents. Nothing here shows that real fleets misreport.</li>
+<li>Learned and handwritten attackers give lower bounds. How much worse could a stronger attacker do, and does a defender that is trained jointly with the attacker (rather than two rounds) converge to anything?</li>
+<li>The raid mechanism was robust against handwritten liars. Does it also resist a learned liar? Not tested.</li>
+<li>Does a defender gain more from changing the audit's structure than from retuning three knobs? E1 only tested retuning.</li>
+<li>The abstract audit model has not been connected back to the spatial ring simulation, so the real cost of a raid in travel is unmeasured.</li>
+</ul>
+
+<h2 id="evidence">Evidence index</h2>
+<div class="tablewrap"><table>
+<tr><th>Stage</th><th>Conclusion</th><th>Paper / demo / data</th></tr>
+<tr><td>Part I</td><td><a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/dispatch/claims.md">claims.md</a>, <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/paper/number_audit.md">number audit</a></td><td><a href="paper/paper.pdf">paper</a>, <a href="demo/">Demo 1</a>, <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/tree/master/results">results/</a></td></tr>
+<tr><td>Direction 1</td><td><a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction1/results/summary.md">summary.md</a>, <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction1/results/number-audit.md">number audit</a></td><td><a href="direction1-paper/paper.pdf">paper</a>, <a href="demo2/">Demo 2</a></td></tr>
+<tr><td>Direction 2</td><td><a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/results/conclusion.md">conclusion.md</a>, <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/results/main.md">main.md</a>, <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/results/independent-holdout.md">holdout</a>, <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/results/number-audit.md">number audit</a></td><td><a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/README.md">Direction 2 README</a>, <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/results/direction2/main.json">main.json</a>, <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/results/direction2/holdout/result.json">holdout result</a></td></tr>
+<tr><td>E1</td><td><a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/results/e1-v2.md">e1-v2.md</a>, <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/results/e1-pilot.md">e1-pilot.md</a></td><td><a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/results/direction2/e1v2/result.json">e1v2/result.json</a>, <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/design/e1-v2.md">preregistered design</a></td></tr>
+<tr><td>Process</td><td><a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/project/decisions.md">decision log</a> (Chinese), <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/README.md">documentation guide</a></td><td><a href="https://github.com/Jadiouo/scarce-actuator-arbitration">repository and README</a></td></tr>
+</table></div>
+
+<h2 id="how">How this was built</h2>
+<p>The research was done with AI agents: a main agent planned and reviewed, subagents ran experiments, a red team attacked conclusions and a white team checked for over-optimism. I chose the topics and directions and made the final judgments.</p>
+
+<footer>Hao-Ting (Lex) Ho, 2026 · working drafts, not peer reviewed · <a href="https://github.com/Jadiouo/scarce-actuator-arbitration">GitHub</a> · <a href="zh/" hreflang="zh-Hant" lang="zh-Hant">繁體中文版</a></footer>
 </main>
 </body>
 </html>

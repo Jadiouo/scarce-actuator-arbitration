@@ -1,8 +1,11 @@
 # When to audit a free claim
 
+> **Portfolio.** A guided tour of this project (why I care about it, what I did, what held up and what did not) is at **<https://jadiouo.github.io/scarce-actuator-arbitration/>**; a Traditional Chinese version is at <https://jadiouo.github.io/scarce-actuator-arbitration/zh/>.
+> It covers four stages: dispatch and the value of information, audit timing, a learned liar versus handwritten liars (Direction 2), and a preregistered attempt to patch the audit (E1), which came out negative. Negative results, withdrawn claims and limits are reported alongside the findings.
+
 A scarce server must be shared among agents who report their own urgency for free, and some may exaggerate: Part I studies dispatching a mobile actuator and what exact state information is worth, and Part II studies *when* to audit a claim when the truth can only be checked after a delay.
 
-**[Documentation guide](docs/README.md)** · **[Current work: learned adversarial reporting](docs/direction2/README.md)**
+**[Documentation guide](docs/README.md)** · **[Learned adversarial reporting (Direction 2, finished)](docs/direction2/README.md)**
 
 ![Quota mechanisms versus audits (M3C, M4) versus round robin and naive trust, over four values of r = rho^tau: honest regret, maximum lying gain, and efficiency loss (direction 1, T=1e5, 32 evaluation seeds)](figures/fig20a_quota_vs_audit.png)
 
@@ -96,6 +99,10 @@ At r=0.5, the validation-selected run0 gains **G=0.03452** per round over honest
 
 **Evidence limits:** S1 passes its original gate, but off-knob checks show baseline-advantage confounding and only 2/3 out-of-family exploits. Main run0 at r=0.5 also has exactly the same policy as an S1 case already evaluated on these test seeds, so it adds no independent evidence relative to S1. The result is an exploitability lower bound for this fixed mechanism, policy class and budget. It is neither an optimal best response nor a safety claim, and it does not test M4 raids.
 
+**Independent holdout (confirmed).** Because the original test reused a policy already seen in S1, an additional preregistered 64-seed holdout was run (threshold delta = 0.005, registered after the main test and before the holdout ran). Run0: **D = +0.010778, 95% CI [+0.007362, +0.014194]**, above 0.005 ("confirmed material advantage"); runs 1 and 2: +0.009158 and +0.010068. Details: [`docs/direction2/results/independent-holdout.md`](docs/direction2/results/independent-holdout.md), data [`results/direction2/holdout/result.json`](results/direction2/holdout/result.json).
+
+**E1: learned-defense patch (v2, preregistered, negative).** Retuning the audit's three knobs against the learned attacker reduced its gain by 0.004236 (about 12%), 90% two-sided interval [0.003883, 0.004589] (two one-sided 95% bounds), which excludes the 0.005 target; honest cost stayed within its limits but is positive. Registered label: **insufficient effect**. This is not a "patch works" claim. Details: [`docs/direction2/results/e1-v2.md`](docs/direction2/results/e1-v2.md).
+
 [Full results and limitations](docs/direction2/results/main.md) · [Independent number audit](docs/direction2/results/number-audit.md) · [Frozen evaluation protocol](docs/direction2/design/main-evaluation.md) · [Data](results/direction2/main.json)
 
 ## Research process
@@ -132,7 +139,7 @@ Part II scripts, all in [`scripts/`](scripts/): `run_adaaudit_2x2.py`, `run_adaa
 
 ## Roadmap
 
-Direction 2 has completed its registered M3C evaluation. The remaining research questions include independently verifying the attack mechanism and assessing other mechanisms such as M4; these are future experiments and are not established by the current results.
+Direction 2 (registered M3C evaluation, independent holdout) and the E1 learned-defense patch (v2) are complete; E1 ended with an "insufficient effect" verdict. Open questions, none established by the current results: whether the M4 raid mechanism resists a learned liar (not tested), whether changing the audit's structure does better than retuning three knobs, and what a jointly trained defender and attacker converge to.
 
 ## Repository structure
 

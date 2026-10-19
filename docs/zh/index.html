@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>稀缺致動器仲裁：研究作品集</title>
+<meta name="description" content="當稀缺的共用資源可以免費宣稱需求時，稽核能抓到謊言嗎？一個四段式研究，包含負面結果。">
+<link rel="alternate" hreflang="en" href="../">
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--fg:#1b2330;--muted:#556071;--line:#d9dee6;--accent:#1f5fbf;--accent-fg:#fff;--warn:#9a4b00;--warnbg:#fff4e5;--ok:#17603a}
+@media (prefers-color-scheme:dark){:root{--bg:#0e1218;--panel:#171d27;--fg:#e7ebf1;--muted:#a3aebe;--line:#2b3442;--accent:#7fadff;--accent-fg:#0e1218;--warn:#ffb86b;--warnbg:#2a2014;--ok:#6fd3a0}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 system-ui,-apple-system,"Segoe UI","Noto Sans TC","PingFang TC",Roboto,sans-serif}
+main{max-width:820px;margin:0 auto;padding:32px 16px 72px}
+h1{font-size:clamp(1.7rem,5vw,2.4rem);line-height:1.15;margin:8px 0 14px;letter-spacing:-.01em}
+h2{font-size:1.45rem;margin:2.6em 0 .5em;padding-top:.4em;border-top:1px solid var(--line);line-height:1.25}
+h3{font-size:1.1rem;margin:1.6em 0 .3em}
+p,li{margin:0 0 .8em}
+ul{padding-left:1.2em}
+a{color:var(--accent)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.92rem;color:var(--muted)}
+.lead{font-size:1.15rem;color:var(--fg)}
+.byline{color:var(--muted);font-size:.95rem}
+.links{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0}
+.links a{display:inline-block;padding:9px 15px;min-height:44px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--fg);text-decoration:none;line-height:1.5}
+.links a.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.links a:hover{border-color:var(--accent)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:16px 0}
+.card h4{margin:0 0 .4em;font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.card ul{margin:0}
+.nope{border-left:4px solid var(--warn);background:var(--warnbg);border-radius:6px;padding:10px 16px;margin:16px 0}
+.nope h4{margin:0 0 .3em;font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;color:var(--warn)}
+.nope ul{margin:0}
+.qa{display:grid;grid-template-columns:7.5em 1fr;gap:4px 14px;margin:.4em 0}
+.qa b{color:var(--muted);font-weight:600;font-size:.9rem}
+.qa div{margin:0}
+@media(max-width:560px){.qa{grid-template-columns:1fr}.qa b{margin-top:.5em}}
+figure{margin:20px 0}
+figure img{max-width:100%;height:auto;border:1px solid var(--line);border-radius:8px;background:#fff}
+figcaption{font-size:.9rem;color:var(--muted);margin-top:6px}
+.status{display:inline-block;font-size:.8rem;border:1px solid var(--line);border-radius:99px;padding:1px 10px;color:var(--muted);margin-left:6px;vertical-align:middle}
+code{font-size:.88em;background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:0 4px;word-break:break-word}
+table{border-collapse:collapse;width:100%;font-size:.93rem}
+td,th{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+.tablewrap{overflow-x:auto}
+blockquote{margin:1em 0;padding:2px 0 2px 16px;border-left:3px solid var(--accent);color:var(--fg)}
+footer{margin-top:3em;color:var(--muted);font-size:.9rem}
+
+details.nope summary{cursor:pointer;font-weight:600;color:var(--fg);list-style-position:outside;margin-left:1.1em}
+details.nope summary::marker{color:var(--warn)}
+details.nope[open] summary{margin-bottom:.6em}
+.howto{border-color:var(--accent)}
+.howto li{margin-bottom:.35em}
+</style>
+</head>
+<body>
+<main>
+<div class="top"><span>研究作品集，2026 年 10 月</span><a href="../" hreflang="en" lang="en">English</a></div>
+
+<h1>稀缺資源可以免費宣稱時，稽核抓得到謊言嗎？</h1>
+<p class="lead">一個共用的服務者，幾個可以免費自報緊急度的代理人，其中有些會誇大。我研究的是：精確資訊值多少、稽核什麼時候有用，以及<em>學習型</em>的說謊者能不能勝過手寫的說謊策略。結論先講：精確資訊只值一點（約 0.02，量尺是 0 到 1 的機器人平均健康度），遠小於相信免費回報的代價；抵達時與派遣時的稽核都會被手寫說謊者擊敗，而隨機突擊稽核（raids，連得標者也可能被抽查的突擊檢查）在我試過的 45 種策略下撐住了；學習型說謊者在一個固定機制裡找到了可量測的額外好處；而我想針對它修補稽核的嘗試，<strong>效果不夠</strong>。</p>
+<p class="byline">Hao-Ting (Lex) Ho，2026。這是抽象模擬研究；論文都是工作草稿，未經同儕審查。</p>
+<div class="links">
+<a class="primary" href="../demo/">Demo 1：派遣與資訊</a>
+<a class="primary" href="../demo2/">Demo 2：稽核時機</a>
+<a href="../paper/paper.pdf">論文 1（草稿，未經同儕審查）</a>
+<a href="../direction1-paper/paper.pdf">論文 2：稽核時機（草稿，未經同儕審查）</a>
+<a href="https://github.com/Jadiouo/scarce-actuator-arbitration">GitHub repo</a>
+</div>
+
+<div class="card">
+<h4>兩分鐘看懂</h4>
+<ul>
+<li><strong>第一部分。</strong>在 8 台機器人的模型裡，總是先服務最緊急的那台（即使用真實緊急度），在每一種測過的負載下都輸給單純輪流，因為它忽略了路程。相信免費回報的代價，遠大於精確知識的價值。</li>
+<li><strong>方向一。</strong>在服務者抵達時才稽核，擋不住說謊。在派遣時稽核成本低，但只對看不到別人出價的說謊者穩健。原本計畫的通用理論被否證，已放棄。</li>
+<li><strong>方向二。</strong>一個小型神經網路學會說謊，在固定的稽核機制下勝過最好的手寫說謊策略；另一組獨立、全新的 64 個種子（門檻在第一次測試之後、holdout 執行之前訂定）再次看到這個優勢。</li>
+<li><strong>E1。</strong>針對這個攻擊者重新調整稽核，只讓它的收益降低 0.0042，沒達到我事先承諾的 0.005。結論：效果不足。</li>
+</ul>
+</div>
+
+<div class="card howto">
+<h4>讀法與符號</h4>
+<ul>
+<li><strong>隊伍健康度</strong>：機器人的平均健康度，0（死亡）到 1（完全健康）。<strong>輪流（round-robin）</strong>：單純按順序輪流服務。</li>
+<li><strong>r</strong>：第一部分指負載（機器人衰退的快慢）；方向一、二指宣稱與稽核之間真實狀態漂移得多慢（越接近 1 漂移越慢）。</li>
+<li><strong>G</strong>：說謊者相對於誠實時的平均收益。<strong>D</strong>：學習型說謊者的 G 減去最佳手寫說謊者的 G。</li>
+<li><strong>後悔值（regret）</strong>：誠實代理人每輪平均吃的虧。<strong>不合格比例（ineligible share）</strong>：代理人被標記後遭停權的輪數比例。</li>
+<li><strong>M3C</strong>：方向一、二使用的固定稽核機制。它在派遣時檢查宣稱、跨多輪累積證據、對可疑者暫時停權，之後再寬恕。E1 重新調整的就是它的三個可調參數。</li>
+<li><strong>holdout</strong>：用全新隨機種子做的獨立複測。<strong>95% 與 90% 區間</strong>：95% 雙側區間是一般的信賴區間；90% 雙側區間由兩個單側 95% 界組成。每次我都標明是哪一種。</li>
+</ul>
+</div>
+
+<h2 id="why">為什麼對這個題目有興趣</h2>
+<!-- src: .scratch/portfolio/motivation.md（中文段落，使用者 2026-10-19 已確認） -->
+<p>我是從做多機器人探索系統時走到這個題目的：一支隊伍共用一個致動器，同一時間只能服務一台機器人。每台機器人回報自己私有、無法驗證的緊急度，而且求助不用付代價。大家都寫「先服務最緊急的」，但緊急度可以免費宣稱，我沒辦法為這條規則辯護。所以我先建了一個小型的抽象模擬來檢查它。第一個意外是：在 8 台機器人的模型裡，總是先服務最緊急的那台——即使用的是真實的緊急度——在每一種測過的負載下都輸給單純的輪流，因為它忽略了服務者要走多遠。這讓我接著問：回報帶有策略時會怎樣、事後稽核何時有用、學習型的說謊者能不能勝過手寫策略。在這之前我大約三年都在做系統，沒有做過理論；這個專案是我學著把這類問題問清楚、驗證清楚的過程。這個 repo 就是從這些問題長出來的抽象研究，並不主張真實機隊會這樣行為。</p>
+<p>機器為什麼會虛報？這裡的「說謊」指的是對回報者有利的系統性偏差。來源可能是不同業主的機器人共用充電站或電梯、學習型的回報策略自己發現誇大有好處，或是估計器本身有偏差，在派遣者看來和說謊一模一樣。 <!-- src: facts.md 第1節；README.md:89 --></p>
+
+<h2 id="journey">研究歷程</h2>
+<p>共四段，每段都寫出什麼站得住、什麼沒有。每個區間都標明種子數與信賴水準（95% 或 90%）。所有結果都來自簡化模型的模擬。</p>
+
+<h3 id="part1">第一部分：派遣與資訊的價值 <span class="status">定稿</span></h3>
+<div class="qa">
+<b>問題</b><div>一個流動的服務者要修復幾台逐漸衰退的機器人（健康度會衰退，部分來自隱藏的衝擊）。機器人免費回報緊急度，每次移動都要花時間。精確知識值多少？相信免費回報的代價又是多少？</div>
+<b>做了什麼</b><div>小規模隊伍用精確動態規劃當基準，搭配 GPU 模擬器；回報行為建成一個賽局，在有限的誇大策略族裡用近似最佳回應求解，再加上各種稽核機制。</div>
+<b>發現</b><div>真實健康度的精確知識價值很小；相信免費回報代價很高；抵達時稽核會被繞過，派遣時稽核的損失較小，但不是零，且「小多少」有但書（見限制）。我第一版說「資訊沒有價值」，主要是因為忽略了路程。</div>
+</div>
+<figure>
+<img src="../figures/portfolio/fig7_v2_load_sweep.png" alt="左：8 台機器人下 15 種派遣策略的隊伍平均健康度隨負載變化，負載越高越低。右：各策略相對於盲目輪流的配對差與 95% 區間；只看真實緊急度的短視優先策略在每個負載都低於零，會考慮距離的策略則接近或高於零。" width="1200" height="488" loading="lazy">
+<figcaption>8 台機器人、v2 模型（claims.md 的 C1 設定）。右圖：相對於盲目輪流的差，95% 區間；低於零代表比輪流還差。緊急度優先策略（Greedy on true urgency，藍線）在每個負載都低於零。來源：<code>figures/fig7_v2_load_sweep.png</code>，資料 <code>results.json</code> 的 <code>v2_sweep</code>，在 <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/figures/README.md">figures/README.md</a> 標為 main (C1)。</figcaption>
+</figure>
+<div class="card">
+<h4>關鍵數字（32 個種子，95% t 區間）</h4>
+<ul>
+<li>精確資訊的價值，3 台機器人、衝擊比例 0.5：<strong>0.019 [0.017, 0.021]</strong>（隊伍健康度）<!-- src: facts.md 第2節第3項；claims.md:18 (VoI_step 0.0188 [0.0170,0.0206], r=.004) --></li>
+<li>相信回報（fused index，直接依自述派遣的派遣者）的損失：3 台 <strong>0.247 [0.223, 0.272]</strong>；8 台 <strong>0.40 [0.36, 0.44]</strong> <!-- src: facts.md 第2節；README.md:24 --></li>
+<li>抵達時稽核（服務者到了才檢查）的損失 0.024 [0.010, 0.038]（3 台）；派遣時稽核 0.0027 [0.0001, 0.0052]，約為前者的 1/9（偏樂觀：最佳回應搜尋未收斂，收斂率 3 台 0.25、8 台 0.00，10 格中 5 格區間含 0） <!-- src: facts.md 第2節第3項 (C5,C6)；number_audit.md:40 --></li>
+<li>8 台機器人時，緊急度優先的派遣在所有測試負載下都輸給輪流 <!-- src: claims.md:10-12 --></li>
+</ul>
+</div>
+<details class="nope">
+<summary>沒成功的地方與限制：我自己提出的「派遣稽核損失為零」被推翻；預定的 27 個設定格只跑了 10 個。</summary>
+<ul>
+<li>我自己事先提出的假設「派遣稽核的損失為零」被推翻並撤回。我也不主張「資訊價值小於 0.02」：統計上和這個門檻分不開。 <!-- src: claims.md:23-26,53-62 --></li>
+<li>派遣稽核的損失及其與抵達稽核的比值偏樂觀：未收斂的搜尋可能漏掉有利可圖的謊。 <!-- src: number_audit.md:46；claims.md:55-59 --></li>
+<li>有幾項發現（距離感知規則、廉價談話崩潰、定價）只是對已知理論的量化檢查，不是新現象。</li>
+<li>預定的 27 個設定格只跑了 10 個；精確基準只做到 3–4 台；策略集有限；協定是專案中途才寫的，不是嚴格的預先登記。 <!-- src: README.md:58,64 --></li>
+</ul>
+</details>
+<p>深入：<a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/dispatch/claims.md">宣稱與證據</a> · <a href="../paper/paper.pdf">論文</a> · <a href="../demo/">Demo 1</a></p>
+
+<h3 id="dir1">方向一：何時稽核 <span class="status">已結案</span></h3>
+<div class="qa">
+<b>問題</b><div>稀缺的服務者每輪服務三個代理人之一，其中一個可能說謊。要稽核一項宣稱得先等待，這段時間真實狀態會漂移，連誠實的代理人也會對不上。什麼時候、怎麼稽核，才不會懲罰誠實的人？</div>
+<b>做了什麼</b><div>比較了：相信回報、輪流、抵達時稽核、派遣時稽核（搭配累積式統計檢定）、配額機制，以及低機率、連得標者也可能被抽查的隨機突擊；對手是一組手寫的 45 種說謊策略。</div>
+<b>發現</b><div>抵達時稽核和單純相信回報一樣被擊敗。派遣時稽核成本低，但只對看不到別人出價的說謊者穩健。隨機突擊稽核（raids）在這組策略中最穩健。</div>
+</div>
+<div class="card">
+<h4>關鍵數字（3 個代理人、100,000 輪、32 個評估種子；± 約為 1.96 個標準誤）</h4>
+<ul>
+<li>r=0.5 時說謊者的最大收益 G：抵達稽核 <strong>0.2795 ± 0.0004</strong>，單純相信 0.2793 ± 0.0004 <!-- src: summary.md:56,48 --></li>
+<li>派遣稽核，看得到別人出價的說謊者（oracle edge）：r=0.9 時 <strong>0.0211 ± 0.0033</strong>；r=0.5 時 0.0870 ± 0.0053 <!-- src: summary.md:60,62 --></li>
+<li>隨機突擊稽核：對 45 種策略 G = <strong>0.0000 ± 0.0000</strong>，誠實代理人每輪後悔值 0.0162 ± 0.0001 <!-- src: summary.md:64-67 --></li>
+</ul>
+</div>
+<details class="nope">
+<summary>沒成功的地方與限制：原本計畫的通用理論失敗；突擊稽核的「G = 0」只代表在 45 種手寫策略內沒找到收益。</summary>
+<ul>
+<li>原本期待的通用縮放定律與定理<strong>失敗</strong>：指數在一個誤罰目標下是 1.26 [1.13, 1.39]，在另一個下是 2.18 [1.77, 2.63]。我在跑實驗前寫下的否證條件讓我停止了這條理論路線；貢獻因此變成一張經驗地圖。我沒有證明任何定理。 <!-- src: summary.md:38；README.md:81-83 --></li>
+<li>早先「派遣稽核能嚇阻說謊」的說法，在紅隊加入 oracle-edge 說謊者後撤回。第一版突擊設計從不稽核得標者，在 r=1 時留下 0.1811 ± 0.0721 的收益。 <!-- src: summary.md:34,36 --></li>
+<li>突擊的 G = 0 是下限（最大值本來就包含誠實策略），意思是「在 45 種手寫策略內找不到收益」，不是「不可能有收益」。只有 3 個代理人；突擊的成本還沒換算成實際路程；事先寫下的四個否證條件中有一個無法判定；不是正式的預先登記。 <!-- src: summary.md:91,101；direction1-paper abstract --></li>
+</ul>
+</details>
+<p>深入：<a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction1/results/summary.md">結果總表</a> · <a href="../direction1-paper/paper.pdf">論文</a> · <a href="../demo2/">Demo 2</a></p>
+
+<h3 id="dir2">方向二：學習型說謊者 vs. 手寫說謊者 <span class="status">已結案</span></h3>
+<div class="qa">
+<b>問題</b><div>手寫的說謊者限制了測試能證明的穩健程度。在固定的派遣稽核下，一個小型神經網路學習說謊，能不能找到超過最佳手寫策略的額外私人收益？</div>
+<b>做了什麼</b><div>訓練前先登記規格並凍結。一個 55 個參數的網路只看公開資訊，用演化策略訓練。檢查點與基準在驗證集上選定，之後只測一次（run 0 的策略先前在 S1 階段（用植入已知弱點來檢驗偵測力的校準階段）已在同一組測試種子上評估過，所以才加做 holdout）。接著我另跑一組獨立的 64 個全新種子 holdout（獨立複測），門檻 0.005 是在第一次測試之後、holdout 執行之前訂定的。</div>
+<b>發現</b><div>在這個固定機制下，是的。學習型說謊者相對最佳手寫說謊者的優勢 D，在三次訓練、兩次測試中都為正。</div>
+</div>
+<figure>
+<img src="../figures/portfolio/direction2-e1-summary.png" alt="三個小圖。A：學習型說謊者相對最佳手寫說謊者的優勢 D，主測試三次訓練與 holdout 三次訓練，95% 區間全部大於零，holdout 的區間也高於 0.005 門檻（此門檻只適用於 holdout）。B：E1 對攻擊者收益的降幅，v1 探索性試跑約 0.0086，v2 預先登記為 0.0042，90% 區間很窄（0.00388 到 0.00459），低於 0.005 目標。C：誠實代價的上界佔上限的比例，v2 在上限內，v1 試跑超出上限。" width="1300" height="460">
+<figcaption>方向二（A 圖）與 E1（B、C 圖）總結。區間：A 為 95% 雙側；B 的 v1 為 95% 雙側，v2 為 90% 雙側（兩個單側 95% 界）。A 圖的 0.005 線是 holdout 的門檻（主測試之後才登記），所以只畫在 holdout 列旁。C 圖的 v1 長條是 95% 雙側區間的上端，v2 是單側 95% 上界，兩者不宜直接比較。由 <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/scripts/portfolio_figures.py"><code>scripts/portfolio_figures.py</code></a> 從原始結果檔繪製；向量版：<a href="../figures/portfolio/direction2-e1-summary.svg">SVG</a>。</figcaption>
+</figure>
+<div class="card">
+<h4>關鍵數字（95% 雙側配對 t 區間；主測試 32 個種子，holdout 64 個種子）</h4>
+<ul>
+<li>主測試 run 0：學習型收益 0.03452，手寫 0.02087；D = <strong>+0.01366 [+0.00932, +0.01800]</strong>；3 次訓練的下界全部大於 0 <!-- src: results/direction2/main.json cells[r=0.5].runs[0].D；main.md:3,7,11-13 --></li>
+<li>獨立 holdout run 0：D = <strong>+0.010778 [+0.007362, +0.014194]</strong>，高於 0.005 門檻（主測試之後、holdout 之前登記）；run 1、2：+0.009158、+0.010068 <!-- src: results/direction2/holdout/result.json runs[0].D；conclusion.md:5-7 --></li>
+<li>誠實代理人每輪後悔值：沒有說謊者時 0.00686，有學習型說謊者時 0.01957。（run 0、r=0.5 的平均；後悔值差異沒做顯著性檢定。）攻擊沒有改善系統效率。 <!-- src: main.md:33,36,44 --></li>
+</ul>
+</div>
+<details class="nope">
+<summary>沒成功的地方與限制：只是單一固定機制的下界，不是安全結論，也不是最佳攻擊；第一次測試對 run 0 並不獨立。</summary>
+<ul>
+<li>原本的測試對 run 0 並沒有提供獨立證據（同一個策略先前在校準步驟中已在那些種子上評估過）。所以才有 holdout；門檻是在我看過主測試之後、holdout 執行之前登記的。 <!-- src: main.md:46；independent-holdout.md --></li>
+<li>偵測力的校準被削弱：樣本外的三個弱點中，只有 2 個有利用證據，不是 3 個。 <!-- src: conclusion.md:28 --></li>
+<li>這是<strong>可利用性的下界</strong>，只針對一個固定機制、一種策略類型、一個訓練預算。它不是最佳攻擊、不是安全結論，也沒有涵蓋突擊機制或其他手寫策略。區間反映的是種子變異，不是重新訓練的不確定性。holdout 的區間比預期寬（半寬 0.003416，計畫為 0.002352）。 <!-- src: main.md:48；independent-holdout.md --></li>
+</ul>
+</details>
+<p>深入：<a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/results/conclusion.md">結論</a> · <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/results/independent-holdout.md">holdout</a> · <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/results/main.md">主測試</a></p>
+
+<h3 id="e1">E1：防守方能修補嗎？ <span class="status">定稿、預先登記、負面結果</span></h3>
+<div class="qa">
+<b>問題</b><div>如果防守方針對學習型攻擊者重新調整稽核的三個參數，能不能讓攻擊者的收益至少降低 0.005，同時對誠實代理人的傷害不超過 0.002 後悔值或 0.01 不合格比例？</div>
+<b>做了什麼</b><div>先做探索性試跑（v1），再做預先登記的 v2，訓練、選擇、測試的種子互不重疊。被選定的設定在測試前凍結；1,024 個全新測試種子只用一次，並留有紀錄。</div>
+<b>發現</b><div>誠實代價在上限內，但降幅太小。事先約定的標籤：<strong>效果不足</strong>。</div>
+</div>
+<div class="card">
+<h4>關鍵數字（v2 測試，1,024 個種子；區間為 90% 雙側，即兩個單側 95% 界）</h4>
+<ul>
+<li>攻擊者收益：原本 0.034755，修補後 0.030519。降幅 <strong>0.004236 [0.003883, 0.004589]</strong>，約 12%；區間不含 0.005 <!-- src: results/direction2/e1v2/result.json mean_D, LB, UB_D, G_orig_mean, G_cand_mean；e1-v2.md:3,5 --></li>
+<li>誠實代價，點估計（95% 上界，上限）：後悔值 +0.001173（0.001283，0.002）；不合格比例 +0.004628（0.005032，0.01）。在上限內，但為正，所以不是免費。 <!-- src: e1-v2.md:78-81；e1v2/result.json honest --></li>
+<li>探索性的 v1 試跑報告降幅 0.0086 [0.0047, 0.0125]（95%），但誠實代價的上界超過上限（0.0033 與 0.0118）。 <!-- src: e1-pilot.md:54,63-66 --></li>
+</ul>
+</div>
+<details class="nope">
+<summary>沒成功的地方與限制：試跑中看似有希望的結果沒能通過預先登記；這不是「修補有效」的宣稱。</summary>
+<ul>
+<li>看起來有希望的 v1 試跑，在預先登記的 v2 中<strong>沒有</strong>站住；v1 的選擇與評估用的是同一組 32 個種子，v2 的估計值約為它的一半。兩者是不同的量，我沒有把它們合併。 <!-- src: e1-pilot.md:61-66；e1-v2.md:137 --></li>
+<li>這不是「修補有效」的宣稱，也不是均衡（只做了兩輪防守與攻擊）；攻擊者是選擇集上 12 個條目（9 組相異攻擊者）中最強的，且都源自原始機制。攻擊者對修補後的稽核可能偏弱，真實降幅可能更小。殘餘收益是 0.030519，離零很遠。 <!-- src: e1-v2.md:175-192 --></li>
+<li>尚未解釋：選擇集上的降幅（0.002631）與測試（0.004236）相差約 2.4 個標準誤。針對改動後的稽核，沒有重新檢查植入式弱點的偵測力。次要結果（12 個條目、9 組相異攻擊者：0.0033 到 0.0043）沒有改變結論。 <!-- src: e1-v2.md:131,158 --></li>
+</ul>
+</details>
+<p>深入：<a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/results/e1-v2.md">E1 v2 結果</a> · <a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/results/e1-pilot.md">v1 試跑</a></p>
+
+<h2 id="built">我做了什麼（工程面）</h2>
+<ul>
+<li>小規模隊伍的精確動態規劃基準，以及一個 float64 的 GPU 模擬器，能逐個種子重現 CPU 參考實作（已存檔的檢查中最大差異約 1e-15）。 <!-- src: paper.tex:58 --></li>
+<li>方向二的環境用 CUDA Graph 加速，並在讀取測試種子之前，與一般（eager）版本逐位元比對過。 <!-- src: e1-v2.md:212 --></li>
+<li>用演化策略（sep-CMA-ES）訓練的 55 參數神經策略，以及帶帳本的凍結評估協定，讓每組測試種子只用一次。 <!-- src: direction2/README.md；e1-v2.md:213 --></li>
+<li><code>tests/</code> 下的 pytest 測試套件，以及把每個報告數字對應到 JSON 欄位的數字稽核。</li>
+</ul>
+<p>重現方式（取自 repo 的 README 與 Makefile）：<code>make quick</code>（小型 CPU 冒煙測試）、<code>make replot</code>（用已存的 JSON 重畫第一部分所有圖）、<code>make test</code>，以及 <code>cd docs &amp;&amp; python3 -m http.server 8000</code> 在本機執行 demo。</p>
+
+<h2 id="learned">我學到什麼</h2>
+<ul>
+<li><strong>先寫下失敗條件。</strong>事先寫好的條件，讓我能停掉走不通的理論（方向一），也讓 E1 的負面結果照事先約定的門檻報告，而不是回頭調整說法。</li>
+<li><strong>攻擊自己的結論。</strong>紅隊審查推翻了「派遣稽核能嚇阻說謊」的說法，也找出從不檢查得標者的突擊設計。精確基準則顯示，我第一版「資訊沒有價值」主要是忽略路程造成的假象。</li>
+<li><strong>把已看過的證據和新證據分開。</strong>發現第一次測試不獨立時，我是加做一組有登記門檻的 holdout，而不是移動門檻。E1 的測試種子只用一次。</li>
+<li><strong>報告區間，也報告它的信賴水準。</strong>同一個效果在不同測試中數字不同（D = 0.01366、0.010778），每一個都標明它的角色。</li>
+</ul>
+
+<h2 id="limits">誠實的限制與開放問題</h2>
+<ul>
+<li>全部是少數代理人的抽象模擬。這裡沒有任何東西顯示真實機隊會虛報。</li>
+<li>學習型與手寫的攻擊者都只給出下界。更強的攻擊者能做到多糟？如果防守方與攻擊者聯合訓練（而不是只做兩輪），會收斂到什麼嗎？</li>
+<li>突擊機制對手寫說謊者很穩健。它對學習型說謊者也穩健嗎？尚未測試。</li>
+<li>改變稽核的結構，會不會比只重新調整三個參數更有效？E1 只測了重新調參。</li>
+<li>抽象的稽核模型還沒有接回空間環形模擬，所以突擊在路程上的實際成本沒有量過。</li>
+</ul>
+
+<h2 id="evidence">證據索引</h2>
+<div class="tablewrap"><table>
+<tr><th>階段</th><th>結論文件</th><th>論文／demo／資料</th></tr>
+<tr><td>第一部分</td><td><a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/dispatch/claims.md">claims.md</a>、<a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/paper/number_audit.md">數字稽核</a></td><td><a href="../paper/paper.pdf">論文</a>、<a href="../demo/">Demo 1</a>、<a href="https://github.com/Jadiouo/scarce-actuator-arbitration/tree/master/results">results/</a></td></tr>
+<tr><td>方向一</td><td><a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction1/results/summary.md">summary.md</a>、<a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction1/results/number-audit.md">數字稽核</a></td><td><a href="../direction1-paper/paper.pdf">論文</a>、<a href="../demo2/">Demo 2</a></td></tr>
+<tr><td>方向二</td><td><a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/results/conclusion.md">conclusion.md</a>、<a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/results/main.md">main.md</a>、<a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/results/independent-holdout.md">holdout</a>、<a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/results/number-audit.md">數字稽核</a></td><td><a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/README.md">方向二 README</a>、<a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/results/direction2/main.json">main.json</a>、<a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/results/direction2/holdout/result.json">holdout 結果</a></td></tr>
+<tr><td>E1</td><td><a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/results/e1-v2.md">e1-v2.md</a>、<a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/results/e1-pilot.md">e1-pilot.md</a></td><td><a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/results/direction2/e1v2/result.json">e1v2/result.json</a>、<a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/direction2/design/e1-v2.md">預先登記的設計</a></td></tr>
+<tr><td>過程</td><td><a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/project/decisions.md">決策紀錄</a>（中文）、<a href="https://github.com/Jadiouo/scarce-actuator-arbitration/blob/master/docs/README.md">文件導覽</a></td><td><a href="https://github.com/Jadiouo/scarce-actuator-arbitration">repo 與 README</a></td></tr>
+</table></div>
+
+<h2 id="how">研究是怎麼做的</h2>
+<p>研究是和 AI agent 一起做的：主 agent 規劃與審查、子 agent 跑實驗、紅隊攻擊結論、白隊檢查有沒有過度樂觀。主題與方向由我選定，最後判斷也由我做。</p>
+
+<footer>Hao-Ting (Lex) Ho，2026 · 工作草稿，未經同儕審查 · <a href="https://github.com/Jadiouo/scarce-actuator-arbitration">GitHub</a> · <a href="../" hreflang="en" lang="en">English</a></footer>
+</main>
+</body>
+</html>

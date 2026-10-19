@@ -598,7 +598,7 @@
 
 ### 使用者決定：S1 改到學校算力執行（2026-10-07）
 - 本機 S1 已停止：143 段中只完成 2 段（s1_D1_s0.02 的 g0–68），其餘 job（#160–#300）全部取消，背景監看器也已停止。這 2 段不計入結果，S1 將在新機器上從頭執行。
-- **目標平台**：學校的 AI 雲端開發平台（Ubuntu）。8 CPU、32GB RAM、550GB 硬碟、Nvidia Quadro RTX 8000，配置 12GB 顯存，推測是 vGPU 切片。可以使用 Docker。
+- **目標平台**：學校的 AI 雲端開發平台（Ubuntu）。Nvidia Quadro RTX 8000，配置 12GB 顯存，推測是 vGPU 切片。可以使用 Docker。
 - **風險**：
   1. Turing 架構的 FP64 速度只有單精度的 1/32，而模擬全程使用 float64，可能明顯變慢。部署後要先做效能量測，再重估時程；判定規則不變。
   2. CUDA 版本要與主機驅動相容，容器採用 CUDA 12 系列。
@@ -608,7 +608,7 @@
 - 新機器上沒有 gpujob，改用可續跑的依序執行器（scripts/d2_run_queue.py），在 tmux 或 nohup 下執行。
 
 ### 使用者授權：GitHub 自動備份（2026-10-07）
-- 使用者原話：「我會直接讓妳可以連結學校電腦的ssh 讓你直接控制那個電腦 然後要做好備份 可以用GH . 不要 讓東西不見了 .」
+- 使用者授權以 ssh 操作學校 GPU 伺服器，並以 GitHub 備份，避免資料遺失。
 - 使用者在 AskUserQuestion 中選擇「推到公開 repo 的分支」，範圍如下：
   - 只推到 Jadiouo/scarce-actuator-arbitration 的 direction2-freeze 分支。
   - 絕不推 master，絕不 force push。
@@ -628,9 +628,9 @@
 - **接受的測試放寬**：T77 改為允許浮點數最後一位誤差，S123 改為不依賴絕對路徑。兩者都是跨機器所必需，不影響檢測力。
 - **GitHub 備份**：遠端 direction2-freeze 分支建立在 b5b838c，與本機 HEAD 相同；master 仍為 eae1f3a，未受影響。
   - 隱私掃描：沒有發現金鑰、token、學校 email。
-  - commit 作者 email 為 gmail（使用者先前已選定）。
+  - commit 作者 email 已由使用者先前選定。
   - 本機路徑出現在 designer_logs，因屬稽核紀錄而保留原樣。
-- **下一步**：等使用者設定 `ssh school`，之後依序進行：
+- **下一步**：等使用者設定 ssh 連線，之後依序進行：
   1. 部署
   2. 設定 deploy key
   3. 驗收與效能量測
@@ -713,7 +713,7 @@
 
 ## 2026-10-08 S1 在學校機器開跑（無人看顧）
 
-- 學校機器（aics-st05-u06，GRID RTX8000-12Q）用系統 python3.10 重建 .venv，micromamba 已移除。setup_venv.sh 自選 torch 2.6.0+cu126（不是 Dockerfile 的 2.5.1+cu124）；S1 全部 cell 在同一環境內跑，各 cell 之間可比較。與本機 pilot 的跨版本差異只影響 pilot 與 S1 的逐位元可重現性，不影響 S1 判讀。
+- 學校機器（GRID RTX8000-12Q）用系統 python3.10 重建 .venv，micromamba 已移除。setup_venv.sh 自選 torch 2.6.0+cu126（不是 Dockerfile 的 2.5.1+cu124）；S1 全部 cell 在同一環境內跑，各 cell 之間可比較。與本機 pilot 的跨版本差異只影響 pilot 與 S1 的逐位元可重現性，不影響 S1 判讀。
 - 驗收：CPU 136 passed；GPU 7 passed，bitwise 等同 frontier。學校每步 2.75–3.45 ms，S1 估約 93 h（加啟動約 4 天），main 約 46 h。
 - GPU util 在 S1 實跑時約 44%，訓練進程單執行緒 CPU 100%：瓶頸是 Python/kernel launch。加速計畫見 docs/direction2/design/speedup.md（CUDA Graphs 可行；合併 batch 不保證 bitwise，否決）。使用者決定這次先不做加速，原速跑完。
 - 2026-10-08 00:42 在 tmux `s1` 開跑：`d2_run_queue.py --stage s1 --push-every 1 --remote origin --branch direction2-freeze`，143 段，每段完成即 commit＋push。
@@ -799,3 +799,16 @@
 - 結果文件 docs/direction2/results/e1-v2.md（sonnet 撰寫）。紅方第 1 輪：無 BLOCKER；HIGH 5 條（AS 與 test 降幅差異的推論與自身 σ_D 矛盾、「最強已知攻擊者」只在 AS 成立而 test 上順序翻轉、12 條目實為 9 個不同參數、飽和≠優化有效、v1/v2 對照的因果措辭與區間口徑不同）、MEDIUM 5 條、LOW 3 條。指揮官判斷全部成立（第 8 條「重算一致」改以本進度檔為證據），已交回修正。
 - 紅方修正後（sonnet 重算）：AS 配對 D=0.002631（SD 0.007313，SE 0.000646），test D=0.004236（SE 0.000214），差 2.36 個組合 SE；test 上各取最強攻擊者相比的描述性降幅 0.003681；C2 殘餘 G 0.030519 [0.029745, 0.031292]。寫手更正指揮官：9bd9c4d、9978186 的 commit 時間是 10/15 16:44、16:51，不是晚上（已改上段）。
 - 閉門會議（第 2 輪，交付前）：未發現數字錯誤，主判定未越出登記範圍。必改 3 條（§8「沒有看到同時滿足的設定」過度推論→改為只就兩個已評估點陳述；開頭補尺度 12% 與 G 白話定義；warm-start 偏差也代表 D 可能高估）全部採納；建議採納縮寫表、manifest 自雜湊說明、「指揮官」改寫、12 條目非獨立證據；不採納「AS/test 差異表移至附錄」，理由：該表回答審查者最可能追問的問題。此段已審兩輪，修正後不再開審，由指揮官檢查修改處後交付。
+
+## 2026-10-19 作品集整理（使用者宣告研究結束）
+
+- 使用者決定：研究告一段落，整理成完整作品集放上 GitHub；允許把 direction2-freeze 快轉併入 master 並更新 Pages；動機取自使用者的研究陳述（PDF 不公開，`docs/idae/` 已被 .gitignore），使用者確認草稿並同意公開「三年做系統、沒做過理論」；英文主頁＋繁中版；投稿延後（查無免費且可遠端的 workshop，11/20 截稿的 AAAI-27 SC4AI27 須現場、學生註冊 ≥$240；待 AAMAS／ICLR 2027 徵稿）。
+- 隱私稽核（sonnet）：無金鑰／憑證。清除：designer_logs 的絕對路徑（換 `<repo>/`，jsonl 驗證合法；test_d2_s1.py `_rel()` 相容 `<repo>/`）、進度檔中使用者原話與學校主機名、ssh 別名、主機規格數字。保留：docs/direction2/design/e1-v2.md:121 的主機名（已登記設計，雜湊在 E1 v2 manifest，不可改；舊內容本就在公開的分支歷史中）；作者署名（作品集署名）。不重寫歷史。
+- 事實底稿 `.scratch/portfolio/facts.md`（sonnet）：研究陳述中「誠實回報精準度最高卻最差」只部分成立（舊模型；greedy_true 精準度更高），動機句改用現行結果：N=8、v2 下即使用真實緊急度的 greedy_true 也在每種負載輸給輪流（paper.tex:70、claims.md:10）。發現舊文件間 7 處矛盾（claims.md 的 8–25 倍、40% 誤觸發等），作品集一律用 number_audit／paper 的核對值。
+- 作品集頁：docs/index.html（英）、docs/zh/index.html、docs/figures/portfolio/direction2-e1-summary.{png,svg}（scripts/portfolio_figures.py）、README 更新、conclusion.md 頂端加 E1 v2 註記。headless Chrome 驗證：桌機與 390px 手機皆無橫向捲動。
+- 紅方（第 1 輪）：約 35 個數字全部吻合；HIGH 3（hero 資訊價值措辭方向錯、holdout 門檻被寫成預先登記、圖 A 門檻線畫過主測）、MEDIUM 6、LOW 5，全部採納。動機句再改為 greedy_true 的精確措辭（用真實緊急度）。
+- 閉門會議（第 2 輪）：無數字錯誤；必改 5（術語定義框、hero 量尺、中文標題與用詞統一、圖 C 口徑）全部採納；建議採納工程面摘要＋真實重現指令、限制收進 details（摘要列保留關鍵限制）、刪重複「未經同儕審查」、若有現成 v2 圖則放 Part I 鉤子圖、AI 協作段移到頁尾。不採納：在 AI 協作段加「方向與判斷是我做的」——實際分工較複雜，此句為過度宣稱。本段已審兩輪，修正後由指揮官驗證，不再開審。
+
+- 推送前驗證（10/19）：direction2 測試分兩段跑完。
+  - `test_d2_misc.py::test_T57_gpu_tests_never_skip` 失敗。在乾淨 HEAD（git stash）上同樣失敗，所以是既有問題：holdout 測試檔的第一行不是 `cuda_required()`。這個檔案可能受雜湊保護，所以不修。
+  - 其餘測試：307 passed、1 failed。失敗的是 `test_d2_speed.py::test_G8_memory_does_not_grow_over_generations`，單獨重跑會通過（3.24s），判定是長時間連續跑造成的偶發失敗。它和隱私清除改到的檔案無關。
