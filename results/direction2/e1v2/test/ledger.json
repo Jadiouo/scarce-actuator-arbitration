@@ -16,5 +16,11 @@
     "contract_sha256": "d2fbfae25ece32668b45b7e7bf3f28ea23bd8f1123bb09873aff6de40cc10afb",
     "started_unix": 1792386060.1500576,
     "raw_sha256": "cc59c3e4a19427cc863c8e96c3489fbfed73ffbd78feb0783bed04098e8e747b"
+  },
+  "cand_secondary": {
+    "status": "completed",
+    "contract_sha256": "378df0a1dedac5deb0ba68725ef5dd39ebea75d742f6fd7b6b21527e702e8a81",
+    "started_unix": 1792387012.9516642,
+    "raw_sha256": "e10dc1708902c21ff7c6ab206b1c0659be10ccb6e4b75bed65ab08189eae57ec"
   }
 }
