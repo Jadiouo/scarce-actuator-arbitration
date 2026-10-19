@@ -1,0 +1,126 @@
+{
+  "schema": "e1-v2-testcheck/1",
+  "manifest_sha256": "34fe0eb85c218d4b847e39c8ca912559b9cdf68dd5ed67ed44f03a9ff9b51c09",
+  "freeze_record_sha256": "61607272c1614377c3ccc2737389be05e06ddc70108412f04b736dcf2f2a4a7b",
+  "path": {
+    "graph": true,
+    "device": "cuda",
+    "chunk": 64,
+    "fallback": false
+  },
+  "seeds": [
+    72300000,
+    72300063,
+    64
+  ],
+  "tolerance": "exact equality, no tolerance",
+  "passed": true,
+  "checks": [
+    {
+      "name": "orig_main",
+      "n_policies": 2,
+      "n_seeds": 64,
+      "identical": true,
+      "fields": {
+        "util_b": {
+          "shape_equal": true,
+          "identical": true,
+          "max_abs": 0.0,
+          "n_seeds_differ": 0
+        },
+        "reg_b": {
+          "shape_equal": true,
+          "identical": true,
+          "max_abs": 0.0,
+          "n_seeds_differ": 0
+        },
+        "pen": {
+          "shape_equal": true,
+          "identical": true,
+          "max_abs": 0.0,
+          "n_seeds_differ": 0
+        }
+      }
+    },
+    {
+      "name": "cand_main",
+      "n_policies": 2,
+      "n_seeds": 64,
+      "identical": true,
+      "fields": {
+        "util_b": {
+          "shape_equal": true,
+          "identical": true,
+          "max_abs": 0.0,
+          "n_seeds_differ": 0
+        },
+        "reg_b": {
+          "shape_equal": true,
+          "identical": true,
+          "max_abs": 0.0,
+          "n_seeds_differ": 0
+        },
+        "pen": {
+          "shape_equal": true,
+          "identical": true,
+          "max_abs": 0.0,
+          "n_seeds_differ": 0
+        }
+      }
+    },
+    {
+      "name": "orig_secondary",
+      "n_policies": 13,
+      "n_seeds": 64,
+      "identical": true,
+      "fields": {
+        "util_b": {
+          "shape_equal": true,
+          "identical": true,
+          "max_abs": 0.0,
+          "n_seeds_differ": 0
+        },
+        "reg_b": {
+          "shape_equal": true,
+          "identical": true,
+          "max_abs": 0.0,
+          "n_seeds_differ": 0
+        },
+        "pen": {
+          "shape_equal": true,
+          "identical": true,
+          "max_abs": 0.0,
+          "n_seeds_differ": 0
+        }
+      }
+    },
+    {
+      "name": "cand_secondary",
+      "n_policies": 13,
+      "n_seeds": 64,
+      "identical": true,
+      "fields": {
+        "util_b": {
+          "shape_equal": true,
+          "identical": true,
+          "max_abs": 0.0,
+          "n_seeds_differ": 0
+        },
+        "reg_b": {
+          "shape_equal": true,
+          "identical": true,
+          "max_abs": 0.0,
+          "n_seeds_differ": 0
+        },
+        "pen": {
+          "shape_equal": true,
+          "identical": true,
+          "max_abs": 0.0,
+          "n_seeds_differ": 0
+        }
+      }
+    }
+  ],
+  "graph_fallback_used": false,
+  "unix": 1792384300.3058238
+}
