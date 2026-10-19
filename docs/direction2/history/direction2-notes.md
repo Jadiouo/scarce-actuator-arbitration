@@ -812,3 +812,4 @@
 - 推送前驗證（10/19）：direction2 測試分兩段跑完。
   - `test_d2_misc.py::test_T57_gpu_tests_never_skip` 失敗。在乾淨 HEAD（git stash）上同樣失敗，所以是既有問題：holdout 測試檔的第一行不是 `cuda_required()`。這個檔案可能受雜湊保護，所以不修。
   - 其餘測試：307 passed、1 failed。失敗的是 `test_d2_speed.py::test_G8_memory_does_not_grow_over_generations`，單獨重跑會通過（3.24s），判定是長時間連續跑造成的偶發失敗。它和隱私清除改到的檔案無關。
+- 頁尾那句：閉門會議建議不要寫「方向與判斷是我做的」，但使用者選擇保留原句（I chose the topics and directions and made the final judgments.），以使用者的判斷為準。已發佈：399b932，master 已快轉，Pages 上線。
