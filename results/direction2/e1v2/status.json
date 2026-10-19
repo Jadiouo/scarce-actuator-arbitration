@@ -1,6 +1,6 @@
 {
   "stage": "test",
-  "updated_unix": 1792385374.1759813,
+  "updated_unix": 1792386053.869448,
   "graph_fallback_used": false,
   "started_unix": 1792116464.5139508,
   "manifest_sha256": "34fe0eb85c218d4b847e39c8ca912559b9cdf68dd5ed67ed44f03a9ff9b51c09",
@@ -19,5 +19,5 @@
     "sx"
   ],
   "finished_unix": 1792166577.3768246,
-  "evaluation": "orig_main"
+  "evaluation": "cand_main"
 }
