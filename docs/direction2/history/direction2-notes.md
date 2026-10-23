@@ -860,3 +860,22 @@
 - 使用者確認（10/21）：E-A1 在 astarc 上跑。學校機器 10/24 前不能用。
 - 第二輪審查（sonnet）：4 項必改、5 項建議，全部採納並寫進 v3，都只是規則補寫，判準、門檻、seeds 不動。依工作規則，第二輪有必改項就先問使用者。使用者同意不開第三輪，由指揮官逐項核對 9 點後 commit。
 - 預先登記：`docs/direction2/design/e-a1.md`（sha256 ea5e9077…）。
+- 使用者指示（10/21）：astarc 上我們自己的 GPU 程式數量不限，已更新 gpu-center 的 astarc.md。E-A1 的執行方式已寫死在登記裡（單一程序、多 lane，未達門檻就依序跑），不改登記；若要改成多程序，要當作偏離記錄。
+- E-A1 實作（sonnet）：`scripts/ea1.py` 1307 行、`scripts/ea1_launch.sh`、`tests/direction2/test_ea1.py`。本機 34 passed、2 skipped（GPU）。97 個受保護檔的雜湊前後都吻合，test_e1_v2 40 passed。
+- 程式審查（sonnet）：沒有 BLOCKER。以下 4 項全部採納，交回原實作者修正：
+  - HIGH：同帳號的 GPU 程式被當成外人，會讓訓練以 75 退出。
+  - MEDIUM：正式 manifest 下可以用 CPU 跑 train 和 select，要拒絕。
+  - MEDIUM：freeze 遇到環境不符只警告，要改成 raise。
+  - LOW：D2_GRAPH_K 環境變數沒有釘住。
+  主判準、選取規則、配方、seeds、續跑都與設計相符，審查者實跑 audit 確認：8608／12064／交集 0。
+- astarc 測試：cputests 79 passed；gputests 2 passed。
+- smoke 失敗：torch 2.6.0+cu126 在同一程序裡跑 3 lane CUDA graph replay，丟出「Offset increment outside graph capture encountered unexpectedly」。speedup.md 已寫明 torch 2.6 沒驗證過同程序並行。依登記規則，3 lane 沒通過就用 lanes=1。
+- 請實作者修 smoke：並行失敗要當成結果記下來，並繼續量單 lane；另外加一項只做量測的「3 個獨立程序同時跑」吞吐比與逐位比對。改用多程序不在登記裡，屬於執行方式的偏離，要量測後交使用者決定。
+- 第二次 smoke（10/21 16:01–約 17:35，astarc）：
+  - graph 與 eager 逐位相同，3 鏈各 5 代。
+  - 3 lane 在同一程序內再次失敗（Offset increment），依登記規則改為 lanes=1。
+  - 單 lane 每代 105.0 s，驗證 107.9 s，估計總計 37.1 h。
+  - 多程序量測：3 個 worker 全部 OOM，沒有取得數據。
+  - smoke 期間 GPU 一開始就有約 5.8GB 的顯存被同帳號的 umi-train 佔用，105 s/代可能受到競爭影響。學校 RTX8000 為 28.2 s/代。
+  - smoke_summary 的 `t_test.extrapolated_1024_seeds_s` 是 0.0，是外推公式的 bug，只影響估計，不影響結果。
+- 多程序這條路放棄：單 lane 的 GPU 使用率已經約 99%，而且 VRAM 不夠，所以照登記用 lanes=1，沒有偏離，也不需要使用者決定。
