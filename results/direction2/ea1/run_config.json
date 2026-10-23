@@ -1,0 +1,13 @@
+{
+  "schema": "ea1-run-config/1",
+  "manifest_sha256": "5d649273efb6b81b777d299e6fcc237f6c5ab8cb365a82dfd634683ebf54b2cd",
+  "lanes": 1,
+  "decision": {
+    "lanes": 1,
+    "ratio": null,
+    "reason": "3-lane run failed or B != C"
+  },
+  "smoke_summary_sha256": "2762ef939bf2f710027a4cca87e96e252463a0d8565a76a82d76feec1dc97577",
+  "parallel_check_sha256": "57237d3647c4a199fdd57a1c08e5c3f6255e52d0af65f698d4142a791ee78971",
+  "rule": "lanes=3 iff 3*t1/t3 >= 1.10 and A=B=C and GPU memory peak <= 6 GB (design 3.3)"
+}

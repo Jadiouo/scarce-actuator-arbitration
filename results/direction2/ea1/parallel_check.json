@@ -1,0 +1,51 @@
+{
+  "schema": "ea1-parallel-check/1",
+  "manifest_sha256": "5d649273efb6b81b777d299e6fcc237f6c5ab8cb365a82dfd634683ebf54b2cd",
+  "ea1_py_sha256": "55aba50e9989087569ed2a3815311a02e83cf85441246e7a7adcf8067b0266ca",
+  "environment": {
+    "python": "3.10.12",
+    "d2_graph_k": null,
+    "numpy": "2.2.6",
+    "scipy": "1.15.3",
+    "torch": "2.6.0+cu126",
+    "cuda": "12.6",
+    "hostname": "U2204-VDE",
+    "threads": {
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1"
+    },
+    "device_name": "Quadro RTX 4000",
+    "capability": [
+      7,
+      5
+    ],
+    "gpu_name": "Quadro RTX 4000",
+    "gpu_uuid": "GPU-75f42f27-ecf6-5a08-ff91-caf9cfc15480",
+    "driver": "595.71.05"
+  },
+  "gpu_memory_peak_gb": null,
+  "n_gens": 5,
+  "A_vs_B": {
+    "0": [],
+    "1": [],
+    "2": []
+  },
+  "B_vs_C": null,
+  "graph_equals_eager": true,
+  "parallel_equals_single": false,
+  "parallel_ok": false,
+  "parallel_error": "lane 0: RuntimeError: Offset increment outside graph capture encountered unexpectedly.; lane 1: RuntimeError: Offset increment outside graph capture encountered unexpectedly.",
+  "digests": {
+    "A": {
+      "0": "54dfb0e56ef8431be8cd6141b591f825ab9bb5bdd176123f3f5275625b99616a",
+      "1": "f9ba6e3b390ae9c8e44c706e9dc861b660a294396ba1c6964328b8785eaed0a8",
+      "2": "ae4b681783e04479ec06bd0a3b837382b31d33a5b3003ca35e1b141922b44056"
+    },
+    "B": {
+      "0": "54dfb0e56ef8431be8cd6141b591f825ab9bb5bdd176123f3f5275625b99616a",
+      "1": "f9ba6e3b390ae9c8e44c706e9dc861b660a294396ba1c6964328b8785eaed0a8",
+      "2": "ae4b681783e04479ec06bd0a3b837382b31d33a5b3003ca35e1b141922b44056"
+    }
+  }
+}

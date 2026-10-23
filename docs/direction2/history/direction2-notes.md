@@ -879,3 +879,8 @@
   - smoke 期間 GPU 一開始就有約 5.8GB 的顯存被同帳號的 umi-train 佔用，105 s/代可能受到競爭影響。學校 RTX8000 為 28.2 s/代。
   - smoke_summary 的 `t_test.extrapolated_1024_seeds_s` 是 0.0，是外推公式的 bug，只影響估計，不影響結果。
 - 多程序這條路放棄：單 lane 的 GPU 使用率已經約 99%，而且 VRAM 不夠，所以照登記用 lanes=1，沒有偏離，也不需要使用者決定。
+- 第一次 paracheck 被拒，原因是「uncommitted input: manifest.json」。astarc 上那份 manifest 是 rsync 複製過去的，沒有被 git 追蹤。比對雜湊後與已 commit 的版本相同，所以把複本移到 ~/ea1_bak，再 git pull，然後重跑。
+- 使用者決定（10/23）：E-A1 和同帳號的 umi-train 一起跑，變慢沒關係，但要避免記憶體不足造成中斷。
+  - 判讀：同時跑不影響數值。smoke 期間 umi 佔用 GPU，graph 仍然等於 eager；testcheck 會再檢查一次。
+  - 措施：在 astarc 家目錄放看門狗 `~/ea1_watchdog.sh`。它不在 repo 裡，不屬於凍結程式。每 10 分鐘檢查一次，如果 ea1_train 不在而且 train 還沒完成，就從 checkpoint 重新啟動，最多 100 次。凍結程式本身不能加記憶體預留，所以沒改。
+- paracheck（10/23 15:06 到約 16:30）：graph_equals_eager=True，3 lane 再次失敗，run_config 判 lanes=1。
