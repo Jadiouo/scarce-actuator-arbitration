@@ -884,3 +884,5 @@
   - 判讀：同時跑不影響數值。smoke 期間 umi 佔用 GPU，graph 仍然等於 eager；testcheck 會再檢查一次。
   - 措施：在 astarc 家目錄放看門狗 `~/ea1_watchdog.sh`。它不在 repo 裡，不屬於凍結程式。每 10 分鐘檢查一次，如果 ea1_train 不在而且 train 還沒完成，就從 checkpoint 重新啟動，最多 100 次。凍結程式本身不能加記憶體預留，所以沒改。
 - paracheck（10/23 15:06 到約 16:30）：graph_equals_eager=True，3 lane 再次失敗，run_config 判 lanes=1。
+- 正式訓練於 10/23 16:20 啟動（lanes=1，並啟動看門狗）。前 4 代每代 42.8–47.6 s，GPU 使用率 100%，與 umi 同時跑；推估約 16 h 完成。smoke 量到 105 s/代，是因為那時和 umi 爭用 GPU。
+- 10/24 00:50 狀態：第 0 條鏈到第 340 代。10/23 22:34 umi-train-r4a 開跑後，每代約 107 s；推估 10/25 清晨完成。10/23 21:48 從 checkpoint 重啟過一次（看門狗沒有紀錄，是 launcher 自己重試，原因未查）。日誌：[worklog-2026-10-20](worklog-2026-10-20.md)。
