@@ -1,0 +1,18 @@
+{
+  "category": "not_stronger",
+  "sub": "flat",
+  "text": "\u6c92\u6709\u66f4\u5f37\uff08\u6301\u5e73\uff09\uff1a\u7121\u6cd5\u6392\u9664\u7565\u9ad8\u65bc 0 \u7684\u5dee\uff0c\u4f46\u6392\u9664\u4e86 A_fresh \u9ad8\u51fa a* \u9054 0.001 \u4ee5\u4e0a\u3002",
+  "n": 1024,
+  "mean_delta": 0.0003330025609992137,
+  "LB": -0.00012020465115689138,
+  "UB": 0.0007862097731553188,
+  "eps": 0.001,
+  "subject": "A_fresh (the single attacker selected on EA1_SEL)",
+  "schema": "ea1-result/1",
+  "manifest_sha256": "5d649273efb6b81b777d299e6fcc237f6c5ab8cb365a82dfd634683ebf54b2cd",
+  "selection_frozen_sha256": "ff6b5a480249499014f319e15cceb64281fe54f4f3e48e240df90c273812c51a",
+  "G_C2_astar": 0.029948956555116833,
+  "G_C2_A_fresh": 0.03028195911611605,
+  "A_fresh": "fresh_run0",
+  "A_fresh_gen": 300
+}
