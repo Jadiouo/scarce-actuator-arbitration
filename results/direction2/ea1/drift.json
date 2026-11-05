@@ -1,0 +1,23 @@
+{
+  "schema": "ea1-drift/1",
+  "manifest_sha256": "5d649273efb6b81b777d299e6fcc237f6c5ab8cb365a82dfd634683ebf54b2cd",
+  "note": "descriptive; no pass/fail threshold; cross-machine comparisons are reference only if not bitwise identical",
+  "orig": {
+    "raw": "evaluations/a3bbb900b1aa3ba9c591e5f21eeda0bd6d7afb7c6ca02de7b5b95adcf709c18a.json",
+    "G_new": 0.03646720854981316,
+    "G_e1v2_AS": 0.03646720854981316,
+    "mean_diff": 0.0,
+    "max_abs_per_seed": 0.0,
+    "n_bitwise_identical": 128,
+    "n": 128
+  },
+  "C2": {
+    "raw": "evaluations/a4f2aa5ea1bd6bfad7b4f6fa69f92b278fadf61ef81e982616c5f394523e2555.json",
+    "G_new": 0.033836472647898505,
+    "G_e1v2_AS": 0.033836472647898505,
+    "mean_diff": 0.0,
+    "max_abs_per_seed": 0.0,
+    "n_bitwise_identical": 128,
+    "n": 128
+  }
+}

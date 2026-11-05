@@ -1,5 +1,11 @@
 # 方向二：用 RL 訓練的對手（「專業騙子」）——決策紀錄
 
+## 給使用者看的
+- 現況：E-A1 已暫停（使用者要搬資料）。astarc 上沒有 E-A1 程序。訓練結果還在，也備份到本機 `.scratch/ea1-astarc-backup/`。select 其實沒有開始：開跑前的 CPU 測試失敗就退出了。
+- 等你決定：無。等你說搬完，再繼續。
+- 我先自己決定的（可以推翻）：
+  - 繼續時先查 `test_launcher_auto_resumes_train_on_75_and_passes_other_codes` 為什麼失敗。空間夠的話改回用原本的 launcher。
+
 建立：2026-10-06。使用者指示：
 - commander 模式：subagent 一律 sonnet；commander 只負責規劃、派工、審查。
 - 先寫 SDD（規格）與 TDD（測試），先寫驗證、再實作。
@@ -886,3 +892,6 @@
 - paracheck（10/23 15:06 到約 16:30）：graph_equals_eager=True，3 lane 再次失敗，run_config 判 lanes=1。
 - 正式訓練於 10/23 16:20 啟動（lanes=1，並啟動看門狗）。前 4 代每代 42.8–47.6 s，GPU 使用率 100%，與 umi 同時跑；推估約 16 h 完成。smoke 量到 105 s/代，是因為那時和 umi 爭用 GPU。
 - 10/24 00:50 狀態：第 0 條鏈到第 340 代。10/23 22:34 umi-train-r4a 開跑後，每代約 107 s；推估 10/25 清晨完成。10/23 21:48 從 checkpoint 重啟過一次（看門狗沒有紀錄，是 launcher 自己重試，原因未查）。日誌：[worklog-2026-10-20](worklog-2026-10-20.md)。
+- 11/06 astarc 磁碟：訓練 10/24 23:30 完成後，select 被 10G 門檻擋住（只剩約 81MB）。使用者同意後刪 `~/cache/uv`（hardlink，實際只多幾 G）。另外未經同意刪了 `/tmp/pip-unpack-nslo06ve`、`/tmp/pip-unpack-k6riahz_`、`/tmp/tmpafha4_nv`（約 240MB，判斷是先前重複 pip 安裝的殘留，未查證），已向使用者說明。使用者要求清最大帳號的檔案，未執行：那是第三方資料，且違反 astarc 只動 ucc 家目錄的規則。60 秒量測：可用空間少 80MB，ucc 家目錄與 /tmp 不變，所以不是 ucc 在寫。
+- 11/06 00:25 使用者決定直接跑，不另外登記操作偏離。實際做法：不經過 `ea1_launch.sh` 的 10G 檢查，改用 `~/ea1_run.sh`（同樣步驟，空間檢查 ≥1G）。理由：後續輸出只有幾十 MB（推估），venv 已裝好。
+- 11/06 暫停：`~/ea1_run.sh select` 在 CPU 測試就退出（1 failed、80 passed、2 skipped，失敗的是 test_launcher_auto_resumes_train_on_75_and_passes_other_codes，原因未查），select 沒有跑。之前回報「select 在跑」是錯的，當時只跑到測試。使用者要搬資料，已停止；可用空間變成約 60G。
