@@ -1,8 +1,8 @@
 # 方向二：用 RL 訓練的對手（「專業騙子」）——決策紀錄
 
 ## 給使用者看的
-- 現況：E-A1 select（A_fresh＝run0 第 300 代）和 testcheck 都已通過，一次性的 test 正在 astarc 上跑，接著是 report。
-- 等你決定：無。等你說搬完，再繼續。
+- 現況：E-A1 已跑完，判定「A_fresh 沒有更強（持平）」。正在做三件事：照第二輪意見修結果文件後 commit；移除公開設計檔裡的他人帳號名（重寫 direction2-freeze 歷史）；設計原設定一側的對照 E-A2。
+- 等你決定：無。
 - 我先自己決定的（可以推翻）：無。
 
 建立：2026-10-06。使用者指示：
@@ -895,3 +895,5 @@
 - 11/06 00:25 使用者決定直接跑，不另外登記操作偏離。實際做法：不經過 `ea1_launch.sh` 的 10G 檢查，改用 `~/ea1_run.sh`（同樣步驟，空間檢查 ≥1G）。理由：後續輸出只有幾十 MB（推估），venv 已裝好。
 - 11/06 暫停：`~/ea1_run.sh select` 在 CPU 測試就退出（1 failed、80 passed、2 skipped，失敗的是 test_launcher_auto_resumes_train_on_75_and_passes_other_codes，原因未查），select 沒有跑。之前回報「select 在跑」是錯的，當時只跑到測試。使用者要搬資料，已停止；可用空間變成約 60G。
 - 11/06 重啟：使用者把 ucc 搬到專用的 /srv/ucc，舊路徑改成 symlink。CPU 測試失敗的原因是 launcher 的 10G 檢查（訊息 only 6G free on /），不是程式問題；根分割區回到 11G 後，用原本的 launcher 重跑，81 passed、2 skipped。`~/ea1_run.sh` 沒有再用，所以 1G 門檻實際上沒有用到。select：A_fresh＝run0 gen300，SEL 上 C2 的 G：a* 0.03120、run0 0.03174、run1 0.03111、run2 0.03138。drift：astarc 與 E1 v2 的 AS 128 seeds 逐位相同（原設定、C2 皆是）。testcheck 四組逐位相同。
+- 11/06 E-A1 結果文件審查：第一輪紅方（opus）HIGH 5、MEDIUM 7、LOW 12，全部採納。第二輪（opus）：第一輪 11 條已修、1 條部分修；必改 7 條（N1–N7），都是修過頭的事後敘述：餘裕不大靠零轉移假設、會改判不成立、a* 優勢較小方向相反、AS 看不出錯、任一規則為假、C2_adapt0 非對應流程、a* 不是最強寫成直述句。已達兩輪上限，停下來問使用者。意見存於 .scratch/ea1-redteam.md、ea1-redteam-r2.md。
+- 11/06 使用者決定：結果文件照第二輪意見改完直接 commit，不開第三輪；補做原設定對照（E-A2，先設計、審查、登記）；移除設計檔裡的他人帳號名並重寫分支歷史（使用者同意這次 force push，僅限 direction2-freeze）。
