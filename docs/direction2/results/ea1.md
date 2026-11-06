@@ -8,7 +8,7 @@
 
 標記規則：**登記**＝設計預先寫死、進判定的數字；**描述性**＝設計列為次要結果、不進判定、未校正多重比較；**事後**＝設計沒有登記、看過資料後才算的數字，一律未校正多重比較、不進判定；**推論**＝由數字推得、未直接量測。
 
-來源簡寫：設計＝`docs/direction2/design/e-a1.md`（sha256 `ea5e9077…`，與 manifest `design_sha256` 相同）；e1v2結果＝`docs/direction2/results/e1-v2.md`；res＝`results/direction2/ea1/result.json`；sec＝`.../secondary.json`；sel＝`.../selection_frozen.json`；man＝`.../manifest.json`；drift＝`.../drift.json`；tc＝`.../testcheck.json`；pc＝`.../parallel_check.json`；rc＝`.../run_config.json`；led＝`.../test/ledger.json`；raw＝`.../test/{main_C2,main_orig,sec_C2,sec_orig}_raw.json`；chains＝`.../chains/run{0,1,2}.json`；**ph＝`.../posthoc.json`**（由 `scripts/ea1_recheck.py` 從 raw 與既有 json 唯讀重算後寫出；本文所有事後數字與「重算」都取自它，其 `check` 區塊逐項比對了 res 與 sec，`post_hoc` 區塊是事後數字）。E1 v2 的檔案前綴 `results/direction2/e1v2/`。
+來源簡寫：設計＝`docs/direction2/design/e-a1.md`（sha256 `ea5e9077…`，與 manifest `design_sha256` 相同；之後因移除第三方帳號名改過一行，見 `docs/direction2/history/ea1-history-rewrite.md`）；e1v2結果＝`docs/direction2/results/e1-v2.md`；res＝`results/direction2/ea1/result.json`；sec＝`.../secondary.json`；sel＝`.../selection_frozen.json`；man＝`.../manifest.json`；drift＝`.../drift.json`；tc＝`.../testcheck.json`；pc＝`.../parallel_check.json`；rc＝`.../run_config.json`；led＝`.../test/ledger.json`；raw＝`.../test/{main_C2,main_orig,sec_C2,sec_orig}_raw.json`；chains＝`.../chains/run{0,1,2}.json`；**ph＝`.../posthoc.json`**（由 `scripts/ea1_recheck.py` 從 raw 與既有 json 唯讀重算後寫出；本文所有事後數字與「重算」都取自它，其 `check` 區塊逐項比對了 res 與 sec，`post_hoc` 區塊是事後數字）。E1 v2 的檔案前綴 `results/direction2/e1v2/`。
 
 ## 名詞與縮寫
 
