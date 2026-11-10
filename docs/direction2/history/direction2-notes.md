@@ -1,9 +1,8 @@
 # 方向二：用 RL 訓練的對手（「專業騙子」）——決策紀錄
 
 ## 給使用者看的
-- 現況：E-A2 實作與 CPU 測試完成（133 passed）；smoke 因 astarc 顯存被 umi r6_train 佔滿而失敗（沒有任何結果產生），已排隊等 umi 跑完再試。umi 粗估 11/7 清晨前後結束（推論，由目前步速外推）。
-- 等你決定：
-  1. E-A2 訓練約 31 h，astarc 只有 8GB，umi r6_train 佔約 7.3GB，兩者放不下（E-A2 約需 1.4GB，由 E-A1 記錄推算）。學校機器 10/24 前不能用的限制已過，現有約 5.6GB 空位，環境版本相同，E-A1 量到每代 28 s（astarc 105 s，當時有競爭）。設計寫死用 astarc，但 manifest 還沒凍結、E-A2 沒有任何結果。E-A2 要在哪跑？選項：A 改到學校（推薦，訓練約三分之一時間，不擋 umi，需在凍結前加一筆設計修正並改啟動腳本的空間檢查）／B 留在 astarc（不改設計，但這 31 h 內 umi 大訓練要等）。不回的話：smoke 照排在 astarc 跑，通過後停在 audit／freeze 前，不開始訓練。
+- 現況：E-A2 smoke 通過（11/10），manifest 已凍結（fae9f89），train 11/10 13:10 在 astarc 開跑，估約 17.5 h（11/11 清晨前後）。這段時間 astarc 不要跑佔 7GB 的 umi 大訓練。
+- 等你決定：無。
 - 我先自己決定的（可以推翻）：
   - E-A2 啟動腳本略過一個讀根分割區的 E-A1 測試（c43c07a），因為它與 E-A2 無關且根分割區只剩約 9G。
   - smoke 等 r6_chain 結束且顯存連續 5 分鐘 ≤6000 MiB，並在執行時持有 umi 的 runs/gpu.lock，因為舊的 6500 門檻在 umi 階段切換時會誤判，持鎖可避免下一個 umi 工作中途撞上。
@@ -918,3 +917,6 @@
 - 估計：train 17.5 h、plus 0.9 h、test 2.9 h。比設計估計（31 h）短，因為這次沒有 umi 同時搶 GPU。
 - smoke_summary 的 code_sha256 與本機 ea2.py／ea2_launch.sh／test_ea2.py 相同；摘要 sha256 d00ee7aa…，已 commit。
 - 跑的時候 astarc 上有同帳號 katago 6 個程序（共約 3GB），E-A2 1.25GB 放得下。
+- 使用者決定（11/10）：E-A2 留在 astarc，不改設計。理由：實測每代 49.6 s，訓練 17.5 h，與 katago（約 3GB）共存放得下；改去學校要改凍結設計，省下的時間不多。
+- audit 通過（新舊 seeds 交集 0）；freeze 寫出 manifest sha256 8a03ccf3…，與 seed_audit 一起 commit（fae9f89）並 push；astarc 拉到同一個 commit 後執行 `bg train`。
+- seed_audit 的 scanned 清單內含 E-A1 已公開的檔名 report_check_U2204-VDE.json，不是新的外洩，屬於既有的未決事項（主機名是否要從公開檔移除）。
