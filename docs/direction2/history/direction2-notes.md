@@ -1,7 +1,7 @@
 # 方向二：用 RL 訓練的對手（「專業騙子」）——決策紀錄
 
 ## 給使用者看的
-- 現況：E-A2 smoke 通過（11/10），manifest 已凍結（fae9f89），train 11/10 13:10 在 astarc 開跑，估約 17.5 h（11/11 清晨前後）。這段時間 astarc 不要跑佔 7GB 的 umi 大訓練。
+- 現況：E-A2 train 暫停於 run0 第 45/416 代（11/10 17:52），因 katago 同時佔 GPU 使每代 390 s。astarc tmux ea2_wait 會在 katago 消失連續 10 分鐘後自動續跑（約 17.5 h）。
 - 等你決定：無。
 - 我先自己決定的（可以推翻）：
   - E-A2 啟動腳本略過一個讀根分割區的 E-A1 測試（c43c07a），因為它與 E-A2 無關且根分割區只剩約 9G。
@@ -920,3 +920,7 @@
 - 使用者決定（11/10）：E-A2 留在 astarc，不改設計。理由：實測每代 49.6 s，訓練 17.5 h，與 katago（約 3GB）共存放得下；改去學校要改凍結設計，省下的時間不多。
 - audit 通過（新舊 seeds 交集 0）；freeze 寫出 manifest sha256 8a03ccf3…，與 seed_audit 一起 commit（fae9f89）並 push；astarc 拉到同一個 commit 後執行 `bg train`。
 - seed_audit 的 scanned 清單內含 E-A1 已公開的檔名 report_check_U2204-VDE.json，不是新的外洩，屬於既有的未決事項（主機名是否要從公開檔移除）。
+- 開跑後每代約 390 s（smoke 49.6 s），原因是同帳號 6 個 katago analysis 佔滿 GPU（smoke 大多在 katago 開始前跑完）。照此速度約 5.6 天。
+- 使用者決定（11/10）：E-A2 先暫停，等 katago 結束再續跑。
+- 暫停作法：程式沒有暫停開關；每代是先 write 狀態、再 stamp。等第 45 代的紀錄出現後，關掉 tmux，再對殘留的 timeout／python 送 TERM。查證：run0.json gen=45、curve=45 筆，沒有殘留的 ea2 程序。
+- 續跑：~/ea2_resume_after_katago.sh（tmux ea2_wait），條件是 GPU 上連續 10 分鐘沒有 katago，然後執行 `bg train`。紀錄在 ~/ea2_resume.log。
