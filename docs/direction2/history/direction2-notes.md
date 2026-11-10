@@ -910,3 +910,11 @@
 - 原因：等待腳本只看瞬間顯存，r6_cache 與 r6_train 之間顯存短暫低於門檻，r6_train 隨即漲回 7.3GB。
 - 處理：smoke-clean 清掉失敗的 smoke 目錄，舊輸出移到 astarc 的 ~/ea2_bak，改用更嚴格的等待條件重新排隊（見最上方）。
 - 查證（學校機器）：torch 2.6.0+cu126、numpy 2.2.6、scipy 1.15.3，與設計釘選相同；顯存 6609/12288 MiB。ea2_launch.sh 要求專案不在根分割區，所以改到學校需一併修改。
+
+## E-A2 smoke 通過（2026-11-10）
+
+- umi r6_chain 於 11/07 10:29 all_done；smoke 於 11/10 12:14 結束，rc=0，CPU 測試 133 passed。
+- graph == eager：True。每代 49.6 s（驗證 52.4 s），A⁺ 每代 11.3 s；GPU 記憶體峰值 1252 MB（主鏈）／688 MB（A⁺）。
+- 估計：train 17.5 h、plus 0.9 h、test 2.9 h。比設計估計（31 h）短，因為這次沒有 umi 同時搶 GPU。
+- smoke_summary 的 code_sha256 與本機 ea2.py／ea2_launch.sh／test_ea2.py 相同；摘要 sha256 d00ee7aa…，已 commit。
+- 跑的時候 astarc 上有同帳號 katago 6 個程序（共約 3GB），E-A2 1.25GB 放得下。
